@@ -126,7 +126,26 @@ fn chat_thread(path: PathBuf, error_sink: Arc<Mutex<Option<String>>>) {
     });
 }
 
+/// Load KEY=VALUE lines from `.env` (next to the executable's working dir) into the
+/// environment without overriding variables that are already set.
+fn load_dotenv() {
+    let Ok(text) = std::fs::read_to_string(".env") else { return };
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if let Some((k, v)) = line.split_once('=') {
+            let (k, v) = (k.trim(), v.trim().trim_matches('"').trim_matches('\''));
+            if std::env::var_os(k).is_none() {
+                std::env::set_var(k, v);
+            }
+        }
+    }
+}
+
 fn main() -> anyhow::Result<()> {
+    load_dotenv();
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("aige=info,warn")).init();
     let cli = Cli::parse();
     match cli.cmd {

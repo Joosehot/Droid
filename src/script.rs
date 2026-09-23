@@ -72,6 +72,8 @@ impl ScriptHost {
     /// Compile-check a script without running it. Returns the error text on failure.
     pub fn check(src: &str) -> Result<(), String> {
         let mut engine = Engine::new();
+        engine.set_max_expr_depths(0, 0);
+        engine.set_max_operations(0);
         register_vec3(&mut engine);
         let w: Shared = Rc::new(RefCell::new(World::from_spec(&crate::spec::GameSpec::empty())));
         register_api(&mut engine, w);
