@@ -12,7 +12,7 @@ fn update(dt) {
   if key_pressed("r") { restart(); return; }
   let v = vel("player");
   set_vel("player", vec3(axis_x() * 7, v.y, -axis_y() * 7));
-  if key_pressed("space") && grounded("player") { set_vel_y("player", 11); play_sound("jump"); }
+  if key_pressed("space") && grounded("player") { set_vel_y("player", 11); play_sound("jump"); play_anim("player", "jump"); }
   if pos("player").y < -10 { restart(); }
   for n in find_tag("gem") { rotate(n, vec3(0, 90 * dt, 0)); }
 }
@@ -21,6 +21,7 @@ fn on_collision(a, b) {
   if a == "player" && has_tag(b, "gem") {
     destroy(b);
     play_sound("coin");
+    squash("player", 0.25);
     let s = add("score", 1);
     text("score", "Gems: " + s + " / 8");
     if s == 8 { play_sound("win"); text_at("win", "ALL GEMS! R to restart", 0.3, 0.45, 40); }

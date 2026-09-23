@@ -70,8 +70,12 @@ pub struct Renderer {
     ui_pipeline: wgpu::RenderPipeline,
     globals: wgpu::Buffer,
     globals_bind: wgpu::BindGroup,
-    /// 0 = box, 1 = sphere, 2 = plane, then one per procedural model.
+    /// 0 = box, 1 = sphere, 2 = plane, then one per model part-group.
     meshes: Vec<Mesh>,
+    /// Per model: its groups as (name, pivot, mesh index).
+    model_groups: Vec<Vec<(String, Vec3, usize)>>,
+    /// Per model: (min_y, height) in model units, for fitting into the entity box.
+    model_bounds: Vec<(f32, f32)>,
     model_gen: u64,
     ui_buffer: wgpu::Buffer,
     ui_capacity: usize,
@@ -392,6 +396,8 @@ impl Renderer {
             globals,
             globals_bind,
             meshes,
+            model_groups: Vec::new(),
+            model_bounds: Vec::new(),
             model_gen: 0,
             ui_buffer,
             ui_capacity,
@@ -419,18 +425,31 @@ impl Renderer {
     pub fn render(&mut self, world: &World, overlay: &Overlay) {
         if self.model_gen != world.model_gen {
             self.meshes.truncate(3);
+            self.model_groups.clear();
+            self.model_bounds.clear();
             for (name, m) in &world.models {
                 let t = std::time::Instant::now();
-                let data = crate::models::build(m);
-                log::info!("built model '{name}': {} verts, {} tris in {:.0} ms", data.positions.len(), data.indices.len() / 3, t.elapsed().as_secs_f32() * 1000.0);
-                let verts: Vec<Vertex> = data
-                    .positions
-                    .iter()
-                    .zip(&data.normals)
-                    .zip(&data.colors)
-                    .map(|((p, n), c)| Vertex { pos: *p, normal: *n, uv: [0.0, 0.0], color: *c })
-                    .collect();
-                self.meshes.push(make_mesh(&self.device, &(verts, data.indices)));
+                let groups = crate::models::build_groups(m);
+                let mut entry = Vec::new();
+                let (mut nv, mut nt) = (0, 0);
+                for g in groups {
+                    nv += g.mesh.positions.len();
+                    nt += g.mesh.indices.len() / 3;
+                    let verts: Vec<Vertex> = g
+                        .mesh
+                        .positions
+                        .iter()
+                        .zip(&g.mesh.normals)
+                        .zip(&g.mesh.colors)
+                        .map(|((p, n), c)| Vertex { pos: *p, normal: *n, uv: [0.0, 0.0], color: *c })
+                        .collect();
+                    entry.push((g.name, g.pivot, self.meshes.len()));
+                    self.meshes.push(make_mesh(&self.device, &(verts, g.mesh.indices)));
+                }
+                log::info!("built model '{name}': {} groups, {nv} verts, {nt} tris in {:.0} ms", entry.len(), t.elapsed().as_secs_f32() * 1000.0);
+                self.model_groups.push(entry);
+                let (lo, hi) = crate::models::bounds_y(m);
+                self.model_bounds.push((lo, hi - lo));
             }
             self.model_gen = world.model_gen;
         }
@@ -477,21 +496,27 @@ impl Renderer {
 
         // Instances grouped by shape.
         let mut groups: Vec<Vec<Instance>> = vec![Vec::new(); self.meshes.len()];
-        for (_, (t, v)) in world.ecs.query::<(&Transform, &Visual)>().iter() {
-            let rot = glam::Quat::from_euler(
-                glam::EulerRot::XYZ,
-                t.rot.x.to_radians(),
-                t.rot.y.to_radians(),
-                t.rot.z.to_radians(),
-            );
-            let model = Mat4::from_scale_rotation_translation(t.scale, rot, t.pos);
-            let idx = match v.model {
-                Some(m) if 3 + m < self.meshes.len() => 3 + m,
-                _ => match v.shape {
-                    Shape::Box => 0,
-                    Shape::Sphere => 1,
-                    Shape::Plane => 2,
-                },
+        let euler = |r: Vec3| glam::Quat::from_euler(glam::EulerRot::XYZ, r.x.to_radians(), r.y.to_radians(), r.z.to_radians());
+        for (_, (t, v, pose)) in world.ecs.query::<(&Transform, &Visual, Option<&crate::anim::Pose>)>().iter() {
+            let model = Mat4::from_scale_rotation_translation(t.scale, euler(t.rot), t.pos);
+            if let Some((mg, (min_y, height))) = v.model.and_then(|m| self.model_groups.get(m).zip(self.model_bounds.get(m).copied())) {
+                // Fit the model into the entity's box: feet at the box bottom, height = scale.y.
+                let k = t.scale.y / height.max(1e-4);
+                let model = Mat4::from_rotation_translation(euler(t.rot), t.pos)
+                    * Mat4::from_translation(Vec3::new(0.0, -t.scale.y * 0.5, 0.0))
+                    * Mat4::from_scale(Vec3::splat(k))
+                    * Mat4::from_translation(Vec3::new(0.0, -min_y, 0.0));
+                for (gname, pivot, mesh_idx) in mg {
+                    let gp = pose.and_then(|p| p.groups.get(gname)).copied().unwrap_or_default();
+                    let local = Mat4::from_translation(gp.offset + *pivot) * Mat4::from_quat(euler(gp.rot)) * Mat4::from_translation(-*pivot);
+                    groups[*mesh_idx].push(Instance { model: (model * local).to_cols_array_2d(), color: [v.color.x, v.color.y, v.color.z, 1.0], uv_rect: [0.0; 4] });
+                }
+                continue;
+            }
+            let idx = match v.shape {
+                Shape::Box => 0,
+                Shape::Sphere => 1,
+                Shape::Plane => 2,
             };
             let mut uv_rect = [0.0; 4];
             if let Some(r) = v.sprite.and_then(|i| self.atlas.rects.get(i)) {

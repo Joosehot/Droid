@@ -127,7 +127,32 @@ size = [0.25, 0.12, 0.2]
 subtract = true
 ```
 
-Colours blend across the joins. Use `blend` 0.2-0.5 for organic shapes (trees, animals, characters) and 0-0.05 for mechanical ones. Keep parts under ~12 per model. Put the model's feet at y = 0 so `position` in the scene is the ground point.
+Colours blend across the joins. Use `blend` 0.2-0.5 for organic shapes (trees, animals, characters) and 0-0.05 for mechanical ones. Keep parts under ~14 per model.
+
+The model is fitted into the entity's collision box: feet at the bottom, height = `scale.y`, uniform scaling. So for a character give the entity `scale = [0.9, 2.2, 0.9]` (box width, character height, depth) and place `position.y` at half the height.
+
+### Animation groups (characters and creatures)
+Give each part a `group`. Parts in the same group are blended together and move as one rigid piece; the engine animates the groups automatically:
+
+| group | animated as |
+|---|---|
+| `body` | torso: bobs while walking, breathes when idle (default group) |
+| `head` (also hats, eyes: put them in `head`) | nods and tilts |
+| `arm_l`, `arm_r` | swing opposite to the legs, raised in the air |
+| `leg_l`, `leg_r` | walk cycle |
+| `tail`, `ear_l`, `ear_r` | wag / flap |
+
+Pivots are automatic (top of legs and arms, bottom of head) or set with `pivot = [x, y, z]` on one part of the group. A model entity turns to face its movement direction in 3D; the engine chooses walk / idle / air poses from its velocity and grounded state. Trees, rocks and props need no groups.
+
+```toml
+[[parts]]
+group = "leg_l"
+shape = "capsule"
+position = [-0.2, 0.3, 0.0]
+size = [0.3, 0.65, 0.3]
+color = [0.15, 0.2, 0.4]
+blend = 0.05
+```
 
 ## Conventions
 - Y is up. 2D lives on the XY plane (z = 0); the camera looks down -Z. `zoom` is the visible height; width = zoom * aspect (about 16:9).
@@ -165,6 +190,11 @@ Functions cannot see top-level `let` variables. Persist state with `set("score",
 - Spawn: `spawn(name, shape, pos, scale, color, body)`, `spawn_tagged(name, [tags], shape, pos, scale, color, body)`, `spawn_sprite(name, [tags], sprite, pos, scale, body)`, `spawn_model(name, [tags], model, pos, scale, body)`. All return the actual (unique) name.
 - `destroy(name)`, `destroy_tag(tag)`.
 
+### Animation
+- Models: `play_anim(name, "jump" | "attack" | "hit" | "spin" | "wave" | "nod")` one-shot on top of the automatic walk/idle. `set_anim(name, "walk" | "idle" | "air" | "none" | "auto")` forces a loop. `set_part(name, group, rot_degrees_vec, offset_vec)` manual pose (e.g. aim an arm). `face_velocity(name, false)` to stop auto-turning.
+- Sprites: `animate_sprite(name, ["run1", "run2", "run3"], 8)` cycles frames at 8 fps; `animate_sprite_once(...)` plays through; `stop_sprite_anim(name)`.
+- Tweens (smooth over seconds): `tween_pos(name, v, secs)`, `tween_scale`, `tween_rotation`, `tween_color`. `squash(name, 0.3)` = instant squash-and-stretch that springs back (landings, hits, pickups).
+
 ### Sound (all procedural, no files)
 - `play_sound(name)`: `shoot laser hit explosion jump coin pickup powerup hurt click win lose bounce step`.
 - `play_tone(freq_hz, seconds, wave)` with wave `sine square saw triangle noise`.
@@ -183,6 +213,7 @@ Functions cannot see top-level `let` variables. Persist state with `set("score",
 4. Camera shows the whole playfield or follows the player.
 5. Robust scripts: check `exists(name)` for things that can be destroyed; never divide by zero.
 6. Use sounds for feedback (shoot, hit, coin, win, lose) and a short music loop.
+7. Make things move with life: model characters get animation groups, sprites get 2-4 frames with `animate_sprite`, and `squash`/`play_anim` on jumps, hits and pickups.
 
 ## Example: minimal 2D platformer
 

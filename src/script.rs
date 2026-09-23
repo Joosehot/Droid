@@ -472,6 +472,107 @@ fn register_api(engine: &mut Engine, world: Shared) {
         }
     });
 
+    // ---- animation ----
+    let ww = w!();
+    engine.register_fn("play_anim", move |n: &str, anim: &str| {
+        let w = ww.borrow_mut();
+        if let Some(e) = w.entity(n) {
+            if let Ok(mut p) = w.ecs.get::<&mut crate::anim::Pose>(e) {
+                p.oneshot = Some((anim.to_string(), 0.0));
+            }
+        }
+    });
+    let ww = w!();
+    engine.register_fn("set_anim", move |n: &str, anim: &str| {
+        let w = ww.borrow_mut();
+        if let Some(e) = w.entity(n) {
+            if let Ok(mut p) = w.ecs.get::<&mut crate::anim::Pose>(e) {
+                p.mode = if anim == "auto" { crate::anim::AnimMode::Auto } else { crate::anim::AnimMode::Named(anim.to_string()) };
+            }
+        }
+    });
+    let ww = w!();
+    engine.register_fn("set_part", move |n: &str, group: &str, rot: Dynamic, offset: Dynamic| {
+        let w = ww.borrow_mut();
+        if let Some(e) = w.entity(n) {
+            if let Ok(mut p) = w.ecs.get::<&mut crate::anim::Pose>(e) {
+                p.manual.insert(group.to_string(), crate::anim::GroupPose { rot: to_vec3(&rot), offset: to_vec3(&offset) });
+            }
+        }
+    });
+    let ww = w!();
+    engine.register_fn("face_velocity", move |n: &str, on: bool| {
+        let w = ww.borrow_mut();
+        if let Some(e) = w.entity(n) {
+            if let Ok(mut p) = w.ecs.get::<&mut crate::anim::Pose>(e) {
+                p.face_velocity = on;
+            }
+        }
+    });
+    let ww = w!();
+    engine.register_fn("animate_sprite", move |n: &str, frames: Array, fps: Dynamic| {
+        let mut w = ww.borrow_mut();
+        let idx: Vec<usize> = frames.iter().filter_map(|f| w.sprite_index(&f.to_string())).collect();
+        if let Some(e) = w.entity(n) {
+            let _ = w.ecs.insert_one(e, crate::anim::SpriteAnim { frames: idx, fps: num(&fps), t: 0.0, looping: true });
+        }
+    });
+    let ww = w!();
+    engine.register_fn("animate_sprite_once", move |n: &str, frames: Array, fps: Dynamic| {
+        let mut w = ww.borrow_mut();
+        let idx: Vec<usize> = frames.iter().filter_map(|f| w.sprite_index(&f.to_string())).collect();
+        if let Some(e) = w.entity(n) {
+            let _ = w.ecs.insert_one(e, crate::anim::SpriteAnim { frames: idx, fps: num(&fps), t: 0.0, looping: false });
+        }
+    });
+    let ww = w!();
+    engine.register_fn("stop_sprite_anim", move |n: &str| {
+        let mut w = ww.borrow_mut();
+        if let Some(e) = w.entity(n) {
+            let _ = w.ecs.remove_one::<crate::anim::SpriteAnim>(e);
+        }
+    });
+    fn add_tween(w: &mut World, n: &str, kind: crate::anim::TweenKind, to: Vec3, secs: f32) {
+        let Some(e) = w.entity(n) else { return };
+        let from = match kind {
+            crate::anim::TweenKind::Pos => w.ecs.get::<&Transform>(e).map(|t| t.pos).unwrap_or_default(),
+            crate::anim::TweenKind::Scale => w.ecs.get::<&Transform>(e).map(|t| t.scale).unwrap_or(Vec3::ONE),
+            crate::anim::TweenKind::Rot => w.ecs.get::<&Transform>(e).map(|t| t.rot).unwrap_or_default(),
+            crate::anim::TweenKind::Color => w.ecs.get::<&Visual>(e).map(|v| v.color).unwrap_or(Vec3::ONE),
+        };
+        let tween = crate::anim::Tween { kind, from, to, t: 0.0, dur: secs.max(0.01) };
+        let existed = if let Ok(mut tw) = w.ecs.get::<&mut crate::anim::Tweens>(e) {
+            tw.0.retain(|t| t.kind != kind);
+            tw.0.push(tween.clone());
+            true
+        } else {
+            false
+        };
+        if !existed {
+            let _ = w.ecs.insert_one(e, crate::anim::Tweens(vec![tween]));
+        }
+    }
+    let ww = w!();
+    engine.register_fn("tween_pos", move |n: &str, to: Dynamic, secs: Dynamic| add_tween(&mut ww.borrow_mut(), n, crate::anim::TweenKind::Pos, to_vec3(&to), num(&secs)));
+    let ww = w!();
+    engine.register_fn("tween_scale", move |n: &str, to: Dynamic, secs: Dynamic| add_tween(&mut ww.borrow_mut(), n, crate::anim::TweenKind::Scale, to_vec3(&to), num(&secs)));
+    let ww = w!();
+    engine.register_fn("tween_rotation", move |n: &str, to: Dynamic, secs: Dynamic| add_tween(&mut ww.borrow_mut(), n, crate::anim::TweenKind::Rot, to_vec3(&to), num(&secs)));
+    let ww = w!();
+    engine.register_fn("tween_color", move |n: &str, to: Dynamic, secs: Dynamic| add_tween(&mut ww.borrow_mut(), n, crate::anim::TweenKind::Color, to_vec3(&to), num(&secs)));
+    let ww = w!();
+    engine.register_fn("squash", move |n: &str, amount: Dynamic| {
+        // Quick squash-and-stretch: scale down/out, then tween back to the current scale.
+        let mut w = ww.borrow_mut();
+        let Some(e) = w.entity(n) else { return };
+        let base = w.ecs.get::<&Transform>(e).map(|t| t.scale).unwrap_or(Vec3::ONE);
+        let a = num(&amount).clamp(0.0, 0.9);
+        if let Ok(mut t) = w.ecs.get::<&mut Transform>(e) {
+            t.scale = Vec3::new(base.x * (1.0 + a), base.y * (1.0 - a), base.z * (1.0 + a));
+        }
+        add_tween(&mut w, n, crate::anim::TweenKind::Scale, base, 0.25);
+    });
+
     // ---- sound ----
     let ww = w!();
     engine.register_fn("play_sound", move |name: &str| ww.borrow_mut().sounds.push(SoundCmd::Effect(name.to_string())));

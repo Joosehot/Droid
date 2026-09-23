@@ -110,6 +110,13 @@ pub struct ModelPart {
     /// true = carve this shape out of the model instead of adding it.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub subtract: bool,
+    /// Animation group ("body", "head", "arm_l", "arm_r", "leg_l", "leg_r", "tail", ...).
+    /// Parts in the same group are blended together and move as one rigid piece.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group: Option<String>,
+    /// Pivot point (model units) the group rotates around. Default: top of legs/arms, bottom of head, centre otherwise.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pivot: Option<[f32; 3]>,
 }
 
 fn default_resolution() -> u32 { 32 }

@@ -140,6 +140,7 @@ impl World {
 
     pub fn spawn_spec(&mut self, e: &EntitySpec) -> Entity {
         let name = self.unique_name(&e.name);
+        let has_model = e.model.as_deref().and_then(|n| self.model_index(n)).is_some();
         let ent = self.ecs.spawn((
             Name(name.clone()),
             Tags(e.tags.clone()),
@@ -159,6 +160,9 @@ impl World {
                 grounded: false,
             },
         ));
+        if has_model {
+            let _ = self.ecs.insert_one(ent, crate::anim::Pose { prev_pos: Vec3::from(e.position), ..Default::default() });
+        }
         self.by_name.insert(name, ent);
         ent
     }

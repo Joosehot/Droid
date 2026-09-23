@@ -132,6 +132,66 @@ impl Field {
     }
 }
 
+pub struct GroupMesh {
+    pub name: String,
+    pub pivot: Vec3,
+    pub mesh: MeshData,
+}
+
+/// Vertical bounds (min_y, max_y) of all additive parts, in model units.
+pub fn bounds_y(spec: &ModelSpec) -> (f32, f32) {
+    let mut lo = f32::INFINITY;
+    let mut hi = f32::NEG_INFINITY;
+    for p in spec.parts.iter().filter(|p| !p.subtract) {
+        let h = p.size[1] * 0.5;
+        lo = lo.min(p.position[1] - h);
+        hi = hi.max(p.position[1] + h);
+    }
+    if lo.is_finite() && hi > lo { (lo, hi) } else { (0.0, 1.0) }
+}
+
+/// Builds one mesh per animation group. Parts without a group go into "body".
+/// Subtractive parts apply to the group they are declared in.
+pub fn build_groups(spec: &ModelSpec) -> Vec<GroupMesh> {
+    let mut order: Vec<String> = Vec::new();
+    for p in &spec.parts {
+        let g = p.group.clone().unwrap_or_else(|| "body".into());
+        if !order.contains(&g) {
+            order.push(g);
+        }
+    }
+    order
+        .into_iter()
+        .map(|g| {
+            let parts: Vec<ModelPart> = spec.parts.iter().filter(|p| p.group.clone().unwrap_or_else(|| "body".into()) == g).cloned().collect();
+            let sub = ModelSpec { parts: parts.clone(), resolution: spec.resolution };
+            let mesh = build(&sub);
+            // Pivot: explicit, else by convention from the group's bounds.
+            let pivot = parts.iter().find_map(|p| p.pivot).map(Vec3::from).unwrap_or_else(|| {
+                let mut lo = Vec3::splat(f32::INFINITY);
+                let mut hi = Vec3::splat(f32::NEG_INFINITY);
+                for p in parts.iter().filter(|p| !p.subtract) {
+                    let h = Vec3::from(p.size) * 0.5;
+                    lo = lo.min(Vec3::from(p.position) - h);
+                    hi = hi.max(Vec3::from(p.position) + h);
+                }
+                let c = (lo + hi) * 0.5;
+                let gl = g.to_ascii_lowercase();
+                if gl.starts_with("leg") || gl.starts_with("arm") || gl.starts_with("tail") || gl.starts_with("ear") {
+                    Vec3::new(c.x, hi.y, c.z)
+                } else if gl.starts_with("head") || gl.starts_with("hat") {
+                    Vec3::new(c.x, lo.y, c.z)
+                } else if gl.starts_with("body") {
+                    Vec3::new(c.x, lo.y, c.z)
+                } else {
+                    c
+                }
+            });
+            GroupMesh { name: g, pivot, mesh }
+        })
+        .collect()
+}
+
 /// Builds a mesh for a model spec. Output is centred as authored (parts are in model units;
 /// an entity's `scale` multiplies them).
 pub fn build(spec: &ModelSpec) -> MeshData {

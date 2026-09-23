@@ -1,6 +1,7 @@
 //! AIGE - AI-native game engine. The AI writes the game; the engine runs it.
 
 mod ai;
+mod anim;
 mod app;
 mod font;
 mod game;

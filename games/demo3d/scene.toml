@@ -14,7 +14,7 @@ tags = ["player"]
 shape = "box"
 model = "hero"
 position = [0.0, 1.2, 0.0]
-scale = [1.0, 1.0, 1.0]
+scale = [0.9, 2.3, 0.9]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -24,8 +24,8 @@ body = "dynamic"
 name = "tree1"
 shape = "box"
 model = "tree"
-position = [5.0, 0.0, -4.0]
-scale = [1.4, 1.4, 1.4]
+position = [5.0, 2.0, -4.0]
+scale = [2.0, 4.0, 2.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -35,8 +35,8 @@ body = "static"
 name = "tree2"
 shape = "box"
 model = "tree"
-position = [-6.0, 0.0, 3.0]
-scale = [1.2, 1.2, 1.2]
+position = [-6.0, 1.8, 3.0]
+scale = [1.8, 3.6, 1.8]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -46,8 +46,8 @@ body = "static"
 name = "tree3"
 shape = "box"
 model = "tree"
-position = [7.0, 0.0, 6.0]
-scale = [1.6, 1.6, 1.6]
+position = [7.0, 2.4, 6.0]
+scale = [2.4, 4.8, 2.4]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]

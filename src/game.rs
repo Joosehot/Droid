@@ -116,6 +116,7 @@ impl Game {
         {
             let mut w = self.world.borrow_mut();
             physics::step(&mut w, dt);
+            crate::anim::step(&mut w, dt);
         }
 
         let pairs: Vec<(String, String)> = {
