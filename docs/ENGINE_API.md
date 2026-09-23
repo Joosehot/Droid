@@ -53,8 +53,8 @@ solid = true                    # false = trigger: collision events only, no blo
 [[entities]]
 name = "gnome"
 model = "gnome"                 # draws models/gnome.toml (3D)
-position = [0.0, 0.0, 0.0]
-scale = [1.0, 1.0, 1.0]         # multiplies the model
+position = [0.0, 1.1, 0.0]
+scale = [0.9, 2.2, 0.9]         # collision box; the model is fitted to its height, feet at the bottom
 rotation = [0.0, 0.0, 0.0]      # euler degrees
 [entities.physics]
 body = "dynamic"
@@ -93,7 +93,7 @@ Animation: make several sprites (`hero_walk1`, `hero_walk2`) and switch with `se
 
 ## models/NAME.toml (3D models you sculpt)
 
-A model is a list of parts blended into one smooth surface (a signed distance field meshed with smooth normals; no visible facets). Parts are in model units, centred where you place them; the entity `scale` multiplies the whole model.
+A model is a list of parts blended into one smooth surface (a signed distance field meshed with smooth normals; no visible facets). Parts are in model units; the finished model is scaled to fit the entity box (see below).
 
 ```toml
 resolution = 40                  # 8..96 grid cells along the longest axis (32-48 is good)
