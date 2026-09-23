@@ -1,6 +1,7 @@
 //! Runtime world: ECS storage plus input, camera, UI text and frame events.
 
-use crate::spec::{BodyKind, CameraSpec, EntitySpec, GameSpec, Shape, SpriteSpec, TextSpec, View};
+use crate::sound::SoundCmd;
+use crate::spec::{BodyKind, CameraSpec, EntitySpec, GameSpec, ModelSpec, Shape, SpriteSpec, TextSpec, View};
 use glam::Vec3;
 use hecs::Entity;
 use std::collections::{HashMap, HashSet};
@@ -25,6 +26,8 @@ pub struct Visual {
     pub color: Vec3,
     /// Index into `World::sprites`, if drawn as a sprite.
     pub sprite: Option<usize>,
+    /// Index into `World::models`, if drawn as a procedural 3D model.
+    pub model: Option<usize>,
     pub flip_x: bool,
 }
 
@@ -98,6 +101,10 @@ pub struct World {
     pub sprites: Vec<(String, SpriteSpec)>,
     /// Bumped whenever `sprites` changes so the renderer rebuilds its atlas.
     pub sprite_gen: u64,
+    pub models: Vec<(String, ModelSpec)>,
+    pub model_gen: u64,
+    /// Sounds requested by the script this frame; drained by the app.
+    pub sounds: Vec<SoundCmd>,
 }
 
 impl World {
@@ -121,6 +128,9 @@ impl World {
             aspect: 16.0 / 9.0,
             sprites: spec.sprites.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
             sprite_gen: next_gen(),
+            models: spec.models.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
+            model_gen: next_gen(),
+            sounds: Vec::new(),
         };
         for e in &spec.entities {
             w.spawn_spec(e);
@@ -138,6 +148,7 @@ impl World {
                 shape: if e.sprite.is_some() { Shape::Plane } else { e.shape },
                 color: Vec3::from(e.color),
                 sprite: e.sprite.as_deref().and_then(|n| self.sprite_index(n)),
+                model: e.model.as_deref().and_then(|n| self.model_index(n)),
                 flip_x: false,
             },
             Body {
@@ -166,8 +177,28 @@ impl World {
         }
     }
 
+    /// Hot-swap sprites and models (art-only reload): re-resolve every entity's sprite/model index by name.
+    pub fn replace_art(&mut self, spec: &GameSpec) {
+        let old_sprites: Vec<String> = self.sprites.iter().map(|(n, _)| n.clone()).collect();
+        let old_models: Vec<String> = self.models.iter().map(|(n, _)| n.clone()).collect();
+        self.sprites = spec.sprites.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+        self.models = spec.models.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+        self.sprite_gen = next_gen();
+        self.model_gen = next_gen();
+        let sprites = self.sprites.clone();
+        let models = self.models.clone();
+        for (_, v) in self.ecs.query_mut::<&mut Visual>() {
+            v.sprite = v.sprite.and_then(|i| old_sprites.get(i)).and_then(|n| sprites.iter().position(|(m, _)| m == n));
+            v.model = v.model.and_then(|i| old_models.get(i)).and_then(|n| models.iter().position(|(m, _)| m == n));
+        }
+    }
+
     pub fn sprite_index(&self, name: &str) -> Option<usize> {
         self.sprites.iter().position(|(n, _)| n == name)
+    }
+
+    pub fn model_index(&self, name: &str) -> Option<usize> {
+        self.models.iter().position(|(n, _)| n == name)
     }
 
     pub fn entity(&self, name: &str) -> Option<Entity> {

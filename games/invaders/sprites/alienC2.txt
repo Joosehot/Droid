@@ -1,0 +1,11 @@
+c = 0.950 0.900 0.300
+e = 0.150 0.100 0.200
+---
+..cccc..
+.cccccc.
+cccccccc
+cceccecc
+cccccccc
+c.cccc.c
+c......c
+.c....c.

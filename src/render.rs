@@ -14,6 +14,7 @@ struct Vertex {
     pos: [f32; 3],
     normal: [f32; 3],
     uv: [f32; 2],
+    color: [f32; 3],
 }
 
 #[repr(C)]
@@ -42,6 +43,15 @@ struct UiQuad {
     color: [f32; 4],
 }
 
+/// Screen-space extras drawn on top of the game (chat box, status bar).
+#[derive(Default)]
+pub struct Overlay {
+    /// (x, y, w, h, rgba) in pixels from top-left.
+    pub rects: Vec<(f32, f32, f32, f32, [f32; 4])>,
+    /// (text, x, y, size, rgb) in pixels from top-left.
+    pub texts: Vec<(String, f32, f32, f32, [f32; 3])>,
+}
+
 struct Mesh {
     vertices: wgpu::Buffer,
     indices: wgpu::Buffer,
@@ -60,7 +70,9 @@ pub struct Renderer {
     ui_pipeline: wgpu::RenderPipeline,
     globals: wgpu::Buffer,
     globals_bind: wgpu::BindGroup,
-    meshes: [Mesh; 3],
+    /// 0 = box, 1 = sphere, 2 = plane, then one per procedural model.
+    meshes: Vec<Mesh>,
+    model_gen: u64,
     ui_buffer: wgpu::Buffer,
     ui_capacity: usize,
     atlas_layout: wgpu::BindGroupLayout,
@@ -91,6 +103,7 @@ struct VsIn {
     @location(0) pos: vec3<f32>,
     @location(1) normal: vec3<f32>,
     @location(2) uv: vec2<f32>,
+    @location(9) vcolor: vec3<f32>,
     @location(3) m0: vec4<f32>,
     @location(4) m1: vec4<f32>,
     @location(5) m2: vec4<f32>,
@@ -113,7 +126,7 @@ fn vs_main(in: VsIn) -> VsOut {
     out.clip = g.view_proj * model * vec4<f32>(in.pos, 1.0);
     let n = (model * vec4<f32>(in.normal, 0.0)).xyz;
     out.normal = normalize(n);
-    out.color = in.color;
+    out.color = vec4<f32>(in.color.rgb * in.vcolor, in.color.a);
     out.uv = mix(in.uv_rect.xy, in.uv_rect.zw, in.uv);
     out.textured = select(0.0, 1.0, in.uv_rect.z != 0.0 || in.uv_rect.x != 0.0);
     return out;
@@ -271,7 +284,7 @@ impl Renderer {
         let vertex_layout = wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Vertex>() as u64,
             step_mode: wgpu::VertexStepMode::Vertex,
-            attributes: &wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3, 2 => Float32x2],
+            attributes: &wgpu::vertex_attr_array![0 => Float32x3, 1 => Float32x3, 2 => Float32x2, 9 => Float32x3],
         };
         let instance_layout = wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Instance>() as u64,
@@ -355,7 +368,7 @@ impl Renderer {
             cache: None,
         });
 
-        let meshes = [
+        let meshes = vec![
             make_mesh(&device, &cube()),
             make_mesh(&device, &sphere(16, 24)),
             make_mesh(&device, &plane()),
@@ -379,6 +392,7 @@ impl Renderer {
             globals,
             globals_bind,
             meshes,
+            model_gen: 0,
             ui_buffer,
             ui_capacity,
             atlas_layout,
@@ -402,7 +416,24 @@ impl Renderer {
         self.config.width as f32 / self.config.height.max(1) as f32
     }
 
-    pub fn render(&mut self, world: &World) {
+    pub fn render(&mut self, world: &World, overlay: &Overlay) {
+        if self.model_gen != world.model_gen {
+            self.meshes.truncate(3);
+            for (name, m) in &world.models {
+                let t = std::time::Instant::now();
+                let data = crate::models::build(m);
+                log::info!("built model '{name}': {} verts, {} tris in {:.0} ms", data.positions.len(), data.indices.len() / 3, t.elapsed().as_secs_f32() * 1000.0);
+                let verts: Vec<Vertex> = data
+                    .positions
+                    .iter()
+                    .zip(&data.normals)
+                    .zip(&data.colors)
+                    .map(|((p, n), c)| Vertex { pos: *p, normal: *n, uv: [0.0, 0.0], color: *c })
+                    .collect();
+                self.meshes.push(make_mesh(&self.device, &(verts, data.indices)));
+            }
+            self.model_gen = world.model_gen;
+        }
         if self.atlas.gen != world.sprite_gen {
             self.atlas = build_atlas(&self.device, &self.queue, &self.atlas_layout, &self.sampler, &world.sprites, world.sprite_gen);
         }
@@ -445,7 +476,7 @@ impl Renderer {
         self.queue.write_buffer(&self.globals, 0, bytemuck::bytes_of(&globals));
 
         // Instances grouped by shape.
-        let mut groups: [Vec<Instance>; 3] = [vec![], vec![], vec![]];
+        let mut groups: Vec<Vec<Instance>> = vec![Vec::new(); self.meshes.len()];
         for (_, (t, v)) in world.ecs.query::<(&Transform, &Visual)>().iter() {
             let rot = glam::Quat::from_euler(
                 glam::EulerRot::XYZ,
@@ -454,10 +485,13 @@ impl Renderer {
                 t.rot.z.to_radians(),
             );
             let model = Mat4::from_scale_rotation_translation(t.scale, rot, t.pos);
-            let idx = match v.shape {
-                Shape::Box => 0,
-                Shape::Sphere => 1,
-                Shape::Plane => 2,
+            let idx = match v.model {
+                Some(m) if 3 + m < self.meshes.len() => 3 + m,
+                _ => match v.shape {
+                    Shape::Box => 0,
+                    Shape::Sphere => 1,
+                    Shape::Plane => 2,
+                },
             };
             let mut uv_rect = [0.0; 4];
             if let Some(r) = v.sprite.and_then(|i| self.atlas.rects.get(i)) {
@@ -495,12 +529,18 @@ impl Renderer {
         if let Some(e) = &world.error {
             texts.push((e.as_str(), 0.02, 0.9, 16.0, [1.0, 0.3, 0.3]));
         }
+        let to_ndc = |px: f32, py: f32, w: f32, h: f32| [px / sw * 2.0 - 1.0, 1.0 - py / sh * 2.0, w / sw * 2.0, h / sh * 2.0];
         for (text, x, y, size, color) in texts {
             font::layout(text, x * sw, y * sh, size, |px, py, w, h| {
-                quads.push(UiQuad {
-                    rect: [px / sw * 2.0 - 1.0, 1.0 - py / sh * 2.0, w / sw * 2.0, h / sh * 2.0],
-                    color: [color[0], color[1], color[2], 1.0],
-                });
+                quads.push(UiQuad { rect: to_ndc(px, py, w, h), color: [color[0], color[1], color[2], 1.0] });
+            });
+        }
+        for (x, y, w, h, color) in &overlay.rects {
+            quads.push(UiQuad { rect: to_ndc(*x, *y, *w, *h), color: *color });
+        }
+        for (text, x, y, size, color) in &overlay.texts {
+            font::layout(text, *x, *y, *size, |px, py, w, h| {
+                quads.push(UiQuad { rect: to_ndc(px, py, w, h), color: [color[0], color[1], color[2], 1.0] });
             });
         }
         if quads.len() > self.ui_capacity {
@@ -585,14 +625,15 @@ fn create_depth(device: &wgpu::Device, config: &wgpu::SurfaceConfiguration) -> w
 }
 
 fn make_mesh(device: &wgpu::Device, (verts, idx): &(Vec<Vertex>, Vec<u32>)) -> Mesh {
+    let empty_v = [Vertex { pos: [0.0; 3], normal: [0.0, 1.0, 0.0], uv: [0.0; 2], color: [1.0; 3] }];
     let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("mesh vertices"),
-        contents: bytemuck::cast_slice(verts),
+        contents: if verts.is_empty() { bytemuck::cast_slice(&empty_v) } else { bytemuck::cast_slice(verts) },
         usage: wgpu::BufferUsages::VERTEX,
     });
     let indices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("mesh indices"),
-        contents: bytemuck::cast_slice(idx),
+        contents: if idx.is_empty() { bytemuck::cast_slice(&[0u32; 4]) } else { bytemuck::cast_slice(idx) },
         usage: wgpu::BufferUsages::INDEX,
     });
     let instance_capacity = 256;
@@ -619,7 +660,7 @@ fn cube() -> (Vec<Vertex>, Vec<u32>) {
     for (n, quad) in faces {
         let base = v.len() as u32;
         for p in quad {
-            v.push(Vertex { pos: p, normal: n, uv: [0.0, 0.0] });
+            v.push(Vertex { pos: p, normal: n, uv: [0.0, 0.0], color: [1.0; 3] });
         }
         i.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
     }
@@ -630,10 +671,10 @@ fn plane() -> (Vec<Vertex>, Vec<u32>) {
     let n = [0.0, 0.0, 1.0];
     // uv y grows downward (top row of the sprite = v 0).
     let v = vec![
-        Vertex { pos: [-0.5, -0.5, 0.0], normal: n, uv: [0.0, 1.0] },
-        Vertex { pos: [0.5, -0.5, 0.0], normal: n, uv: [1.0, 1.0] },
-        Vertex { pos: [0.5, 0.5, 0.0], normal: n, uv: [1.0, 0.0] },
-        Vertex { pos: [-0.5, 0.5, 0.0], normal: n, uv: [0.0, 0.0] },
+        Vertex { pos: [-0.5, -0.5, 0.0], normal: n, uv: [0.0, 1.0], color: [1.0; 3] },
+        Vertex { pos: [0.5, -0.5, 0.0], normal: n, uv: [1.0, 1.0], color: [1.0; 3] },
+        Vertex { pos: [0.5, 0.5, 0.0], normal: n, uv: [1.0, 0.0], color: [1.0; 3] },
+        Vertex { pos: [-0.5, 0.5, 0.0], normal: n, uv: [0.0, 0.0], color: [1.0; 3] },
     ];
     (v, vec![0, 1, 2, 0, 2, 3])
 }
@@ -646,7 +687,7 @@ fn sphere(rings: u32, segments: u32) -> (Vec<Vertex>, Vec<u32>) {
         for s in 0..=segments {
             let theta = 2.0 * std::f32::consts::PI * s as f32 / segments as f32;
             let n = [phi.sin() * theta.cos(), phi.cos(), phi.sin() * theta.sin()];
-            v.push(Vertex { pos: [n[0] * 0.5, n[1] * 0.5, n[2] * 0.5], normal: n, uv: [0.0, 0.0] });
+            v.push(Vertex { pos: [n[0] * 0.5, n[1] * 0.5, n[2] * 0.5], normal: n, uv: [0.0, 0.0], color: [1.0; 3] });
         }
     }
     let stride = segments + 1;

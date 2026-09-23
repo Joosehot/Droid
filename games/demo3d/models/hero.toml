@@ -1,0 +1,50 @@
+resolution = 40
+
+[[parts]]
+shape = "capsule"
+position = [0.0, 0.6, 0.0]
+size = [0.9, 1.2, 0.9]
+blend = 0.25
+color = [0.2, 0.5, 0.9]
+
+[[parts]]
+shape = "sphere"
+position = [0.0, 1.45, 0.0]
+size = [0.8, 0.8, 0.8]
+blend = 0.2
+color = [0.98, 0.85, 0.7]
+
+[[parts]]
+shape = "cone"
+position = [0.0, 1.95, 0.0]
+size = [0.9, 0.7, 0.9]
+blend = 0.1
+color = [0.9, 0.25, 0.25]
+
+[[parts]]
+shape = "sphere"
+position = [-0.15, 1.5, 0.32]
+size = [0.12, 0.12, 0.12]
+blend = 0.0
+color = [0.05, 0.05, 0.05]
+
+[[parts]]
+shape = "sphere"
+position = [0.15, 1.5, 0.32]
+size = [0.12, 0.12, 0.12]
+blend = 0.0
+color = [0.05, 0.05, 0.05]
+
+[[parts]]
+shape = "sphere"
+position = [-0.55, 0.7, 0.0]
+size = [0.35, 0.35, 0.35]
+blend = 0.3
+color = [0.2, 0.5, 0.9]
+
+[[parts]]
+shape = "sphere"
+position = [0.55, 0.7, 0.0]
+size = [0.35, 0.35, 0.35]
+blend = 0.3
+color = [0.2, 0.5, 0.9]

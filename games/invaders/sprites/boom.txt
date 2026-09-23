@@ -1,0 +1,11 @@
+o = 1.000 0.450 0.100
+y = 1.000 0.900 0.350
+---
+..o..o..
+o.oyyo.o
+..yyyy..
+.yyooyy.
+.yyooyy.
+..yyyy..
+o.oyyo.o
+..o..o..

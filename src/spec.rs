@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GameSpec {
     pub title: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub description: String,
     #[serde(default)]
     pub view: View,
@@ -21,6 +21,9 @@ pub struct GameSpec {
     /// Pixel-art sprites drawn by the AI, keyed by name.
     #[serde(default)]
     pub sprites: BTreeMap<String, SpriteSpec>,
+    /// Procedural 3D models (blended primitive parts), keyed by name.
+    #[serde(default)]
+    pub models: BTreeMap<String, ModelSpec>,
     #[serde(default)]
     pub entities: Vec<EntitySpec>,
     #[serde(default)]
@@ -67,6 +70,51 @@ impl SpriteSpec {
     }
 }
 
+/// A 3D model built from primitive parts that are smoothly blended ("morphed") together.
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+pub struct ModelSpec {
+    #[serde(default)]
+    pub parts: Vec<ModelPart>,
+    /// Grid resolution along the longest axis (8..96). Higher = smoother, slower to build.
+    #[serde(default = "default_resolution")]
+    pub resolution: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum PartShape {
+    #[default]
+    Sphere,
+    Box,
+    Capsule,
+    Cylinder,
+    Cone,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ModelPart {
+    #[serde(default)]
+    pub shape: PartShape,
+    #[serde(default)]
+    pub position: [f32; 3],
+    /// Full extents (width, height, depth) in model units.
+    #[serde(default = "default_scale")]
+    pub size: [f32; 3],
+    #[serde(default, skip_serializing_if = "is_zero3")]
+    pub rotation: [f32; 3],
+    /// Smooth-blend radius with the other parts. 0 = hard union.
+    #[serde(default = "default_blend")]
+    pub blend: f32,
+    #[serde(default = "default_color")]
+    pub color: [f32; 3],
+    /// true = carve this shape out of the model instead of adding it.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub subtract: bool,
+}
+
+fn default_resolution() -> u32 { 32 }
+fn default_blend() -> f32 { 0.2 }
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum View {
     #[serde(rename = "2d")]
@@ -88,7 +136,7 @@ pub struct CameraSpec {
     #[serde(default = "default_zoom")]
     pub zoom: f32,
     /// Name of an entity the camera keeps centred / follows.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub follow: Option<String>,
 }
 
@@ -126,13 +174,13 @@ pub enum BodyKind {
 pub struct PhysicsSpec {
     #[serde(default)]
     pub body: BodyKind,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "is_zero3")]
     pub velocity: [f32; 3],
     /// 0 = no bounce, 1 = perfectly elastic.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "is_zero")]
     pub bounciness: f32,
     /// false = trigger: reports collisions but does not block movement.
-    #[serde(default = "default_true")]
+    #[serde(default = "default_true", skip_serializing_if = "std::clone::Clone::clone")]
     pub solid: bool,
 }
 
@@ -142,26 +190,38 @@ impl Default for PhysicsSpec {
     }
 }
 
+impl PhysicsSpec {
+    fn is_default(&self) -> bool {
+        self.body == BodyKind::None && self.velocity == [0.0; 3] && self.bounciness == 0.0 && self.solid
+    }
+}
+
+fn is_zero3(v: &[f32; 3]) -> bool { *v == [0.0; 3] }
+fn is_zero(v: &f32) -> bool { *v == 0.0 }
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct EntitySpec {
     pub name: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub tags: Vec<String>,
     #[serde(default)]
     pub shape: Shape,
     /// Name of a sprite from `sprites`; the entity is then drawn as a textured quad.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sprite: Option<String>,
+    /// Name of a model from `models`; the entity is then drawn as that 3D mesh.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
     #[serde(default)]
     pub position: [f32; 3],
     /// Euler rotation in degrees (x, y, z).
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "is_zero3")]
     pub rotation: [f32; 3],
     #[serde(default = "default_scale")]
     pub scale: [f32; 3],
     #[serde(default = "default_color")]
     pub color: [f32; 3],
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "PhysicsSpec::is_default")]
     pub physics: PhysicsSpec,
 }
 

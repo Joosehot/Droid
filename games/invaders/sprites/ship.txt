@@ -1,0 +1,10 @@
+g = 0.250 0.950 0.450
+w = 0.850 1.000 0.950
+---
+.....w.....
+....www....
+...wwwww...
+.ggggggggg.
+ggggggggggg
+gg.ggggg.gg
+g.g.....g.g

@@ -4,13 +4,16 @@ mod ai;
 mod app;
 mod font;
 mod game;
+mod models;
 mod physics;
+mod project;
 mod render;
 mod script;
+mod sound;
 mod spec;
 mod world;
 
-use anyhow::{bail, Context};
+use anyhow::bail;
 use clap::{Parser, Subcommand};
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
@@ -25,56 +28,71 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Generate a new game from a description into games/<name>/game.json
+    /// Generate a new game from a description into games/<name>/
     New { name: String, prompt: String },
-    /// Run a game (hot-reloads game.json when it changes; F5 restarts)
+    /// Run a game (hot-reloads when its files change; F5 restarts; TAB opens the AI chat)
     Run { name: String },
     /// Ask the AI to change an existing game
     Edit { name: String, prompt: String },
-    /// Generate a game and immediately run it with the live chat open
+    /// Generate a game and immediately run it
     Play { name: String, prompt: String },
-    /// Run a game with a terminal chat: every line you type is sent to the AI as a change request
+    /// Run a game with an additional terminal chat (the window has TAB chat anyway)
     Chat { name: String },
-    /// Validate a game file (JSON + script) without running it
+    /// Validate a game (files + script) without running it
     Check { name: String },
     /// Simulate N frames headlessly (no window) and report errors and UI texts
     Sim {
         name: String,
         #[arg(long, default_value_t = 300)]
         frames: u32,
-        /// Fixed timestep in seconds
+        /// Fixed timestep in seconds (0 = real time)
         #[arg(long, default_value_t = 1.0 / 60.0)]
         dt: f32,
     },
+    /// Convert a legacy games/<name>/game.json into the folder format
+    Convert { name: String },
 }
 
+/// `games/<name>` folder, or a direct path to a folder / legacy `.json`.
 fn game_path(name: &str) -> PathBuf {
     let p = Path::new(name);
-    if p.extension().map_or(false, |e| e == "json") {
+    if p.is_dir() || p.extension().map_or(false, |e| e == "json") {
         return p.to_path_buf();
     }
-    Path::new("games").join(name).join("game.json")
-}
-
-fn save(path: &Path, spec: &spec::GameSpec) -> anyhow::Result<()> {
-    if let Some(dir) = path.parent() {
-        std::fs::create_dir_all(dir)?;
+    let dir = Path::new("games").join(name);
+    let legacy = dir.join("game.json");
+    if !dir.join("game.toml").exists() && legacy.exists() {
+        return legacy;
     }
-    std::fs::write(path, spec.to_json())?;
-    Ok(())
-}
-
-fn load(path: &Path) -> anyhow::Result<spec::GameSpec> {
-    let s = std::fs::read_to_string(path).with_context(|| format!("cannot read {}", path.display()))?;
-    spec::GameSpec::from_json(&s)
+    dir
 }
 
 fn generate_new(client: &ai::Client, path: &Path, prompt: &str) -> anyhow::Result<()> {
     eprintln!("[aige] {} is designing your game...", client.describe());
-    let spec = client.new_game(prompt)?;
-    save(path, &spec)?;
-    eprintln!("[aige] wrote {} ({} entities, {} script bytes): {}", path.display(), spec.entities.len(), spec.script.len(), spec.title);
+    let (spec, files) = client.new_game(prompt)?;
+    project::write_dir(path, &files)?;
+    eprintln!(
+        "[aige] wrote {} ({} files, {} entities, {} sprites, {} models): {}",
+        path.display(),
+        files.len(),
+        spec.entities.len(),
+        spec.sprites.len(),
+        spec.models.len(),
+        spec.title
+    );
     Ok(())
+}
+
+/// Ask the AI for a change and save the result. Shared by `edit`, the terminal chat and the window chat.
+pub fn ai_edit(client: &ai::Client, path: &Path, request: &str, runtime_error: Option<&str>) -> anyhow::Result<spec::GameSpec> {
+    let current = if path.is_dir() { project::read_dir(path)? } else { project::to_files(&project::load(path)?)? };
+    let (spec, files) = client.edit_game(&current, request, runtime_error)?;
+    if path.is_dir() {
+        project::write_dir(path, &files)?;
+    } else {
+        project::save(path, &spec)?;
+    }
+    Ok(spec)
 }
 
 /// Terminal chat loop, runs on a background thread while the window is open.
@@ -103,31 +121,17 @@ fn chat_thread(path: PathBuf, error_sink: Arc<Mutex<Option<String>>>) {
             if req == "quit" || req == "exit" {
                 break;
             }
-            let current = match load(&path) {
-                Ok(s) => s,
-                Err(e) => {
-                    eprintln!("[aige] cannot load current game: {e}");
-                    continue;
-                }
-            };
             let err = error_sink.lock().unwrap().clone();
             let request = if req == "fix" { "Fix the reported error without changing the design.".to_string() } else { req };
-            match client.edit_game(&current, &request, err.as_deref()) {
-                Ok(spec) => {
-                    if let Err(e) = save(&path, &spec) {
-                        eprintln!("[aige] save failed: {e}");
-                    } else {
-                        eprintln!("[aige] updated: {} (the window reloads automatically)", spec.title);
-                    }
-                }
+            match ai_edit(&client, &path, &request, err.as_deref()) {
+                Ok(spec) => eprintln!("[aige] updated: {} (the window reloads automatically)", spec.title),
                 Err(e) => eprintln!("[aige] AI error: {e}"),
             }
         }
     });
 }
 
-/// Load KEY=VALUE lines from `.env` (next to the executable's working dir) into the
-/// environment without overriding variables that are already set.
+/// Load KEY=VALUE lines from `.env` into the environment without overriding set variables.
 fn load_dotenv() {
     let Ok(text) = std::fs::read_to_string(".env") else { return };
     for line in text.lines() {
@@ -151,22 +155,30 @@ fn main() -> anyhow::Result<()> {
     match cli.cmd {
         Cmd::New { name, prompt } => {
             let client = ai::Client::from_env()?;
-            generate_new(&client, &game_path(&name), &prompt)?;
+            generate_new(&client, &Path::new("games").join(&name), &prompt)?;
         }
         Cmd::Edit { name, prompt } => {
             let client = ai::Client::from_env()?;
             let path = game_path(&name);
-            let current = load(&path)?;
-            eprintln!("[aige] {} is editing {}...", client.describe(), current.title);
-            let spec = client.edit_game(&current, &prompt, None)?;
-            save(&path, &spec)?;
-            eprintln!("[aige] updated {}", path.display());
+            eprintln!("[aige] {} is editing {}...", client.describe(), path.display());
+            let spec = ai_edit(&client, &path, &prompt, None)?;
+            eprintln!("[aige] updated {}: {}", path.display(), spec.title);
         }
         Cmd::Check { name } => {
             let path = game_path(&name);
-            let spec = load(&path)?;
-            script::ScriptHost::check(&spec.script).map_err(|e| anyhow::anyhow!("script: {e}"))?;
-            println!("OK: {} ({} entities)", spec.title, spec.entities.len());
+            let spec = ai::validate(project::load(&path)?)?;
+            println!("OK: {} ({} entities, {} sprites, {} models)", spec.title, spec.entities.len(), spec.sprites.len(), spec.models.len());
+        }
+        Cmd::Convert { name } => {
+            let dir = Path::new("games").join(&name);
+            let legacy = dir.join("game.json");
+            if !legacy.exists() {
+                bail!("{} not found", legacy.display());
+            }
+            let spec = project::load(&legacy)?;
+            project::write_dir(&dir, &project::to_files(&spec)?)?;
+            std::fs::rename(&legacy, dir.join("game.json.bak"))?;
+            println!("converted {} -> {}/ (old file kept as game.json.bak)", legacy.display(), dir.display());
         }
         Cmd::Sim { name, frames, dt } => {
             let path = game_path(&name);
@@ -182,13 +194,10 @@ fn main() -> anyhow::Result<()> {
                     g.step(dt);
                 }
             }
-            {
-                let w = g.world.borrow();
-                for (_, (n, t)) in w.ecs.query::<(&world::Name, &world::Transform)>().iter() {
-                    println!("  {} at ({:.2}, {:.2}, {:.2})", n.0, t.pos.x, t.pos.y, t.pos.z);
-                }
-            }
             let w = g.world.borrow();
+            for (_, (n, t)) in w.ecs.query::<(&world::Name, &world::Transform)>().iter() {
+                println!("  {} at ({:.2}, {:.2}, {:.2})", n.0, t.pos.x, t.pos.y, t.pos.z);
+            }
             println!("{}: {} frames, {} entities", g.spec.title, frames, w.ecs.len());
             for t in &w.texts {
                 println!("  text {} = {:?}", t.id, t.text);
@@ -216,11 +225,9 @@ fn main() -> anyhow::Result<()> {
         }
         Cmd::Play { name, prompt } => {
             let client = ai::Client::from_env()?;
-            let path = game_path(&name);
+            let path = Path::new("games").join(&name);
             generate_new(&client, &path, &prompt)?;
-            let sink = Arc::new(Mutex::new(None));
-            chat_thread(path.clone(), sink.clone());
-            app::App::new(path, Some(sink)).run()?;
+            app::App::new(path, None).run()?;
         }
     }
     Ok(())

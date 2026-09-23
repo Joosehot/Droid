@@ -1,0 +1,11 @@
+b = 0.300 0.850 1.000
+e = 1.000 1.000 1.000
+---
+.b....b.
+.bbbbbb.
+bbbbbbbb
+bbebbebb
+bbbbbbbb
+..bbbb..
+.b.bb.b.
+b.b..b.b

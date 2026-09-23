@@ -1,0 +1,47 @@
+[[entities]]
+name = "player"
+tags = ["player"]
+shape = "box"
+sprite = "ship"
+position = [0.0, -8.0, 0.0]
+scale = [2.2, 1.4, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "ground"
+shape = "box"
+position = [0.0, -9.5, 0.0]
+scale = [40.0, 0.3, 1.0]
+color = [0.15, 0.6, 0.3]
+
+[[texts]]
+id = "score"
+text = "Score: 0"
+x = 0.02
+y = 0.03
+size = 26.0
+color = [1.0, 1.0, 0.6]
+
+[[texts]]
+id = "lives"
+text = "Lives: 3"
+x = 0.02
+y = 0.09
+size = 22.0
+color = [0.5, 1.0, 0.7]
+
+[[texts]]
+id = "level"
+text = "Wave 1"
+x = 0.86
+y = 0.03
+size = 24.0
+color = [1.0, 0.6, 0.8]
+
+[[texts]]
+id = "help"
+text = "A/D or ARROWS move  -  SPACE shoot  -  R restart"
+x = 0.02
+y = 0.94
+size = 17.0
+color = [0.6, 0.6, 0.75]

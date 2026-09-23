@@ -1,6 +1,7 @@
 //! Rhai scripting host. The AI-written script defines `init()`, `update(dt)` and
 //! `on_collision(a, b)`; this module exposes the engine API to it.
 
+use crate::sound::SoundCmd;
 use crate::spec::{BodyKind, EntitySpec, PhysicsSpec, Shape};
 use crate::world::{Body, Tags, Transform, Visual, World};
 use glam::Vec3;
@@ -382,6 +383,7 @@ fn register_api(engine: &mut Engine, world: Shared) {
             tags: vec![],
             shape: shape_of(shape),
             sprite: None,
+            model: None,
             position: to_vec3(&pos).into(),
             rotation: [0.0; 3],
             scale: to_vec3(&scale).into(),
@@ -399,6 +401,7 @@ fn register_api(engine: &mut Engine, world: Shared) {
             tags: tags.iter().map(|t| t.to_string()).collect(),
             shape: shape_of(shape),
             sprite: None,
+            model: None,
             position: to_vec3(&pos).into(),
             rotation: [0.0; 3],
             scale: to_vec3(&scale).into(),
@@ -416,6 +419,7 @@ fn register_api(engine: &mut Engine, world: Shared) {
             tags: tags.iter().map(|t| t.to_string()).collect(),
             shape: Shape::Plane,
             sprite: Some(sprite.to_string()),
+            model: None,
             position: to_vec3(&pos).into(),
             rotation: [0.0; 3],
             scale: to_vec3(&scale).into(),
@@ -439,6 +443,49 @@ fn register_api(engine: &mut Engine, world: Shared) {
             }
         }
     });
+    let ww = w!();
+    engine.register_fn("spawn_model", move |name: &str, tags: Array, model: &str, pos: Dynamic, scale: Dynamic, body: &str| -> String {
+        let spec = EntitySpec {
+            name: name.to_string(),
+            tags: tags.iter().map(|t| t.to_string()).collect(),
+            shape: Shape::Box,
+            sprite: None,
+            model: Some(model.to_string()),
+            position: to_vec3(&pos).into(),
+            rotation: [0.0; 3],
+            scale: to_vec3(&scale).into(),
+            color: [1.0; 3],
+            physics: PhysicsSpec { body: body_of(body), ..Default::default() },
+        };
+        let mut w = ww.borrow_mut();
+        let e = w.spawn_spec(&spec);
+        w.name_of(e)
+    });
+    let ww = w!();
+    engine.register_fn("set_model", move |n: &str, model: &str| {
+        let w = ww.borrow_mut();
+        let idx = w.model_index(model);
+        if let Some(e) = w.entity(n) {
+            if let Ok(mut v) = w.ecs.get::<&mut Visual>(e) {
+                v.model = idx;
+            }
+        }
+    });
+
+    // ---- sound ----
+    let ww = w!();
+    engine.register_fn("play_sound", move |name: &str| ww.borrow_mut().sounds.push(SoundCmd::Effect(name.to_string())));
+    let ww = w!();
+    engine.register_fn("play_tone", move |freq: Dynamic, secs: Dynamic, wave: &str| {
+        ww.borrow_mut().sounds.push(SoundCmd::Tone { freq: num(&freq), secs: num(&secs), wave: wave.to_string(), volume: 0.3 })
+    });
+    let ww = w!();
+    engine.register_fn("play_music", move |bpm: Dynamic, notes: &str, wave: &str| {
+        ww.borrow_mut().sounds.push(SoundCmd::Music { bpm: num(&bpm), notes: notes.to_string(), wave: wave.to_string(), volume: 0.4 })
+    });
+    let ww = w!();
+    engine.register_fn("stop_music", move || ww.borrow_mut().sounds.push(SoundCmd::StopMusic));
+
     let ww = w!();
     engine.register_fn("set_flip_x", move |n: &str, f: bool| with_entity!(ww, n, Visual, |v| v.flip_x = f));
     let ww = w!();

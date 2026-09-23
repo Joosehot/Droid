@@ -1,10 +1,10 @@
 # AIGE - AI-native game engine
 
-Describe a game. The AI designs it, draws the pixel art, writes the logic. You play it
-immediately, then change it by talking while it runs.
+Describe a game. The AI designs it, draws the pixel art, sculpts the 3D models, writes the
+logic and the sounds. You play it immediately, then change it by talking to it while it runs.
 
-Rust + wgpu. 2D and 3D. A game is one `game.json` file: scene, sprites, physics, UI and a
-Rhai script. The engine runs it directly and hot-reloads it whenever the file changes.
+Rust + wgpu. 2D and 3D. A game is a folder of small plain-text files the engine runs
+directly and hot-reloads whenever one of them changes.
 
 ## Setup
 
@@ -22,36 +22,63 @@ OpenAI-compatible server (llama.cpp `/v1`).
 aige play invaders "Space Invaders with pixel art aliens, score and lives"
 ```
 
-Generates `games/invaders/game.json`, opens the window, and starts the chat in the terminal.
-Type change requests there ("make the aliens faster", "add a boss every 5 waves"). The AI
-rewrites the file and the window reloads in place. Type `fix` to have it fix the error shown on
-screen.
+Generates `games/invaders/` and opens it. In the window, press **TAB**, type a change
+("make the aliens shoot back", "add a boss every 5 waves"), press Enter. The AI edits the
+files and the game reloads in place. Type `fix` to have it fix the error shown on screen.
 
 | Command | What it does |
 |---|---|
-| `aige new <name> "<prompt>"` | Generate a game |
-| `aige run <name>` | Run it (F5 restarts, edits to `game.json` hot-reload) |
-| `aige chat <name>` | Run it with the AI chat |
-| `aige edit <name> "<request>"` | One-off AI change |
-| `aige check <name>` | Validate JSON + script |
-| `aige sim <name> --frames 600` | Headless run, prints UI texts, errors and entity positions |
+| `aige new <name> "<prompt>"` | Generate a game into `games/<name>/` |
+| `aige run <name>` | Run it (TAB chat, F5 restart, file edits hot-reload) |
+| `aige edit <name> "<request>"` | One-off AI change from the terminal |
+| `aige chat <name>` | Run with an extra terminal chat |
+| `aige check <name>` | Validate files + script |
+| `aige sim <name> --frames 600` | Headless run: prints UI texts, errors, entity positions |
+| `aige convert <name>` | Convert a legacy single `game.json` to the folder format |
 
 `AIGE_EXIT_AFTER=5 aige run <name>` quits after 5 seconds and prints the UI state (automation).
+`AIGE_EFFORT=low|medium|high` overrides the model effort (default: high for new games, medium for edits).
+
+## Game folder
+
+```
+games/<name>/
+  game.toml          title, view (2d/3d), camera, gravity, background
+  scene.toml         [[entities]] and [[texts]]
+  script.rhai        behaviour: init(), update(dt), on_collision(a, b)
+  sprites/*.txt      pixel art as text: palette lines, ---, then rows of characters
+  models/*.toml      3D models: primitive parts blended into one smooth surface
+```
+
+Everything is human-editable. Change a sprite file while the game runs and it swaps in
+without restarting; change the script or scene and the game restarts with the new version.
+The full format and script API is in `docs/ENGINE_API.md`, which is also the AI's reference.
 
 ## How the AI loop works
 
-1. The system prompt is `docs/ENGINE_API.md`: the file format, the script API, and one example game.
-2. The model returns the full JSON. The engine parses it, compiles the Rhai script, and sends any
-   error back to the model (up to 3 repairs) before you ever see it.
-3. Runtime script errors are shown on screen and attached to your next chat request.
+1. The system prompt is `docs/ENGINE_API.md` plus the file-bundle format.
+2. For a new game the model writes every file. For a change it writes only the files that
+   change, or FIND/REPLACE edit blocks inside a file, so edits are fast and cheap.
+3. The engine assembles the files, validates them (TOML, sprite palettes, references,
+   Rhai compile) and sends any error back to the model, up to 3 repairs, before you see it.
+4. Runtime script errors are shown on screen and attached to your next chat request.
+
+## Engine features
+
+- Renderer: wgpu, instanced primitives, Lambert lighting in 3D, sprite atlas with
+  nearest-neighbour sampling and alpha cut-out, built-in bitmap font for UI.
+- 3D models: parts (sphere, box, capsule, cylinder, cone, subtractive) combined as a signed
+  distance field with smooth-min blending, meshed with surface nets, smooth normals from
+  the field gradient, per-vertex colour blending.
+- Physics: AABB bodies (static, kinematic, dynamic), triggers, grounded detection, bounce.
+- Scripting: Rhai with ~80 engine functions (input, entities, tags, spawning, camera, UI,
+  sounds, music).
+- Audio: procedural synth effects and a note-sequencer for looping music. No asset files.
 
 ## Layout
 
-- `src/spec.rs` game file format (serde)
-- `src/world.rs` ECS world (hecs), input, camera, texts
-- `src/physics.rs` AABB physics, triggers, collision events
-- `src/script.rs` Rhai bindings (the API the AI uses)
-- `src/render.rs` wgpu renderer: instanced box/sphere/plane, sprite atlas, bitmap-font UI
-- `src/ai.rs` Claude Messages API (raw HTTP, streaming) and OpenAI-compatible backends
-- `src/game.rs` frame step + hot reload, `src/app.rs` winit window, `src/main.rs` CLI
-- `games/` generated games, `docs/ENGINE_API.md` the AI's reference
+- `src/spec.rs` data model, `src/project.rs` folder format + AI bundle parser
+- `src/world.rs` ECS world (hecs), `src/physics.rs`, `src/script.rs` Rhai bindings
+- `src/models.rs` SDF sculpting + meshing, `src/sound.rs` synth, `src/font.rs`
+- `src/render.rs` wgpu renderer, `src/app.rs` window + chat overlay, `src/game.rs` loop + hot reload
+- `src/ai.rs` Claude / OpenAI-compatible client, `src/main.rs` CLI

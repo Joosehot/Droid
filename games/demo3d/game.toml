@@ -1,0 +1,11 @@
+title = "Blob Garden"
+description = "3D test: blended procedural models, physics, sounds."
+view = "3d"
+background = [0.55, 0.75, 0.95]
+gravity = [0.0, -25.0, 0.0]
+
+[camera]
+position = [0.0, 9.0, 14.0]
+look_at = [0.0, 0.0, 0.0]
+zoom = 20.0
+follow = "player"

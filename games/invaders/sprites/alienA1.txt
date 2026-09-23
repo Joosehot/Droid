@@ -1,0 +1,11 @@
+a = 1.000 0.350 0.720
+e = 1.000 1.000 1.000
+---
+...aa...
+..aaaa..
+.aaaaaa.
+aaeaaeaa
+aaaaaaaa
+.a.aa.a.
+a.a..a.a
+..a..a..

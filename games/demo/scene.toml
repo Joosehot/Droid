@@ -1,0 +1,60 @@
+[[entities]]
+name = "ground"
+shape = "box"
+position = [0.0, -1.0, 0.0]
+scale = [60.0, 2.0, 1.0]
+color = [0.3, 0.5, 0.3]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "platform"
+shape = "box"
+position = [6.0, 2.5, 0.0]
+scale = [5.0, 0.6, 1.0]
+color = [0.4, 0.4, 0.5]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "player"
+tags = ["player"]
+shape = "box"
+sprite = "hero_walk1"
+position = [-5.0, 1.0, 0.0]
+scale = [1.2, 1.4, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "coin"
+tags = ["coin"]
+shape = "sphere"
+sprite = "coin"
+position = [6.0, 3.6, 0.0]
+scale = [0.7, 0.7, 0.7]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[texts]]
+id = "score"
+text = "Coins: 0"
+x = 0.02
+y = 0.02
+size = 28.0
+color = [1.0, 1.0, 1.0]
+
+[[texts]]
+id = "help"
+text = "A/D move, SPACE jump, R restart"
+x = 0.02
+y = 0.08
+size = 18.0
+color = [0.7, 0.7, 0.7]

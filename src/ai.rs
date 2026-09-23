@@ -1,7 +1,8 @@
-//! LLM client: the AI writes the whole game (spec + script) as one JSON document.
-//! Backends: Claude Messages API (raw HTTP, streaming) or any OpenAI-compatible
-//! local server such as llama.cpp.
+//! LLM client: the AI writes the game as a set of files (game.toml, scene.toml,
+//! script.rhai, sprites/*.txt, models/*.toml). Backends: Claude Messages API (raw
+//! HTTP, streaming) or any OpenAI-compatible local server such as llama.cpp.
 
+use crate::project::{self, FileSet};
 use crate::script::ScriptHost;
 use crate::spec::GameSpec;
 use anyhow::{anyhow, bail, Context};
@@ -11,12 +12,12 @@ use std::io::{BufRead, BufReader, Write};
 const ENGINE_API: &str = include_str!("../docs/ENGINE_API.md");
 
 const SYSTEM: &str = "You are the game designer, artist and programmer inside AIGE, an AI-native game engine. \
-You produce complete, playable games as a single JSON document that the engine runs directly.\n\n\
+You produce complete, playable games as a small set of plain-text files that the engine runs directly.\n\n\
 Output rules:\n\
-- Respond with ONLY the JSON document. No markdown fences, no commentary before or after.\n\
-- The `script` field must be valid Rhai using only the API documented below.\n\
-- Make the game fun and finished: clear goal, feedback text, difficulty ramp, restart.\n\
-- Build visuals from coloured primitives with good contrast against the background.\n\n\
+- Respond with ONLY the file bundle in the exact `=== file: path ===` format described below. No commentary before or after.\n\
+- script.rhai must be valid Rhai using only the API documented below.\n\
+- Make the game fun and finished: clear goal, feedback text, difficulty ramp, restart on R.\n\
+- You are also the artist: draw pixel-art sprites for characters and items, build 3D models from blended parts, and use sounds.\n\n\
 ENGINE REFERENCE:\n\n";
 
 #[derive(Clone, Debug)]
@@ -29,6 +30,9 @@ pub struct Client {
     backend: Backend,
     http: reqwest::blocking::Client,
     pub verbose: bool,
+    /// Claude `output_config.effort` for new games / edits (AIGE_EFFORT overrides both).
+    effort_new: String,
+    effort_edit: String,
 }
 
 #[derive(Clone, Debug)]
@@ -56,7 +60,14 @@ impl Client {
             }
         };
         let http = reqwest::blocking::Client::builder().timeout(std::time::Duration::from_secs(1800)).build()?;
-        Ok(Client { backend, http, verbose: true })
+        let forced = std::env::var("AIGE_EFFORT").ok().filter(|e| !e.is_empty());
+        Ok(Client {
+            backend,
+            http,
+            verbose: true,
+            effort_new: forced.clone().unwrap_or_else(|| "high".into()),
+            effort_edit: forced.unwrap_or_else(|| "medium".into()),
+        })
     }
 
     pub fn describe(&self) -> String {
@@ -67,33 +78,44 @@ impl Client {
     }
 
     fn system_prompt() -> String {
-        format!("{SYSTEM}{ENGINE_API}")
+        format!("{SYSTEM}{ENGINE_API}\n\n## Output bundle format\n\n{}", project::BUNDLE_FORMAT)
     }
 
-    /// Generate a brand-new game from a description.
-    pub fn new_game(&self, prompt: &str) -> anyhow::Result<GameSpec> {
-        let user = format!("Create a complete game from this description:\n\n{prompt}\n\nReturn the full game JSON.");
-        self.generate_valid(vec![Msg { role: "user", content: user }])
+    /// Generate a brand-new game from a description. Returns the validated spec and its files.
+    pub fn new_game(&self, prompt: &str) -> anyhow::Result<(GameSpec, FileSet)> {
+        let user = format!("Create a complete game from this description:\n\n{prompt}\n\nWrite every file of the game (game.toml, scene.toml, script.rhai, sprites/*.txt and models/*.toml as needed) as full files.");
+        self.run(vec![Msg { role: "user", content: user }], FileSet::new(), &self.effort_new)
     }
 
-    /// Modify an existing game according to a request. `runtime_error` is the last
-    /// script/engine error, if any, so the AI can fix it.
-    pub fn edit_game(&self, current: &GameSpec, request: &str, runtime_error: Option<&str>) -> anyhow::Result<GameSpec> {
-        let mut user = format!("Here is the current game JSON:\n\n{}\n\n", current.to_json());
-        if let Some(e) = runtime_error {
-            user.push_str(&format!("The engine reported this error while running it:\n{e}\n\n"));
+    /// Modify an existing game. `runtime_error` is the last script/engine error, if any.
+    pub fn edit_game(&self, current: &FileSet, request: &str, runtime_error: Option<&str>) -> anyhow::Result<(GameSpec, FileSet)> {
+        let mut user = String::from("Here are the current files of the game:\n\n");
+        for (path, content) in current {
+            user.push_str(&format!("=== file: {path} ===\n{content}\n"));
         }
-        user.push_str(&format!("Change request: {request}\n\nApply the change (and fix any error) and return the FULL updated game JSON."));
-        self.generate_valid(vec![Msg { role: "user", content: user }])
+        if let Some(e) = runtime_error {
+            user.push_str(&format!("\nThe engine reported this error while running it:\n{e}\n"));
+        }
+        user.push_str(&format!("\nChange request: {request}\n\nRespond with ONLY the files or edit sections that change, in the bundle format."));
+        self.run(vec![Msg { role: "user", content: user }], current.clone(), &self.effort_edit)
     }
 
-    /// Ask, parse, validate; feed errors back to the model up to 3 times.
-    fn generate_valid(&self, mut msgs: Vec<Msg>) -> anyhow::Result<GameSpec> {
+    /// Ask, apply the bundle to `base`, validate; feed errors back to the model up to 3 times.
+    fn run(&self, mut msgs: Vec<Msg>, base: FileSet, effort: &str) -> anyhow::Result<(GameSpec, FileSet)> {
         let system = Self::system_prompt();
         for attempt in 1..=4 {
-            let raw = self.complete(&system, &msgs)?;
-            match parse_game(&raw) {
-                Ok(spec) => return Ok(spec),
+            let raw = self.complete(&system, &msgs, effort)?;
+            let result = (|| -> anyhow::Result<(GameSpec, FileSet)> {
+                let items = project::parse_bundle(&raw)?;
+                let mut files = base.clone();
+                project::apply_bundle(&mut files, &items)?;
+                let spec = project::from_files(&files)?;
+                let spec = validate(spec)?;
+                let files = project::to_files(&spec)?;
+                Ok((spec, files))
+            })();
+            match result {
+                Ok(r) => return Ok(r),
                 Err(e) => {
                     if attempt == 4 {
                         bail!("AI could not produce a valid game after {attempt} attempts: {e}");
@@ -102,29 +124,27 @@ impl Client {
                         eprintln!("[aige] attempt {attempt} invalid ({e}); asking the AI to fix it");
                     }
                     msgs.push(Msg { role: "assistant", content: raw });
-                    msgs.push(Msg {
-                        role: "user",
-                        content: format!("That was not valid. Error:\n{e}\n\nReturn the corrected FULL game JSON only."),
-                    });
+                    msgs.push(Msg { role: "user", content: format!("That did not work. Error:\n{e}\n\nRespond again with only the corrected files or edit sections, in the bundle format.") });
                 }
             }
         }
         unreachable!()
     }
 
-    fn complete(&self, system: &str, msgs: &[Msg]) -> anyhow::Result<String> {
+    fn complete(&self, system: &str, msgs: &[Msg], effort: &str) -> anyhow::Result<String> {
         match &self.backend {
-            Backend::Claude { api_key, model } => self.claude(api_key, model, system, msgs),
+            Backend::Claude { api_key, model } => self.claude(api_key, model, system, msgs, effort),
             Backend::OpenAiCompat { base_url, model } => self.openai_compat(base_url, model, system, msgs),
         }
     }
 
-    fn claude(&self, api_key: &str, model: &str, system: &str, msgs: &[Msg]) -> anyhow::Result<String> {
+    fn claude(&self, api_key: &str, model: &str, system: &str, msgs: &[Msg], effort: &str) -> anyhow::Result<String> {
         let body = json!({
             "model": model,
             "max_tokens": 32000,
             "stream": true,
             "fallbacks": "default",
+            "output_config": { "effort": effort },
             "system": [{ "type": "text", "text": system, "cache_control": { "type": "ephemeral" } }],
             "messages": msgs.iter().map(|m| json!({ "role": m.role, "content": m.content })).collect::<Vec<_>>(),
         });
@@ -199,18 +219,32 @@ impl Client {
     }
 }
 
-/// Extract the JSON object from a model reply (tolerates fences / prose) and validate it.
-pub fn parse_game(raw: &str) -> anyhow::Result<GameSpec> {
-    let start = raw.find('{').ok_or_else(|| anyhow!("no JSON object found in reply"))?;
-    let end = raw.rfind('}').ok_or_else(|| anyhow!("no closing brace in reply"))?;
-    if end <= start {
-        bail!("malformed JSON in reply");
-    }
-    let json = &raw[start..=end];
-    let spec = GameSpec::from_json(json).map_err(|e| anyhow!("JSON does not match the game format: {e}"))?;
+/// Semantic checks on an assembled game.
+pub fn validate(spec: GameSpec) -> anyhow::Result<GameSpec> {
     if spec.entities.is_empty() {
-        bail!("the game has no entities");
+        bail!("scene.toml has no entities");
     }
-    ScriptHost::check(&spec.script).map_err(|e| anyhow!("Rhai script error: {e}"))?;
+    for e in &spec.entities {
+        if let Some(sp) = &e.sprite {
+            if !spec.sprites.contains_key(sp) {
+                bail!("entity '{}' uses sprite '{}' but there is no sprites/{}.txt", e.name, sp, sp);
+            }
+        }
+        if let Some(m) = &e.model {
+            if !spec.models.contains_key(m) {
+                bail!("entity '{}' uses model '{}' but there is no models/{}.toml", e.name, m, m);
+            }
+        }
+    }
+    for (name, s) in &spec.sprites {
+        let (w, h) = s.size();
+        if w == 0 || h == 0 {
+            bail!("sprite '{name}' has no pixel rows");
+        }
+        if w > 128 || h > 128 {
+            bail!("sprite '{name}' is {w}x{h}; keep sprites at most 128x128");
+        }
+    }
+    ScriptHost::check(&spec.script).map_err(|e| anyhow!("script.rhai: {e}"))?;
     Ok(spec)
 }

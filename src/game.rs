@@ -1,6 +1,7 @@
 //! Game runtime: owns the world + script host, steps a frame, hot-reloads `game.json`.
 
 use crate::physics;
+use crate::project;
 use crate::script::{ScriptHost, Shared};
 use crate::spec::GameSpec;
 use crate::world::World;
@@ -14,7 +15,7 @@ pub struct Game {
     pub spec: GameSpec,
     pub world: Shared,
     host: ScriptHost,
-    mtime: Option<SystemTime>,
+    stamp: (Option<SystemTime>, usize),
     last_check: Instant,
     /// Shared with the chat thread so the AI can see runtime errors.
     pub error_sink: Option<std::sync::Arc<std::sync::Mutex<Option<String>>>>,
@@ -22,15 +23,22 @@ pub struct Game {
 
 impl Game {
     pub fn load(path: &Path) -> anyhow::Result<Game> {
-        let src = std::fs::read_to_string(path)?;
-        let spec = GameSpec::from_json(&src)?;
-        let mtime = std::fs::metadata(path).and_then(|m| m.modified()).ok();
+        let spec = project::load(path)?;
+        let stamp = Self::stamp_of(path);
         let world: Shared = Rc::new(RefCell::new(World::from_spec(&spec)));
         let host = ScriptHost::new(world.clone());
-        let mut g = Game { path: path.to_path_buf(), spec, world, host, mtime, last_check: Instant::now(), error_sink: None };
+        let mut g = Game { path: path.to_path_buf(), spec, world, host, stamp, last_check: Instant::now(), error_sink: None };
         let r = g.host.load(&g.spec.script.clone());
         g.report(r);
         Ok(g)
+    }
+
+    fn stamp_of(path: &Path) -> (Option<SystemTime>, usize) {
+        if path.is_dir() {
+            project::stamp(path)
+        } else {
+            (std::fs::metadata(path).and_then(|m| m.modified()).ok(), 1)
+        }
     }
 
     fn report(&mut self, r: Result<(), String>) {
@@ -63,21 +71,33 @@ impl Game {
             return false;
         }
         self.last_check = Instant::now();
-        let mtime = std::fs::metadata(&self.path).and_then(|m| m.modified()).ok();
-        if mtime == self.mtime {
+        let stamp = Self::stamp_of(&self.path);
+        if stamp == self.stamp {
             return false;
         }
-        self.mtime = mtime;
-        match std::fs::read_to_string(&self.path).map_err(|e| e.to_string()).and_then(|s| GameSpec::from_json(&s).map_err(|e| e.to_string())) {
+        self.stamp = stamp;
+        match project::load(&self.path) {
             Ok(spec) => {
                 log::info!("reloaded {}", self.path.display());
+                // Art-only change (sprites/models): swap assets without restarting the game.
+                let art_only = spec.script == self.spec.script
+                    && spec.entities.len() == self.spec.entities.len()
+                    && serde_json::to_string(&spec.entities).ok() == serde_json::to_string(&self.spec.entities).ok()
+                    && spec.texts.len() == self.spec.texts.len()
+                    && spec.view == self.spec.view
+                    && (spec.sprites.len() != self.spec.sprites.len() || spec.models.len() != self.spec.models.len()
+                        || serde_json::to_string(&spec.sprites).ok() != serde_json::to_string(&self.spec.sprites).ok()
+                        || serde_json::to_string(&spec.models).ok() != serde_json::to_string(&self.spec.models).ok());
                 self.spec = spec;
-                self.restart();
+                if art_only {
+                    self.world.borrow_mut().replace_art(&self.spec);
+                } else {
+                    self.restart();
+                }
                 true
             }
             Err(e) => {
-                let msg = format!("game.json: {e}");
-                self.report(Err(msg));
+                self.report(Err(format!("{e:#}")));
                 false
             }
         }
@@ -134,6 +154,7 @@ impl GameSpec {
             background: [0.0; 3],
             gravity: [0.0; 3],
             sprites: Default::default(),
+            models: Default::default(),
             entities: vec![],
             texts: vec![],
             script: String::new(),
