@@ -15,8 +15,7 @@
 //!
 //! Paths inside the files are relative to the game folder.
 //!
-//! `FileSet` is the in-memory form (relative path -> text) used by the loader, the saver
-//! and the AI patcher alike, so the same code validates what the AI produced.
+//! `FileSet` is the in-memory form (relative path -> text) used by the loader and the saver.
 
 use crate::spec::{CameraSpec, EntitySpec, GameSpec, ImageRef, ModelSpec, Rgba, SpriteSpec, TextSpec, TileRule, View};
 use std::sync::Arc;
@@ -163,7 +162,7 @@ fn parse_color(v: &str) -> anyhow::Result<[f32; 3]> {
 // ---------------------------------------------------------------- FileSet <-> GameSpec
 
 /// TOML with inline arrays and floats rounded to 4 decimals (no f32 noise like 0.0799999).
-fn to_toml<T: Serialize>(v: &T) -> anyhow::Result<String> {
+pub fn to_toml<T: Serialize>(v: &T) -> anyhow::Result<String> {
     let mut json = serde_json::to_value(v)?;
     round_floats(&mut json);
     let value: toml::Value = serde_json::from_value::<toml::Value>(json)?;
@@ -456,177 +455,33 @@ pub fn save(path: &Path, spec: &GameSpec) -> anyhow::Result<()> {
     }
 }
 
-// ---------------------------------------------------------------- AI bundle format
+// ---------------------------------------------------------------- checks
 
-/// The multi-file text format the AI writes. Full files:
-/// ```text
-/// === file: script.rhai ===
-/// ...contents...
-/// === file: sprites/hero.txt ===
-/// ...
-/// === delete: sprites/old.txt ===
-/// ```
-/// and in-place edits:
-/// ```text
-/// === edit: script.rhai ===
-/// <<<<<<< FIND
-/// exact existing text
-/// =======
-/// replacement text
-/// >>>>>>> REPLACE
-/// ```
-pub const BUNDLE_FORMAT: &str = r#"Write files using this exact bundle format (no markdown fences around it):
-
-=== file: game.toml ===
-(full contents)
-=== file: scene.toml ===
-(full contents)
-=== file: script.rhai ===
-(full contents)
-=== file: sprites/hero.txt ===
-(full contents)
-
-For changes to an existing game, include only the files you change. Small changes inside a file use an edit section instead of resending the file:
-
-=== edit: script.rhai ===
-<<<<<<< FIND
-exact text that exists in the file now
-=======
-the replacement text
->>>>>>> REPLACE
-
-(any number of FIND/REPLACE blocks per edit section; FIND must match exactly once, whitespace included)
-=== delete: sprites/unused.txt ===
-"#;
-
-pub enum BundleItem {
-    File(String, String),
-    Edit(String, Vec<(String, String)>),
-    Delete(String),
-}
-
-pub fn parse_bundle(text: &str) -> anyhow::Result<Vec<BundleItem>> {
-    let mut items = Vec::new();
-    let mut current: Option<(String, String, String)> = None; // (kind, path, body)
-    let flush = |current: &mut Option<(String, String, String)>, items: &mut Vec<BundleItem>| -> anyhow::Result<()> {
-        if let Some((kind, path, body)) = current.take() {
-            let body = body.trim_start_matches('\n').trim_end().to_string() + "\n";
-            match kind.as_str() {
-                "file" => items.push(BundleItem::File(path, body)),
-                "delete" => items.push(BundleItem::Delete(path)),
-                "edit" => items.push(BundleItem::Edit(path.clone(), parse_edits(&body).with_context(|| format!("edit section for {path}"))?)),
-                _ => unreachable!(),
+/// Every sprite and model an entity names exists, and the script (legacy games) compiles.
+pub fn check(spec: GameSpec) -> anyhow::Result<GameSpec> {
+    if spec.entities.is_empty() {
+        bail!("scene.toml has no entities");
+    }
+    for e in &spec.entities {
+        if let Some(sp) = &e.sprite {
+            if !spec.sprites.contains_key(sp) {
+                bail!("entity '{}' uses sprite '{}' but there is no sprites/{}.txt|.toml|.png", e.name, sp, sp);
             }
         }
-        Ok(())
-    };
-    for line in text.lines() {
-        let t = line.trim();
-        if let Some(rest) = t.strip_prefix("=== ").and_then(|r| r.strip_suffix(" ===")) {
-            if let Some((kind, path)) = rest.split_once(':') {
-                let kind = kind.trim();
-                if ["file", "edit", "delete"].contains(&kind) {
-                    flush(&mut current, &mut items)?;
-                    let path = path.trim().trim_matches('`').replace('\\', "/");
-                    if path.contains("..") || path.starts_with('/') {
-                        bail!("invalid path {path:?}");
-                    }
-                    current = Some((kind.to_string(), path, String::new()));
-                    continue;
-                }
-            }
-        }
-        if let Some((_, _, body)) = current.as_mut() {
-            body.push_str(line);
-            body.push('\n');
-        }
-    }
-    flush(&mut current, &mut items)?;
-    if items.is_empty() {
-        bail!("no `=== file: ... ===` sections found in the reply");
-    }
-    Ok(items)
-}
-
-fn parse_edits(body: &str) -> anyhow::Result<Vec<(String, String)>> {
-    let mut edits = Vec::new();
-    let mut state = 0; // 0 outside, 1 in find, 2 in replace
-    let (mut find, mut replace) = (String::new(), String::new());
-    for line in body.lines() {
-        let t = line.trim_end();
-        match (state, t.trim()) {
-            (0, s) if s.starts_with("<<<<<<<") => {
-                state = 1;
-                find.clear();
-                replace.clear();
-            }
-            (1, "=======") => state = 2,
-            (2, s) if s.starts_with(">>>>>>>") => {
-                state = 0;
-                edits.push((strip_last_nl(&find), strip_last_nl(&replace)));
-            }
-            (1, _) => {
-                find.push_str(line);
-                find.push('\n');
-            }
-            (2, _) => {
-                replace.push_str(line);
-                replace.push('\n');
-            }
-            _ => {}
-        }
-    }
-    if state != 0 {
-        bail!("unterminated FIND/REPLACE block");
-    }
-    if edits.is_empty() {
-        bail!("no FIND/REPLACE blocks");
-    }
-    Ok(edits)
-}
-
-fn strip_last_nl(s: &str) -> String {
-    s.strip_suffix('\n').unwrap_or(s).to_string()
-}
-
-/// Applies a parsed bundle to a file set (in place).
-pub fn apply_bundle(files: &mut FileSet, items: &[BundleItem]) -> anyhow::Result<()> {
-    for item in items {
-        match item {
-            BundleItem::File(path, body) => {
-                files.insert(path.clone(), body.clone());
-            }
-            BundleItem::Delete(path) => {
-                if path == "game.toml" || path == "scene.toml" || path == "script.rhai" {
-                    bail!("cannot delete {path}");
-                }
-                files.remove(path);
-            }
-            BundleItem::Edit(path, edits) => {
-                let content = files.get(path).ok_or_else(|| anyhow!("edit target {path} does not exist; write it as a full file instead"))?;
-                let mut content = content.clone();
-                for (i, (find, replace)) in edits.iter().enumerate() {
-                    let n = content.matches(find.as_str()).count();
-                    if n == 0 {
-                        // Retry ignoring trailing whitespace differences per line.
-                        let norm = |s: &str| s.lines().map(|l| l.trim_end()).collect::<Vec<_>>().join("\n");
-                        let (nc, nf) = (norm(&content), norm(find));
-                        if nf.is_empty() || nc.matches(nf.as_str()).count() != 1 {
-                            bail!("{path} edit {}: FIND text not found (must match the current file exactly). FIND was:\n{find}", i + 1);
-                        }
-                        content = nc.replacen(nf.as_str(), &norm(replace), 1) + "\n";
-                        continue;
-                    }
-                    if n > 1 {
-                        bail!("{path} edit {}: FIND text occurs {n} times; include more surrounding lines so it is unique", i + 1);
-                    }
-                    content = content.replacen(find.as_str(), replace, 1);
-                }
-                files.insert(path.clone(), content);
+        if let Some(m) = &e.model {
+            if !spec.models.contains_key(m) {
+                bail!("entity '{}' uses model '{}' but there is no models/{}.toml", e.name, m, m);
             }
         }
     }
-    Ok(())
+    for (name, s) in &spec.sprites {
+        let (w, h) = s.size();
+        if s.tiles.is_none() && (w == 0 || h == 0) {
+            bail!("sprite '{name}' has no pixels");
+        }
+    }
+    crate::script::ScriptHost::check(&spec.script).map_err(|e| anyhow!("script.rhai: {e}"))?;
+    Ok(spec)
 }
 
 #[cfg(test)]

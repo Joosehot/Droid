@@ -1,16 +1,14 @@
-//! Droid command line.
+//! Droid command line: a whole game from one sentence (`droid make`), plus the legacy
+//! commands for the script games in legacy/.
 
-use droid::{ai, app, game, project, spec, world};
-
+use droid::{app, game, hot, project, world};
 
 use anyhow::bail;
 use clap::{Parser, Subcommand};
-use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
 
 #[derive(Parser)]
-#[command(name = "aige", version, about = "AI-native game engine: describe a game, play it, change it while it runs")]
+#[command(name = "droid", version, about = "Droid: a game engine where a whole game comes from one sentence")]
 struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
@@ -18,29 +16,51 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Generate a new game from a description into games/<name>/
-    New { name: String, prompt: String },
-    /// Run a game (hot-reloads when its files change; F5 restarts; TAB opens the AI chat)
-    Run { name: String },
-    /// Ask the AI to change an existing game
-    Edit { name: String, prompt: String },
-    /// Generate a game and immediately run it
-    Play { name: String, prompt: String },
-    /// Run a game with an additional terminal chat (the window has TAB chat anyway)
-    Chat { name: String },
-    /// Validate a game (files + script) without running it
-    Check { name: String },
-    /// Simulate N frames headlessly (no window) and report errors and UI texts
-    Sim {
+    /// Make games/<name>/ from a sentence: design, level, art, behaviour, Rust code, checks
+    Make {
         name: String,
-        #[arg(long, default_value_t = 300)]
-        frames: u32,
-        /// Fixed timestep in seconds (0 = real time)
-        #[arg(long, default_value_t = 1.0 / 60.0)]
-        dt: f32,
+        sentence: String,
+        /// Also print what every rule weighed and why the game is the way it is
+        #[arg(long)]
+        explain: bool,
+        /// Use another rules.toml (every number the engine uses)
+        #[arg(long)]
+        rules: Option<PathBuf>,
+        /// Skip words the vocabulary doesn't know instead of failing
+        #[arg(long)]
+        lenient: bool,
+        /// Open the game in a window when it is made
+        #[arg(long)]
+        run: bool,
+        /// Skip `cargo build` and the headless run (checks 4 and 5)
+        #[arg(long)]
+        no_build: bool,
     },
-    /// Convert a legacy games/<name>/game.json into the folder format
-    Convert { name: String },
+    /// Add words to a game's sentence and make it again (later words override earlier ones)
+    Edit {
+        name: String,
+        words: String,
+        #[arg(long)]
+        explain: bool,
+        #[arg(long)]
+        rules: Option<PathBuf>,
+        #[arg(long)]
+        lenient: bool,
+        #[arg(long)]
+        run: bool,
+        #[arg(long)]
+        no_build: bool,
+    },
+    /// Show how a sentence is understood and what the rules would choose (writes nothing)
+    Explain {
+        sentence: String,
+        #[arg(long)]
+        rules: Option<PathBuf>,
+        #[arg(long)]
+        lenient: bool,
+    },
+    /// List every word a sentence may use
+    Vocabulary,
     /// List the asset library (downloaded CC0 art) by kind; --check validates it
     Assets {
         /// Check every file exists and loads and every required kind is covered; exit 1 if not
@@ -50,9 +70,24 @@ enum Cmd {
         #[arg(long)]
         dir: Option<PathBuf>,
     },
+    /// Legacy: run a script game from legacy/ (hot-reloads when its files change; F5 restarts)
+    Run { name: String },
+    /// Legacy: validate a script game (files + script) without running it
+    Check { name: String },
+    /// Legacy: simulate N frames headlessly (no window) and report errors and UI texts
+    Sim {
+        name: String,
+        #[arg(long, default_value_t = 300)]
+        frames: u32,
+        /// Fixed timestep in seconds (0 = real time)
+        #[arg(long, default_value_t = 1.0 / 60.0)]
+        dt: f32,
+    },
+    /// Legacy: convert legacy/<name>/game.json into the folder format
+    Convert { name: String },
 }
 
-/// `games/<name>` folder, or a direct path to a folder / legacy `.json`.
+/// `legacy/<name>` folder, or a direct path to a folder / legacy `.json`.
 fn game_path(name: &str) -> PathBuf {
     let p = Path::new(name);
     if p.is_dir() || p.extension().map_or(false, |e| e == "json") {
@@ -66,107 +101,83 @@ fn game_path(name: &str) -> PathBuf {
     dir
 }
 
-fn generate_new(client: &ai::Client, path: &Path, prompt: &str) -> anyhow::Result<()> {
-    eprintln!("[aige] {} is designing your game...", client.describe());
-    let (spec, files) = client.new_game(prompt)?;
-    project::write_dir(path, &files)?;
-    eprintln!(
-        "[aige] wrote {} ({} files, {} entities, {} sprites, {} models): {}",
-        path.display(),
-        files.len(),
-        spec.entities.len(),
-        spec.sprites.len(),
-        spec.models.len(),
-        spec.title
-    );
+/// The Droid checkout: games/ lives here, and the staging crates build against it.
+fn root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+}
+
+fn fail(errs: Vec<String>) -> ! {
+    for e in errs {
+        eprintln!("{e}");
+    }
+    std::process::exit(1);
+}
+
+fn load_rules(rules: Option<&Path>) -> hot::config::Config {
+    hot::config::Config::load(rules).unwrap_or_else(|e| fail(vec![format!("error: {e:#}")]))
+}
+
+fn library() -> droid::assets::Library {
+    droid::assets::Library::builtin().unwrap_or_else(|e| fail(vec![format!("error: asset library: {e:#}")]))
+}
+
+fn make(name: &str, sentence: &str, explain: bool, rules: Option<&Path>, lenient: bool, run: bool, no_build: bool) -> anyhow::Result<()> {
+    let cfg = load_rules(rules);
+    let lib = library();
+    if explain {
+        match hot::explain(sentence, &cfg, &lib, lenient) {
+            Ok(s) => println!("{s}"),
+            Err(e) => fail(e),
+        }
+    }
+    let opts = hot::Options { lenient, build: !no_build };
+    eprintln!("[droid] making {name}: \"{sentence}\"{}", if no_build { "" } else { " (checks include cargo build and a headless run)" });
+    let made = hot::make(&root(), name, sentence, &cfg, &lib, &opts).unwrap_or_else(|e| fail(e));
+    for d in &made.dropped {
+        eprintln!("[droid] {d}");
+    }
+    println!("made {} ({} files) from finalist {}", made.dir.display(), made.files, made.finalist);
+    if let Some(r) = &made.report {
+        println!("headless run: status {}, player at {}, {} entities, texts {}", r["status"], r["player"], r["entities"], r["texts"]);
+    }
+    println!("see why.txt for every decision; play it with: cargo run -p {}", made.slug);
+    if run {
+        let status = std::process::Command::new(std::env::var("CARGO").unwrap_or_else(|_| "cargo".into()))
+            .args(["run", "--quiet", "-p", &made.slug])
+            .current_dir(root())
+            .status()?;
+        if !status.success() {
+            bail!("the game exited with {status}");
+        }
+    }
     Ok(())
 }
 
-/// Ask the AI for a change and save the result. Shared by `edit`, the terminal chat and the window chat.
-pub fn ai_edit(client: &ai::Client, path: &Path, request: &str, runtime_error: Option<&str>) -> anyhow::Result<spec::GameSpec> {
-    let current = if path.is_dir() { project::read_dir(path)? } else { project::to_files(&project::load(path)?)? };
-    let (spec, files) = client.edit_game(&current, request, runtime_error)?;
-    if path.is_dir() {
-        project::write_dir(path, &files)?;
-    } else {
-        project::save(path, &spec)?;
-    }
-    Ok(spec)
-}
-
-/// Terminal chat loop, runs on a background thread while the window is open.
-fn chat_thread(path: PathBuf, error_sink: Arc<Mutex<Option<String>>>) {
-    std::thread::spawn(move || {
-        let client = match ai::Client::from_env() {
-            Ok(c) => c,
-            Err(e) => {
-                eprintln!("[aige] chat disabled: {e}");
-                return;
-            }
-        };
-        eprintln!("[aige] chat ready ({}). Type a change request and press Enter. 'fix' = fix the current error, 'quit' = exit chat.", client.describe());
-        let stdin = std::io::stdin();
-        loop {
-            eprint!("aige> ");
-            let _ = std::io::stderr().flush();
-            let mut line = String::new();
-            if stdin.lock().read_line(&mut line).unwrap_or(0) == 0 {
-                break;
-            }
-            let req = line.trim().to_string();
-            if req.is_empty() {
-                continue;
-            }
-            if req == "quit" || req == "exit" {
-                break;
-            }
-            let err = error_sink.lock().unwrap().clone();
-            let request = if req == "fix" { "Fix the reported error without changing the design.".to_string() } else { req };
-            match ai_edit(&client, &path, &request, err.as_deref()) {
-                Ok(spec) => eprintln!("[aige] updated: {} (the window reloads automatically)", spec.title),
-                Err(e) => eprintln!("[aige] AI error: {e}"),
-            }
-        }
-    });
-}
-
-/// Load KEY=VALUE lines from `.env` into the environment without overriding set variables.
-fn load_dotenv() {
-    let Ok(text) = std::fs::read_to_string(".env") else { return };
-    for line in text.lines() {
-        let line = line.trim();
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-        if let Some((k, v)) = line.split_once('=') {
-            let (k, v) = (k.trim(), v.trim().trim_matches('"').trim_matches('\''));
-            if std::env::var_os(k).is_none() {
-                std::env::set_var(k, v);
-            }
-        }
-    }
-}
-
 fn main() -> anyhow::Result<()> {
-    load_dotenv();
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("aige=info,warn")).init();
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("droid=info,warn")).init();
     let cli = Cli::parse();
     match cli.cmd {
-        Cmd::New { name, prompt } => {
-            let client = ai::Client::from_env()?;
-            generate_new(&client, &Path::new("legacy").join(&name), &prompt)?;
+        Cmd::Make { name, sentence, explain, rules, lenient, run, no_build } => {
+            make(&name, &sentence, explain, rules.as_deref(), lenient, run, no_build)?;
         }
-        Cmd::Edit { name, prompt } => {
-            let client = ai::Client::from_env()?;
-            let path = game_path(&name);
-            eprintln!("[aige] {} is editing {}...", client.describe(), path.display());
-            let spec = ai_edit(&client, &path, &prompt, None)?;
-            eprintln!("[aige] updated {}: {}", path.display(), spec.title);
+        Cmd::Edit { name, words, explain, rules, lenient, run, no_build } => {
+            let slug = hot::slug(&name).unwrap_or_else(|e| fail(vec![format!("error: {e}")]));
+            let path = root().join("games").join(&slug).join("sentence.txt");
+            let old = std::fs::read_to_string(&path).unwrap_or_else(|_| fail(vec![format!("error: {} not found; make the game first with: droid make {slug} \"<sentence>\"", path.display())]));
+            let sentence = format!("{}, {}", old.trim().trim_end_matches('.'), words.trim());
+            make(&slug, &sentence, explain, rules.as_deref(), lenient, run, no_build)?;
         }
-        Cmd::Check { name } => {
-            let path = game_path(&name);
-            let spec = ai::validate(project::load(&path)?)?;
-            println!("OK: {} ({} entities, {} sprites, {} models)", spec.title, spec.entities.len(), spec.sprites.len(), spec.models.len());
+        Cmd::Explain { sentence, rules, lenient } => {
+            let cfg = load_rules(rules.as_deref());
+            match hot::explain(&sentence, &cfg, &library(), lenient) {
+                Ok(s) => println!("{s}"),
+                Err(e) => fail(e),
+            }
+        }
+        Cmd::Vocabulary => {
+            for w in hot::vocabulary() {
+                println!("{w}");
+            }
         }
         Cmd::Assets { check, dir } => {
             let lib = match dir {
@@ -194,6 +205,11 @@ fn main() -> anyhow::Result<()> {
             } else {
                 print!("{}", lib.listing());
             }
+        }
+        Cmd::Check { name } => {
+            let path = game_path(&name);
+            let spec = project::check(project::load(&path)?)?;
+            println!("OK: {} ({} entities, {} sprites, {} models)", spec.title, spec.entities.len(), spec.sprites.len(), spec.models.len());
         }
         Cmd::Convert { name } => {
             let dir = Path::new("legacy").join(&name);
@@ -236,23 +252,8 @@ fn main() -> anyhow::Result<()> {
         Cmd::Run { name } => {
             let path = game_path(&name);
             if !path.exists() {
-                bail!("{} does not exist. Create it with: aige new {name} \"<description>\"", path.display());
+                bail!("{} does not exist (new games are made with: droid make <name> \"<sentence>\")", path.display());
             }
-            app::App::new(path, None).run()?;
-        }
-        Cmd::Chat { name } => {
-            let path = game_path(&name);
-            if !path.exists() {
-                bail!("{} does not exist", path.display());
-            }
-            let sink = Arc::new(Mutex::new(None));
-            chat_thread(path.clone(), sink.clone());
-            app::App::new(path, Some(sink)).run()?;
-        }
-        Cmd::Play { name, prompt } => {
-            let client = ai::Client::from_env()?;
-            let path = Path::new("legacy").join(&name);
-            generate_new(&client, &path, &prompt)?;
             app::App::new(path, None).run()?;
         }
     }

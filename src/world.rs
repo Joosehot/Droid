@@ -67,13 +67,15 @@ pub struct Camera {
     pub follow: Option<String>,
     /// 3D follow: eye offset relative to the followed entity.
     pub follow_offset: Vec3,
+    /// 2D follow: the view centre is the followed entity plus this.
+    pub offset: Vec3,
 }
 
 impl Camera {
     fn from_spec(c: &CameraSpec) -> Self {
         let position = Vec3::from(c.position);
         let look_at = Vec3::from(c.look_at);
-        Self { position, look_at, zoom: c.zoom.max(0.1), follow: c.follow.clone(), follow_offset: position - look_at }
+        Self { position, look_at, zoom: c.zoom.max(0.1), follow: c.follow.clone(), follow_offset: position - look_at, offset: Vec3::from(c.offset) }
     }
 }
 
@@ -258,8 +260,8 @@ impl World {
         let p = t.pos;
         match self.view {
             View::TwoD => {
-                self.camera.position.x = p.x;
-                self.camera.position.y = p.y;
+                self.camera.position.x = p.x + self.camera.offset.x;
+                self.camera.position.y = p.y + self.camera.offset.y;
             }
             View::ThreeD => {
                 self.camera.look_at = p;

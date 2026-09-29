@@ -7,6 +7,7 @@ use super::config::Config;
 use super::request::*;
 use std::collections::BTreeMap;
 
+pub mod art;
 pub mod camera;
 pub mod controls;
 pub mod enemy_attack;
@@ -77,6 +78,7 @@ pub fn all() -> Vec<&'static dyn Rule> {
         &health::Health,
         &ramp::Ramp,
         &palette::Palette,
+        &art::Art,
         &music::Music,
         &juice::Juice,
         &hud::Hud,

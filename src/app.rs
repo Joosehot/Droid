@@ -1,63 +1,17 @@
-//! winit application: window, input mapping, frame pacing, in-window AI chat.
+//! winit application: window, input mapping, frame pacing. Games are changed with
+//! `droid edit <name> "<more words>"`; the window reloads when its files change.
 
-use crate::ai;
 use crate::game::Game;
 use crate::render::{Overlay, Renderer};
 use crate::sound::Audio;
-use crate::project;
 use std::path::PathBuf;
-use std::sync::{mpsc, Arc, Mutex};
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, MouseButton, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{Window, WindowId};
-
-/// Background AI worker: receives change requests, patches the game file, reports status.
-struct AiWorker {
-    tx: mpsc::Sender<String>,
-    status: Arc<Mutex<String>>,
-    busy: Arc<Mutex<bool>>,
-}
-
-impl AiWorker {
-    fn start(path: PathBuf, error_sink: Arc<Mutex<Option<String>>>) -> Option<AiWorker> {
-        let client = match ai::Client::from_env() {
-            Ok(c) => c,
-            Err(e) => {
-                log::warn!("in-window chat disabled: {e}");
-                return None;
-            }
-        };
-        let (tx, rx) = mpsc::channel::<String>();
-        let status = Arc::new(Mutex::new(format!("AI ready ({}). Press TAB to chat.", client.describe())));
-        let busy = Arc::new(Mutex::new(false));
-        let (st, bz) = (status.clone(), busy.clone());
-        std::thread::spawn(move || {
-            for req in rx {
-                *bz.lock().unwrap() = true;
-                *st.lock().unwrap() = format!("AI working on: {req}");
-                let started = Instant::now();
-                let err = error_sink.lock().unwrap().clone();
-                let request = if req == "fix" { "Fix the reported error without changing the design.".to_string() } else { req.clone() };
-                let result = (|| -> anyhow::Result<crate::spec::GameSpec> {
-                    let current = if path.is_dir() { project::read_dir(&path)? } else { project::to_files(&project::load(&path)?)? };
-                    let (spec, files) = client.edit_game(&current, &request, err.as_deref())?;
-                    if path.is_dir() { project::write_dir(&path, &files)?; } else { project::save(&path, &spec)?; }
-                    Ok(spec)
-                })();
-                let secs = started.elapsed().as_secs();
-                *st.lock().unwrap() = match result {
-                    Ok(spec) => format!("AI done in {secs}s: {}. TAB to chat again.", spec.title),
-                    Err(e) => format!("AI error: {e}"),
-                };
-                *bz.lock().unwrap() = false;
-            }
-        });
-        Some(AiWorker { tx, status, busy })
-    }
-}
 
 pub struct App {
     path: PathBuf,
@@ -70,17 +24,14 @@ pub struct App {
     started: Instant,
     factory: Option<crate::game::Factory>,
     audio: Audio,
-    ai: Option<AiWorker>,
-    /// Some(buffer) while the chat box is open.
-    chat: Option<String>,
-    status_shown_until: Option<Instant>,
+    /// Some(until) while the "use droid edit" hint is shown (TAB).
+    hint_until: Option<Instant>,
 }
 
 impl App {
     pub fn new(path: PathBuf, error_sink: Option<Arc<Mutex<Option<String>>>>) -> Self {
         let exit_after = std::env::var("DROID_EXIT_AFTER").ok().and_then(|v| v.parse().ok());
         let error_sink = error_sink.unwrap_or_default();
-        let ai = AiWorker::start(path.clone(), error_sink.clone());
         App {
             path,
             game: None,
@@ -91,16 +42,13 @@ impl App {
             started: Instant::now(),
             factory: None,
             audio: Audio::start(),
-            ai,
-            chat: None,
-            status_shown_until: Some(Instant::now() + std::time::Duration::from_secs(6)),
+            hint_until: None,
         }
     }
 
     /// Run Rust game code instead of the data's script.
     pub fn with_game(mut self, factory: crate::game::Factory) -> Self {
         self.factory = Some(factory);
-        self.ai = None;
         self
     }
 
@@ -111,36 +59,12 @@ impl App {
         Ok(())
     }
 
-    fn send_chat(&mut self, text: String) {
-        let Some(ai) = &self.ai else { return };
-        if *ai.busy.lock().unwrap() {
-            *ai.status.lock().unwrap() = "AI is still working; wait for it to finish.".into();
-        } else {
-            let _ = ai.tx.send(text);
-        }
-        self.status_shown_until = None; // keep status visible while working
-    }
-
     fn overlay(&self, w: u32, h: u32) -> Overlay {
         let mut o = Overlay::default();
-        let (w, h) = (w as f32, h as f32);
-        if let Some(buf) = &self.chat {
-            let bar_h = 44.0;
-            o.rects.push((0.0, h - bar_h, w, bar_h, [0.05, 0.05, 0.08, 0.92]));
-            let caret = if (self.started.elapsed().as_secs_f32() * 2.0) as i32 % 2 == 0 { "_" } else { " " };
-            o.texts.push((format!("> {buf}{caret}"), 12.0, h - bar_h + 12.0, 20.0, [1.0, 1.0, 1.0]));
-            o.texts.push(("ENTER send   ESC close".into(), w - 300.0, h - bar_h + 14.0, 14.0, [0.6, 0.6, 0.7]));
-        }
-        if let Some(ai) = &self.ai {
-            let busy = *ai.busy.lock().unwrap();
-            let timed = self.status_shown_until.map_or(true, |t| Instant::now() < t);
-            if busy || timed || self.chat.is_some() {
-                let status = ai.status.lock().unwrap().clone();
-                let y = if self.chat.is_some() { h - 44.0 - 26.0 } else { h - 30.0 };
-                o.rects.push((0.0, y - 4.0, w, 26.0, [0.05, 0.05, 0.08, 0.75]));
-                let col = if busy { [1.0, 0.85, 0.3] } else if status.starts_with("AI error") { [1.0, 0.4, 0.4] } else { [0.7, 0.9, 0.7] };
-                o.texts.push((status, 12.0, y, 14.0, col));
-            }
+        if self.hint_until.is_some_and(|t| Instant::now() < t) {
+            let (w, h) = (w as f32, h as f32);
+            o.rects.push((0.0, h - 34.0, w, 26.0, [0.05, 0.05, 0.08, 0.75]));
+            o.texts.push(("change this game with: droid edit <name> \"<more words>\"".into(), 12.0, h - 30.0, 14.0, [0.7, 0.9, 0.7]));
         }
         o
     }
@@ -205,38 +129,9 @@ impl ApplicationHandler for App {
                 let PhysicalKey::Code(code) = event.physical_key else { return };
                 let pressed = event.state == ElementState::Pressed;
 
-                // Chat box open: capture typing.
-                if let Some(buf) = self.chat.as_mut() {
-                    if !pressed {
-                        return;
-                    }
-                    match code {
-                        KeyCode::Escape | KeyCode::Tab => self.chat = None,
-                        KeyCode::Enter => {
-                            let text = buf.trim().to_string();
-                            self.chat = None;
-                            if !text.is_empty() {
-                                self.send_chat(text);
-                            }
-                        }
-                        KeyCode::Backspace => {
-                            buf.pop();
-                        }
-                        _ => {
-                            if let Some(t) = &event.text {
-                                for c in t.chars().filter(|c| !c.is_control()) {
-                                    buf.push(c);
-                                }
-                            }
-                        }
-                    }
-                    return;
-                }
-
                 let game = self.game.as_mut().unwrap();
-                if code == KeyCode::Tab && pressed && !event.repeat && self.ai.is_some() {
-                    self.chat = Some(String::new());
-                    game.world.borrow_mut().input.down.clear();
+                if code == KeyCode::Tab && pressed && !event.repeat {
+                    self.hint_until = Some(Instant::now() + std::time::Duration::from_secs(4));
                     return;
                 }
                 if code == KeyCode::F5 && pressed {
@@ -286,7 +181,6 @@ impl ApplicationHandler for App {
                     if game.poll_reload() {
                         renderer.window.set_title(&format!("Droid - {}", game.spec.title));
                         game.world.borrow_mut().aspect = renderer.aspect();
-                        self.status_shown_until = Some(Instant::now() + std::time::Duration::from_secs(8));
                     }
                     game.step(dt);
                     for cmd in game.world.borrow_mut().sounds.drain(..) {

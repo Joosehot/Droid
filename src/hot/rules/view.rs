@@ -22,7 +22,11 @@ impl Rule for View {
             Some(v) if v.v == ViewReq::Depth && !arena => Err(format!("\"{}\": only arenas have a 3d version", v.words)),
             Some(v) if v.v == ViewReq::Depth => Ok(vec![Offer::named("depth", v.words.clone())]),
             Some(v) => Ok(vec![Offer::named("flat", v.words.clone())]),
-            None if arena => Ok(vec![Offer::plain("flat"), Offer::plain("depth")]),
+            // "top-down" names the flat view outright
+            None if arena => match cx.req.genre.as_ref().filter(|g| g.words.to_lowercase().starts_with("top")) {
+                Some(g) => Ok(vec![Offer::named("flat", g.words.clone())]),
+                None => Ok(vec![Offer::plain("flat"), Offer::plain("depth")]),
+            },
             None => Ok(vec![Offer::plain("flat")]),
         }
     }
@@ -36,6 +40,11 @@ mod tests {
     #[test]
     fn arenas_may_be_3d() {
         assert_eq!(offers(&View, "make an arena", &[("genre", "arena")]), Some(vec!["flat", "depth"]));
+    }
+
+    #[test]
+    fn top_down_is_flat() {
+        assert_eq!(offers(&View, "make a top-down arena", &[("genre", "arena")]), Some(vec!["flat"]));
     }
 
     #[test]

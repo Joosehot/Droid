@@ -43,7 +43,9 @@ pub fn step(world: &mut World, dt: f32) {
             }
             _ => {}
         }
-        if two_d {
+        // 2D: moving things stay on the z = 0 plane; scenery without a body keeps its depth
+        // (decor behind the level at z < 0).
+        if two_d && b.kind != BodyKind::None {
             t.pos.z = 0.0;
             b.vel.z = 0.0;
         }

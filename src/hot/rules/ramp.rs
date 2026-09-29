@@ -19,8 +19,8 @@ impl Rule for Ramp {
     fn offers(&self, cx: &Ctx, chosen: &Chosen) -> Result<Vec<Offer>, String> {
         let _ = (cx, chosen);
         Ok(match (genre_of(chosen), chosen.get("goal").copied()) {
-            // new waves only make sense when clearing the field is the point
-            (Genre::Shooter, _) | (_, Some("destroy_all")) => vec![Offer::plain("steady"), Offer::plain("waves"), Offer::plain("speedup")],
+            // new waves come when the field is cleared, or on a timer while surviving
+            (Genre::Shooter, _) | (_, Some("destroy_all")) | (_, Some("survive")) => vec![Offer::plain("steady"), Offer::plain("waves"), Offer::plain("speedup")],
             _ => vec![Offer::plain("steady"), Offer::plain("speedup")],
         })
     }
@@ -34,6 +34,12 @@ mod tests {
     #[test]
     fn shooters_ramp() {
         assert_eq!(offers(&Ramp, "make a shooter", &[("genre", "shooter"), ("goal", "destroy_all")]), Some(vec!["steady", "waves", "speedup"]));
+    }
+
+    #[test]
+    fn survival_waves_and_collecting_without() {
+        assert_eq!(offers(&Ramp, "make an arena with zombies", &[("genre", "arena"), ("goal", "survive")]), Some(vec!["steady", "waves", "speedup"]));
+        assert_eq!(offers(&Ramp, "make an arena with zombies", &[("genre", "arena"), ("goal", "collect_all")]), Some(vec!["steady", "speedup"]));
     }
 
     #[test]

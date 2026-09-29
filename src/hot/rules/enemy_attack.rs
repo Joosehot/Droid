@@ -1,4 +1,4 @@
-//! How shooting enemies aim: straight or at the player. Only when enemies shoot (always for a
+//! How shooting enemies aim: straight down or at the player (arenas: always at the player). Only when enemies shoot (always for a
 //! shooter's fleet).
 
 use super::*;
@@ -23,8 +23,12 @@ impl Rule for EnemyAttack {
             .or_else(|| (genre_of(chosen) == Genre::Shooter).then(|| "a shooter's fleet fires back".to_string()))
     }
     fn offers(&self, cx: &Ctx, chosen: &Chosen) -> Result<Vec<Offer>, String> {
-        let _ = (cx, chosen);
-        Ok(vec![Offer::plain("straight"), Offer::plain("aimed")])
+        let _ = cx;
+        // seen from above there is no "down" to shoot along: arena enemies aim
+        Ok(match genre_of(chosen) {
+            Genre::Arena => vec![Offer::plain("aimed")],
+            _ => vec![Offer::plain("straight"), Offer::plain("aimed")],
+        })
     }
 }
 

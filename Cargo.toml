@@ -26,7 +26,6 @@ rhai = { version = "1", features = ["f32_float", "only_i64"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 toml = { version = "0.8", features = ["preserve_order"] }
-reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls"], default-features = false }
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 rand = "0.8"
@@ -35,6 +34,7 @@ env_logger = "0.11"
 rodio = { version = "0.19", default-features = false }
 image = { version = "0.25", default-features = false, features = ["png"] }
 gltf = { version = "1", default-features = false, features = ["import", "utils", "names"] }
+senne = { path = "../Senne" }
 
 [profile.dev]
 opt-level = 1

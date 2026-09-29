@@ -4,13 +4,13 @@
 //! Rust type implementing [`api::Game`] plus a data folder (game.toml, scene.toml, sprites,
 //! models) and is started with [`run`].
 
-pub mod ai;
 pub mod anim;
 pub mod assets;
 pub mod api;
 pub mod app;
 pub mod font;
 pub mod game;
+pub mod hot;
 pub mod models;
 pub mod physics;
 pub mod project;

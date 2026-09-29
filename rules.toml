@@ -43,7 +43,7 @@ shooter = { weight = 0.9, axes = [0.0, 0.0, 0.0] }
 
 [variants.view]
 flat = { weight = 1.0, axes = [0.0, 0.0, 0.2] }
-depth = { weight = 0.8, axes = [0.0, 0.0, -0.4] }
+depth = { weight = 0.1, axes = [0.0, 0.0, -0.4] }   # 3d mostly when asked for: the depth judges add up to +0.8
 
 [variants.layout]
 flat_run = { weight = 1.0, axes = [-0.6, 0.4, 0.8] }
@@ -121,6 +121,12 @@ full = { weight = 1.05, axes = [0.0, 0.3, -0.4] }
 corner = { weight = 1.0, axes = [0.0, 0.0, 0.4] }
 top_bar = { weight = 1.0, axes = [0.0, 0.2, -0.2] }
 
+# which family of library art draws the game (asset library `style`)
+[variants.art]
+pixel = { weight = 1.0, axes = [0.0, 0.0, 0.4] }
+vector = { weight = 1.05, axes = [0.0, 0.2, -0.2] }
+lowpoly = { weight = 1.0, axes = [0.0, 0.0, 0.0] }
+
 # ---------------------------------------------------------------- judges
 # Bonuses and penalties that look at several choices together.
 [judges]
@@ -187,7 +193,22 @@ platform_width = [3.0, 6.0]
 spawn_x = 3.0
 exit_margin = 4.0
 camera_zoom = 14.0
-lookahead = 3.0
+lookahead = 3.0          # the lookahead camera sees this many units more
+camera_rise = 2.0        # the camera looks this far above the player (more sky, less underground)
+ground_bottom = -6.0     # ground boxes reach down to here
+first_segment = 11.0     # the spawn segment is at least this long
+gap_min = 1.6
+step_min = 0.6           # "steps" layout: smallest height change between segments
+max_height = 5.0         # ground never climbs above this
+platform_thickness = 0.5
+platform_gap = 1.0       # clear space between a platform and anything under it
+pit_depth = 1.4          # hazard pits ("in_gaps") are this deep
+hazard_margin = 2.0      # hazards keep this far from a segment's ends
+coin_height = 1.0        # pickups float this high above what they sit on
+coin_spacing = 1.4
+decor_every = 7.0        # one tree/bush per this many units of ground
+clouds = 9
+cloud_height = [6.0, 10.0]
 
 [layout.arena]
 width = 28.0
@@ -197,6 +218,12 @@ pillar_size = 1.4
 room_door = 4.0
 wall_height_3d = 1.4
 camera_zoom = 19.0
+follow_zoom = 13.0         # a following camera shows this many units top to bottom
+pillar_keep = 0.7          # chance that a grid spot gets a pillar
+pillar_height_3d = 2.8
+wall_thickness = 1.0
+clear_cell = 0.5           # flood-fill grid cell for the reachability check
+decor = 8                  # decor pieces outside the walls (3D) or on the floor (2D)
 depth_camera = [0.0, 14.0, 11.0]   # 3D follow offset (x, up, back)
 high_camera = [0.0, 22.0, 7.0]
 
@@ -211,6 +238,8 @@ camera_zoom = 21.0
 stars = 40
 shield_count = 4
 shield_y = -5.5
+shield_block = 0.7         # one shield is 4 x 2 blocks of this size
+star_size = [0.06, 0.16]
 
 # ---------------------------------------------------------------- things
 # speed in world units per second; size = [width, height]; behavior = the default.
@@ -278,6 +307,10 @@ wander_turn = 1.6          # seconds between direction changes
 shoot_interval = 1.6       # seconds between shots per group (shooter: whole fleet)
 shoot_speed = 9.0
 stomp_bounce = 11.0
+patrol_distance = 2.5      # patrollers walk this far to each side
+fly_height = 2.4           # platformer: flying enemies hover this high above the ground
+shoot_range = 10.0         # enemies aim at the player within this distance
+wave_every = 15.0          # arena survival with waves: seconds between waves
 
 [pickups.coin]
 value = 1
@@ -442,6 +475,28 @@ platform = [0.45, 0.35, 0.3]
 wall = [0.35, 0.25, 0.22]
 decor = [1.0, 0.45, 0.1]
 text = [1.0, 0.9, 0.7]
+
+# ---------------------------------------------------------------- art from the asset library
+[art]
+tile_size = 1.0            # world size of one ground/platform/wall tile
+player_height = 1.3
+ship_height = 1.3
+exit_height = 1.8
+shot_size = 0.4
+decor_height = { tree = 3.2, bush = 1.0, rock = 1.0, cactus = 1.8, cloud = 1.4 }
+model_height = 1.4         # 3D characters are this tall (pickups use their size, enemies their height)
+player_fallback = "hero"   # art kind for a default player when its kind has no art in the chosen style
+walk_fps = 8.0
+enemy_fps = 4.0
+# Library themes for each sentence theme (tilesets and decor).
+tile_theme = { forest = "forest", cave = "cave", space = "castle", desert = "desert", snow = "snow", garden = "forest", ocean = "desert", candy = "candy", castle = "castle", city = "castle", lava = "cave" }
+decor = { forest = ["tree", "bush"], cave = ["rock"], space = ["rock"], desert = ["cactus", "rock"], snow = ["tree", "rock"], garden = ["bush", "tree"], ocean = ["rock", "bush"], candy = ["bush"], castle = ["rock"], city = ["bush"], lava = ["rock"] }
+# 3D: model kinds to use when a kind has no model of its own.
+model_fallback = { gnome = "humanoid", frog = "humanoid", ship = "humanoid" }
+
+[hud]
+help = [0.02, 0.95, 16.0]  # controls line: x, y (0..1 from the top left) and text size
+help_dim = 0.75            # the controls line is the theme's text colour times this
 
 [palette]
 dark_factor = 0.35       # "night" / dark palette: background x this, others x (factor + 0.4)

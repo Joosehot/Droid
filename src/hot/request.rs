@@ -20,6 +20,7 @@ kinds!(Theme {
     Forest = "forest", Cave = "cave", Space = "space", Desert = "desert", Snow = "snow",
     Garden = "garden", Ocean = "ocean", Candy = "candy", Castle = "castle", City = "city", Lava = "lava",
 });
+kinds!(ArtStyle { Pixel = "pixel", Vector = "vector", Lowpoly = "lowpoly" });
 kinds!(TimeOfDay { Day = "day", Night = "night" });
 kinds!(Color {
     Red = "red", Orange = "orange", Yellow = "yellow", Green = "green", Blue = "blue", Purple = "purple",
@@ -115,6 +116,8 @@ pub struct Request {
     pub abilities: Vec<Val<Ability>>,
     pub theme: Option<Val<Theme>>,
     pub time: Option<Val<TimeOfDay>>,
+    /// "pixel", "cartoon", "low poly": which family of library art to draw with.
+    pub style: Option<Val<ArtStyle>>,
     pub mods: Vec<Val<Mod>>,
     pub lives: Option<Val<u32>>,
     pub edits: Vec<Val<(Target, Change)>>,

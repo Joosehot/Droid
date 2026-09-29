@@ -344,11 +344,14 @@ pub struct CameraSpec {
     /// Name of an entity the camera keeps centred / follows.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub follow: Option<String>,
+    /// 2D follow only: the view centre is the followed entity plus this (e.g. look ahead).
+    #[serde(default, skip_serializing_if = "is_zero3")]
+    pub offset: [f32; 3],
 }
 
 impl Default for CameraSpec {
     fn default() -> Self {
-        Self { position: default_cam_pos(), look_at: [0.0; 3], zoom: default_zoom(), follow: None }
+        Self { position: default_cam_pos(), look_at: [0.0; 3], zoom: default_zoom(), follow: None, offset: [0.0; 3] }
     }
 }
 

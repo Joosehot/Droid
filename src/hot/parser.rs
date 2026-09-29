@@ -160,11 +160,19 @@ fn parse_clause(toks: &[Token], req: &mut Request, prev_verb: &mut Option<(Verb,
         let w = t.text.clone();
         match t.tok {
             Tok::Make | Tok::Add | Tok::Filler | Tok::With => {}
-            Tok::Genre(g) => req.genre = Some(Val::new(g, w)),
+            Tok::Genre(g) => {
+                // "top-down arena": both words name the same genre; keep them all as provenance
+                let words = match &req.genre {
+                    Some(old) if old.v == g && !old.words.contains(&w) => format!("{} {w}", old.words),
+                    _ => w,
+                };
+                req.genre = Some(Val::new(g, words));
+            }
             Tok::View(v) => req.view = Some(Val::new(v, w)),
             Tok::Mod(m) => req.mods.push(Val::new(m, w)),
             Tok::Theme(th) => req.theme = Some(Val::new(th, w)),
             Tok::Time(ti) => req.time = Some(Val::new(ti, w)),
+            Tok::Style(st) => req.style = Some(Val::new(st, w)),
             Tok::Color(col) => {
                 if c.color.is_some() {
                     return Err(Diag::new(format!("\"{all}\" has two colours for one thing")));

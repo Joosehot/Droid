@@ -34,6 +34,33 @@ pub struct Config {
     pub default_enemy: BTreeMap<String, String>,
     pub default_pickup: BTreeMap<String, String>,
     pub music: BTreeMap<String, MusicCfg>,
+    pub art: ArtCfg,
+    pub hud: HudCfg,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct HudCfg {
+    pub help: [f32; 3],
+    pub help_dim: f32,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ArtCfg {
+    pub tile_size: f32,
+    pub player_height: f32,
+    pub ship_height: f32,
+    pub exit_height: f32,
+    pub shot_size: f32,
+    pub decor_height: BTreeMap<String, f32>,
+    pub model_height: f32,
+    pub player_fallback: String,
+    pub walk_fps: f32,
+    pub enemy_fps: f32,
+    pub tile_theme: BTreeMap<String, String>,
+    pub decor: BTreeMap<String, Vec<String>>,
+    pub model_fallback: BTreeMap<String, String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -124,6 +151,21 @@ pub struct PlatformerLayout {
     pub exit_margin: f32,
     pub camera_zoom: f32,
     pub lookahead: f32,
+    pub camera_rise: f32,
+    pub ground_bottom: f32,
+    pub first_segment: f32,
+    pub gap_min: f32,
+    pub step_min: f32,
+    pub max_height: f32,
+    pub platform_thickness: f32,
+    pub platform_gap: f32,
+    pub pit_depth: f32,
+    pub hazard_margin: f32,
+    pub coin_height: f32,
+    pub coin_spacing: f32,
+    pub decor_every: f32,
+    pub clouds: u32,
+    pub cloud_height: [f32; 2],
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -136,6 +178,12 @@ pub struct ArenaLayout {
     pub room_door: f32,
     pub wall_height_3d: f32,
     pub camera_zoom: f32,
+    pub follow_zoom: f32,
+    pub pillar_keep: f32,
+    pub pillar_height_3d: f32,
+    pub wall_thickness: f32,
+    pub clear_cell: f32,
+    pub decor: u32,
     pub depth_camera: [f32; 3],
     pub high_camera: [f32; 3],
 }
@@ -153,6 +201,8 @@ pub struct ShooterLayout {
     pub stars: u32,
     pub shield_count: u32,
     pub shield_y: f32,
+    pub shield_block: f32,
+    pub star_size: [f32; 2],
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -175,6 +225,10 @@ pub struct EnemyRules {
     pub shoot_interval: f32,
     pub shoot_speed: f32,
     pub stomp_bounce: f32,
+    pub patrol_distance: f32,
+    pub fly_height: f32,
+    pub shoot_range: f32,
+    pub wave_every: f32,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -346,6 +400,24 @@ impl Config {
         for (k, v) in &self.default_pickup {
             if PickupKind::ALL.iter().all(|x| x.name() != v) {
                 bail!("default_pickup.{k} = {v:?} is not a pickup kind");
+            }
+        }
+        for t in Theme::ALL {
+            if !self.art.tile_theme.contains_key(t.name()) {
+                bail!("missing art.tile_theme.{}", t.name());
+            }
+            if !self.art.decor.contains_key(t.name()) {
+                bail!("missing art.decor.{}", t.name());
+            }
+            for d in &self.art.decor[t.name()] {
+                if !self.art.decor_height.contains_key(d) {
+                    bail!("art.decor.{} names {d:?}, which has no art.decor_height", t.name());
+                }
+            }
+        }
+        for (k, v) in [("tile_size", self.art.tile_size), ("player_height", self.art.player_height), ("model_height", self.art.model_height), ("shot_size", self.art.shot_size)] {
+            if !(v > 0.0) {
+                bail!("art.{k} must be above 0");
             }
         }
         if self.search.beam_width == 0 || self.search.finalists == 0 || self.search.per_shape == 0 {

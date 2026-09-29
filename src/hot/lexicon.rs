@@ -13,6 +13,7 @@ pub enum Tok {
     Mod(Mod),
     Theme(Theme),
     Time(TimeOfDay),
+    Style(ArtStyle),
     Color(Color),
     Player(PlayerKind),
     /// "the player", "you", "hero": the player without a kind.
@@ -158,6 +159,16 @@ fn table() -> Vec<(&'static str, Tok)> {
         ("day", T::Time(TimeOfDay::Day)),
         ("sunny", T::Time(TimeOfDay::Day)),
         ("bright", T::Time(TimeOfDay::Day)),
+        // art style
+        ("pixel", T::Style(ArtStyle::Pixel)),
+        ("pixel art", T::Style(ArtStyle::Pixel)),
+        ("pixelated", T::Style(ArtStyle::Pixel)),
+        ("retro", T::Style(ArtStyle::Pixel)),
+        ("cartoon", T::Style(ArtStyle::Vector)),
+        ("cartoony", T::Style(ArtStyle::Vector)),
+        ("vector", T::Style(ArtStyle::Vector)),
+        ("low poly", T::Style(ArtStyle::Lowpoly)),
+        ("lowpoly", T::Style(ArtStyle::Lowpoly)),
         // colours
         ("red", T::Color(Color::Red)),
         ("orange", T::Color(Color::Orange)),
@@ -351,7 +362,7 @@ fn table() -> Vec<(&'static str, Tok)> {
         "it", "its", "their", "them", "him", "her", "they", "can", "must", "should", "will", "all", "every", "each", "there",
         "as", "for", "from", "around", "across", "back", "end", "game", "games", "me", "my", "your", "into", "out", "over",
         "under", "only", "just", "also", "very", "really", "super", "so", "please", "one", "full", "along",
-        "little", "big", "tiny", "huge", "cute", "scary", "spooky", "retro", "pixel", "classic", "fun", "cool",
+        "little", "big", "tiny", "huge", "cute", "scary", "spooky", "classic", "fun", "cool",
         "about", "like", "kind", "sort", "style", "themed",
     ] {
         t.push((f, Tok::Filler));
