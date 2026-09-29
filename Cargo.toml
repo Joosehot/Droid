@@ -1,12 +1,19 @@
 [package]
-name = "aige"
+name = "droid"
 version = "0.1.0"
 edition = "2021"
-description = "AIGE - AI-native game engine. The AI writes the game; the engine runs it."
+description = "Droid - a game engine whose games are written from a sentence (HotMotor design)"
+
+[lib]
+name = "droid"
+path = "src/lib.rs"
 
 [[bin]]
-name = "aige"
+name = "droid"
 path = "src/main.rs"
+
+[workspace]
+members = ["games/*"]
 
 [dependencies]
 wgpu = "24"

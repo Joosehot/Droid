@@ -1,18 +1,7 @@
-//! AIGE - AI-native game engine. The AI writes the game; the engine runs it.
+//! Droid command line.
 
-mod ai;
-mod anim;
-mod app;
-mod font;
-mod game;
-mod models;
-mod physics;
-mod project;
-mod render;
-mod script;
-mod sound;
-mod spec;
-mod world;
+use droid::{ai, app, game, project, spec, world};
+
 
 use anyhow::bail;
 use clap::{Parser, Subcommand};
@@ -60,7 +49,7 @@ fn game_path(name: &str) -> PathBuf {
     if p.is_dir() || p.extension().map_or(false, |e| e == "json") {
         return p.to_path_buf();
     }
-    let dir = Path::new("games").join(name);
+    let dir = Path::new("legacy").join(name);
     let legacy = dir.join("game.json");
     if !dir.join("game.toml").exists() && legacy.exists() {
         return legacy;
@@ -156,7 +145,7 @@ fn main() -> anyhow::Result<()> {
     match cli.cmd {
         Cmd::New { name, prompt } => {
             let client = ai::Client::from_env()?;
-            generate_new(&client, &Path::new("games").join(&name), &prompt)?;
+            generate_new(&client, &Path::new("legacy").join(&name), &prompt)?;
         }
         Cmd::Edit { name, prompt } => {
             let client = ai::Client::from_env()?;
@@ -171,7 +160,7 @@ fn main() -> anyhow::Result<()> {
             println!("OK: {} ({} entities, {} sprites, {} models)", spec.title, spec.entities.len(), spec.sprites.len(), spec.models.len());
         }
         Cmd::Convert { name } => {
-            let dir = Path::new("games").join(&name);
+            let dir = Path::new("legacy").join(&name);
             let legacy = dir.join("game.json");
             if !legacy.exists() {
                 bail!("{} not found", legacy.display());
@@ -226,7 +215,7 @@ fn main() -> anyhow::Result<()> {
         }
         Cmd::Play { name, prompt } => {
             let client = ai::Client::from_env()?;
-            let path = Path::new("games").join(&name);
+            let path = Path::new("legacy").join(&name);
             generate_new(&client, &path, &prompt)?;
             app::App::new(path, None).run()?;
         }

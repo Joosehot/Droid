@@ -1,0 +1,12 @@
+Y = 1.000 0.850 0.200
+o = 0.950 0.550 0.050
+y = 0.850 0.650 0.100
+---
+..yyyy..
+.yYYYYy.
+yYYooYYy
+yYoYYoYy
+yYoYYoYy
+yYYooYYy
+.yYYYYy.
+..yyyy..

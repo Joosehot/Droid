@@ -1,0 +1,10 @@
+title = "Coin Runner"
+view = "2d"
+background = [0.08, 0.09, 0.12]
+gravity = [0.0, -30.0, 0.0]
+
+[camera]
+position = [0.0, 2.0, 20.0]
+look_at = [0.0, 0.0, 0.0]
+zoom = 18.0
+follow = "player"

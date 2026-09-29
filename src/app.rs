@@ -68,6 +68,7 @@ pub struct App {
     /// AIGE_EXIT_AFTER=<seconds>: quit automatically (for automated testing).
     exit_after: Option<f32>,
     started: Instant,
+    factory: Option<crate::game::Factory>,
     audio: Audio,
     ai: Option<AiWorker>,
     /// Some(buffer) while the chat box is open.
@@ -77,7 +78,7 @@ pub struct App {
 
 impl App {
     pub fn new(path: PathBuf, error_sink: Option<Arc<Mutex<Option<String>>>>) -> Self {
-        let exit_after = std::env::var("AIGE_EXIT_AFTER").ok().and_then(|v| v.parse().ok());
+        let exit_after = std::env::var("DROID_EXIT_AFTER").ok().and_then(|v| v.parse().ok());
         let error_sink = error_sink.unwrap_or_default();
         let ai = AiWorker::start(path.clone(), error_sink.clone());
         App {
@@ -88,11 +89,19 @@ impl App {
             error_sink,
             exit_after,
             started: Instant::now(),
+            factory: None,
             audio: Audio::start(),
             ai,
             chat: None,
             status_shown_until: Some(Instant::now() + std::time::Duration::from_secs(6)),
         }
+    }
+
+    /// Run Rust game code instead of the data's script.
+    pub fn with_game(mut self, factory: crate::game::Factory) -> Self {
+        self.factory = Some(factory);
+        self.ai = None;
+        self
     }
 
     pub fn run(mut self) -> anyhow::Result<()> {
@@ -159,7 +168,7 @@ impl ApplicationHandler for App {
         if self.renderer.is_some() {
             return;
         }
-        let game = match Game::load(&self.path) {
+        let game = match Game::load_with(&self.path, self.factory.clone()) {
             Ok(mut g) => {
                 g.error_sink = Some(self.error_sink.clone());
                 g
@@ -171,7 +180,7 @@ impl ApplicationHandler for App {
             }
         };
         let attrs = Window::default_attributes()
-            .with_title(format!("AIGE - {}", game.spec.title))
+            .with_title(format!("Droid - {}", game.spec.title))
             .with_inner_size(winit::dpi::LogicalSize::new(1280, 720));
         let window = Arc::new(event_loop.create_window(attrs).expect("window"));
         let renderer = Renderer::new(window).expect("renderer");
@@ -275,7 +284,7 @@ impl ApplicationHandler for App {
                     let game = self.game.as_mut().unwrap();
                     let renderer = self.renderer.as_mut().unwrap();
                     if game.poll_reload() {
-                        renderer.window.set_title(&format!("AIGE - {}", game.spec.title));
+                        renderer.window.set_title(&format!("Droid - {}", game.spec.title));
                         game.world.borrow_mut().aspect = renderer.aspect();
                         self.status_shown_until = Some(Instant::now() + std::time::Duration::from_secs(8));
                     }
@@ -292,10 +301,10 @@ impl ApplicationHandler for App {
                     if self.started.elapsed().as_secs_f32() > limit {
                         let w = game.world.borrow();
                         for t in &w.texts {
-                            eprintln!("[aige] text {} = {:?}", t.id, t.text);
+                            eprintln!("[droid] text {} = {:?}", t.id, t.text);
                         }
                         if let Some(e) = &w.error {
-                            eprintln!("[aige] ERROR: {e}");
+                            eprintln!("[droid] ERROR: {e}");
                         }
                         event_loop.exit();
                     }

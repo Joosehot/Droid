@@ -19,18 +19,39 @@ pub struct Game {
     last_check: Instant,
     /// Shared with the chat thread so the AI can see runtime errors.
     pub error_sink: Option<std::sync::Arc<std::sync::Mutex<Option<String>>>>,
+    /// Game code written in Rust (a fresh instance is made on every restart).
+    native: Option<(Box<dyn crate::api::Game>, Factory)>,
 }
+
+/// Makes a fresh game-code instance.
+pub type Factory = std::rc::Rc<dyn Fn() -> Box<dyn crate::api::Game>>;
 
 impl Game {
     pub fn load(path: &Path) -> anyhow::Result<Game> {
+        Self::load_with(path, None)
+    }
+
+    /// Load the game data at `path`; with a factory, the game logic is that Rust code
+    /// instead of the data's script.
+    pub fn load_with(path: &Path, factory: Option<Factory>) -> anyhow::Result<Game> {
         let spec = project::load(path)?;
         let stamp = Self::stamp_of(path);
         let world: Shared = Rc::new(RefCell::new(World::from_spec(&spec)));
         let host = ScriptHost::new(world.clone());
-        let mut g = Game { path: path.to_path_buf(), spec, world, host, stamp, last_check: Instant::now(), error_sink: None };
-        let r = g.host.load(&g.spec.script.clone());
-        g.report(r);
+        let native = factory.map(|f| (f(), f));
+        let mut g = Game { path: path.to_path_buf(), spec, world, host, stamp, last_check: Instant::now(), error_sink: None, native };
+        g.start_logic();
         Ok(g)
+    }
+
+    fn start_logic(&mut self) {
+        if let Some((game, _)) = self.native.as_mut() {
+            let mut w = self.world.borrow_mut();
+            game.init(&mut crate::api::Ctx::new(&mut w));
+        } else {
+            let r = self.host.load(&self.spec.script.clone());
+            self.report(r);
+        }
     }
 
     fn stamp_of(path: &Path) -> (Option<SystemTime>, usize) {
@@ -61,8 +82,10 @@ impl Game {
         if let Some(s) = &self.error_sink {
             *s.lock().unwrap() = None;
         }
-        let r = self.host.load(&self.spec.script);
-        self.report(r);
+        if let Some((game, f)) = self.native.as_mut() {
+            *game = f();
+        }
+        self.start_logic();
     }
 
     /// Reload from disk if the file changed. Returns true if reloaded.
@@ -110,8 +133,13 @@ impl Game {
             w.dt = dt;
             w.time += dt;
         }
-        let r = self.host.update(dt);
-        self.report(r);
+        if let Some((game, _)) = self.native.as_mut() {
+            let mut w = self.world.borrow_mut();
+            game.update(&mut crate::api::Ctx::new(&mut w), dt);
+        } else {
+            let r = self.host.update(dt);
+            self.report(r);
+        }
 
         {
             let mut w = self.world.borrow_mut();
@@ -125,6 +153,13 @@ impl Game {
         };
         for (a, b) in pairs {
             if a.is_empty() || b.is_empty() {
+                continue;
+            }
+            if let Some((game, _)) = self.native.as_mut() {
+                let mut w = self.world.borrow_mut();
+                let mut cx = crate::api::Ctx::new(&mut w);
+                game.on_collision(&mut cx, &a, &b);
+                game.on_collision(&mut cx, &b, &a);
                 continue;
             }
             let r = self.host.on_collision(&a, &b);
