@@ -44,6 +44,11 @@ impl Game {
         Ok(g)
     }
 
+    /// The game code's status (script games are always "playing").
+    pub fn status(&self) -> crate::api::Status {
+        self.native.as_ref().map(|(g, _)| g.status()).unwrap_or(crate::api::Status::Playing)
+    }
+
     fn start_logic(&mut self) {
         if let Some((game, _)) = self.native.as_mut() {
             let mut w = self.world.borrow_mut();

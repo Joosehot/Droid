@@ -65,6 +65,14 @@ impl Game for CoinRunner {
         }
     }
 
+    fn status(&self) -> Status {
+        if self.won {
+            Status::Won
+        } else {
+            Status::Playing
+        }
+    }
+
     fn on_collision(&mut self, cx: &mut Ctx, a: &str, b: &str) {
         // "when the player touches a coin, destroy it, add 1 to the score and play the coin sound"
         if a == "player" && cx.has_tag(b, "coin") {

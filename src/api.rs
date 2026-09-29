@@ -14,6 +14,27 @@ pub trait Game {
     fn init(&mut self, _cx: &mut Ctx) {}
     fn update(&mut self, _cx: &mut Ctx, _dt: f32) {}
     fn on_collision(&mut self, _cx: &mut Ctx, _a: &str, _b: &str) {}
+    /// Whether the round is still going. Checks and `DROID_SIM` read this.
+    fn status(&self) -> Status {
+        Status::Playing
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Status {
+    Playing,
+    Won,
+    Lost,
+}
+
+impl Status {
+    pub fn name(self) -> &'static str {
+        match self {
+            Status::Playing => "playing",
+            Status::Won => "won",
+            Status::Lost => "lost",
+        }
+    }
 }
 
 /// Access to the running world for game code.
