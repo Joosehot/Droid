@@ -1,0 +1,485 @@
+# DroidGameEngine rules: every number the engine uses.
+# The code holds the logic ("a chasing enemy must be slower than the player");
+# this file holds the taste ("how much slower"). Change a value and the games change.
+# Point `droid --rules my.toml` at a copy to experiment. Typos fail at load.
+
+[search]
+beam_width = 32         # partial solutions kept after each rule
+per_shape = 4           # at most this many of them share a level shape (view, layout, controls, pickups, hazards)
+finalists = 5           # complete candidates built and checked, best first
+evidence_bonus = 8.0    # added when the sentence names a variant outright
+
+# Profile axes, in this order everywhere: [challenge, pace, simplicity].
+# A variant scores weight * (1 + axes . (profile - 0.5)).
+[profile]
+default = [0.5, 0.5, 0.5]
+
+[profile.shift]
+hard = [0.35, 0.0, 0.0]
+easy = [-0.35, 0.0, 0.0]
+fast = [0.0, 0.35, 0.0]
+slow = [0.0, -0.35, 0.0]
+simple = [0.0, 0.0, 0.4]
+
+# How the profile turns into numbers.
+[tuning]
+pace_speed_gain = 0.6       # speeds x (1 + (pace - 0.5) * gain)
+challenge_count_gain = 0.8  # enemy/hazard counts x (1 + (challenge - 0.5) * gain)
+challenge_speed_gain = 0.4  # enemy speeds x (1 + (challenge - 0.5) * gain)
+simplicity_count_cut = 0.5  # enemy/hazard counts x (1 - (simplicity - 0.5) * cut)
+edit_speed_step = 1.25      # each "faster" / "slower"
+edit_count_step = 1.5       # each "more" / "fewer"
+edit_size_step = 1.3        # each "bigger" / "longer" / "smaller" / "shorter"
+many_count = 16             # "lots of coins"
+few_count = 3               # "a few bats"
+
+# ---------------------------------------------------------------- variants
+# weight and axes [challenge, pace, simplicity] for every choice a rule can make.
+
+[variants.genre]
+platformer = { weight = 1.0, axes = [0.0, 0.0, 0.0] }
+arena = { weight = 0.95, axes = [0.0, 0.0, 0.0] }
+shooter = { weight = 0.9, axes = [0.0, 0.0, 0.0] }
+
+[variants.view]
+flat = { weight = 1.0, axes = [0.0, 0.0, 0.2] }
+depth = { weight = 0.8, axes = [0.0, 0.0, -0.4] }
+
+[variants.layout]
+flat_run = { weight = 1.0, axes = [-0.6, 0.4, 0.8] }
+steps = { weight = 1.1, axes = [0.2, 0.2, 0.2] }
+stacked = { weight = 1.0, axes = [0.6, -0.2, -0.6] }
+open = { weight = 1.0, axes = [-0.2, 0.5, 0.8] }
+pillars = { weight = 1.05, axes = [0.3, 0.0, 0.0] }
+rooms = { weight = 0.95, axes = [0.5, -0.4, -0.6] }
+open_sky = { weight = 1.0, axes = [0.4, 0.2, 0.6] }
+shields = { weight = 1.05, axes = [-0.4, -0.1, -0.2] }
+
+[variants.controls]
+snappy = { weight = 1.05, axes = [0.2, 0.5, 0.0] }
+floaty = { weight = 1.0, axes = [-0.4, -0.5, 0.2] }
+direct = { weight = 1.05, axes = [0.0, 0.3, 0.5] }
+momentum = { weight = 0.95, axes = [0.4, 0.0, -0.4] }
+slide = { weight = 1.0, axes = [0.0, 0.2, 0.4] }
+drift = { weight = 0.9, axes = [0.4, -0.2, -0.3] }
+
+[variants.camera]
+follow = { weight = 1.0, axes = [0.0, 0.0, 0.3] }
+lookahead = { weight = 1.0, axes = [0.0, 0.5, -0.3] }
+fixed = { weight = 1.0, axes = [0.0, 0.0, 0.4] }
+chase_cam = { weight = 1.0, axes = [0.2, 0.3, 0.0] }
+high_cam = { weight = 1.0, axes = [-0.3, 0.0, 0.3] }
+
+[variants.enemy_behavior]
+by_kind = { weight = 1.0, axes = [0.0, 0.0, 0.3] }
+aggressive = { weight = 0.9, axes = [0.8, 0.4, -0.2] }
+calm = { weight = 0.9, axes = [-0.8, -0.4, 0.2] }
+
+[variants.enemy_attack]
+straight = { weight = 1.0, axes = [-0.4, 0.0, 0.4] }
+aimed = { weight = 1.0, axes = [0.6, 0.2, -0.2] }
+
+[variants.pickups]
+trail = { weight = 1.0, axes = [-0.4, 0.4, 0.6] }
+scattered = { weight = 1.0, axes = [0.2, 0.0, 0.2] }
+rewarding = { weight = 1.05, axes = [0.5, -0.2, -0.4] }
+
+[variants.hazards]
+in_gaps = { weight = 1.0, axes = [0.6, 0.2, -0.2] }
+on_floor = { weight = 1.0, axes = [0.0, 0.0, 0.4] }
+
+[variants.goal]
+collect_all = { weight = 1.0, axes = [0.0, 0.0, 0.3] }
+reach_exit = { weight = 1.0, axes = [0.0, 0.3, 0.2] }
+survive = { weight = 1.0, axes = [0.3, 0.0, 0.2] }
+destroy_all = { weight = 1.0, axes = [0.2, 0.2, 0.2] }
+
+[variants.health]
+one_hit = { weight = 1.0, axes = [0.9, 0.4, 0.6] }
+lives = { weight = 1.05, axes = [-0.4, 0.0, -0.2] }
+
+[variants.ramp]
+steady = { weight = 1.0, axes = [-0.4, -0.2, 0.6] }
+waves = { weight = 1.0, axes = [0.4, 0.2, -0.3] }
+speedup = { weight = 1.0, axes = [0.5, 0.5, 0.0] }
+
+[variants.palette]
+bright = { weight = 1.0, axes = [0.0, 0.3, 0.2] }
+muted = { weight = 0.95, axes = [0.0, -0.4, 0.3] }
+dark = { weight = 0.9, axes = [0.3, 0.0, 0.0] }
+
+[variants.music]
+bounce = { weight = 1.0, axes = [-0.3, 0.3, 0.2] }
+drive = { weight = 1.0, axes = [0.5, 0.6, 0.0] }
+calm = { weight = 1.0, axes = [-0.5, -0.7, 0.3] }
+
+[variants.juice]
+minimal = { weight = 1.0, axes = [0.0, -0.3, 0.8] }
+full = { weight = 1.05, axes = [0.0, 0.3, -0.4] }
+
+[variants.hud]
+corner = { weight = 1.0, axes = [0.0, 0.0, 0.4] }
+top_bar = { weight = 1.0, axes = [0.0, 0.2, -0.2] }
+
+# ---------------------------------------------------------------- judges
+# Bonuses and penalties that look at several choices together.
+[judges]
+chase_needs_direct_control = -0.6     # chasing enemies + momentum controls feel unfair
+rewarding_pickups_on_stacked = 0.5    # coins on high platforms need a layout that has them
+trail_pickups_on_flat_run = 0.4
+hazard_gaps_need_snappy = 0.3         # jumping spike gaps wants precise control
+one_hit_with_shooting_enemies = -0.7  # bullets plus instant death is harsh
+lives_with_waves = 0.3
+open_arena_in_depth = 0.5             # walls block the 3D camera
+lookahead_with_fast_controls = 0.3
+calm_music_with_aggressive = -0.5
+full_juice_in_depth = 0.3
+
+# ---------------------------------------------------------------- physics and controls
+[controls.snappy]
+run = 7.5
+accel = 16.0
+jump = 14.5
+gravity = 40.0
+variable_jump = true
+
+[controls.floaty]
+run = 6.5
+accel = 7.0
+jump = 11.0
+gravity = 22.0
+variable_jump = false
+
+[controls.direct]
+speed = 7.0
+accel = 0.0
+
+[controls.momentum]
+speed = 8.0
+accel = 5.0
+
+[controls.slide]
+speed = 11.0
+accel = 0.0
+
+[controls.drift]
+speed = 12.0
+accel = 6.0
+
+[abilities]
+double_jump_factor = 0.85   # second jump speed / first
+dash_speed = 22.0
+dash_time = 0.15
+dash_cooldown = 0.8
+player_bullet_speed = 22.0
+player_fire_cooldown = 0.28
+invulnerable_time = 1.5
+
+# ---------------------------------------------------------------- level layout
+[layout.platformer]
+length = 90.0            # world units at the default size
+kill_y = -12.0
+segment_min = 7.0        # ground piece length
+segment_max = 14.0
+gap_fraction = 0.55      # a gap is at most this fraction of the jump reach
+rise_fraction = 0.7      # a step or platform is at most this fraction of the jump height
+platform_width = [3.0, 6.0]
+spawn_x = 3.0
+exit_margin = 4.0
+camera_zoom = 14.0
+lookahead = 3.0
+
+[layout.arena]
+width = 28.0
+height = 17.0
+pillar_every = 5.0
+pillar_size = 1.4
+room_door = 4.0
+wall_height_3d = 1.4
+camera_zoom = 19.0
+depth_camera = [0.0, 14.0, 11.0]   # 3D follow offset (x, up, back)
+high_camera = [0.0, 22.0, 7.0]
+
+[layout.shooter]
+half_width = 12.5
+player_y = -8.5
+top_y = 9.5
+lose_y = -6.0
+alien_spacing = [2.2, 1.6]
+alien_drop = 0.6
+camera_zoom = 21.0
+stars = 40
+shield_count = 4
+shield_y = -5.5
+
+# ---------------------------------------------------------------- things
+# speed in world units per second; size = [width, height]; behavior = the default.
+[enemies.slime]
+speed = 2.2
+size = [1.0, 0.8]
+behavior = "patrol"
+flying = false
+score = 10
+
+[enemies.spider]
+speed = 3.0
+size = [1.1, 0.8]
+behavior = "patrol"
+flying = false
+score = 15
+
+[enemies.skeleton]
+speed = 2.4
+size = [0.9, 1.4]
+behavior = "patrol"
+flying = false
+score = 15
+
+[enemies.zombie]
+speed = 2.3
+size = [0.9, 1.4]
+behavior = "chase"
+flying = false
+score = 20
+
+[enemies.blob]
+speed = 2.0
+size = [1.1, 1.0]
+behavior = "wander"
+flying = false
+score = 10
+
+[enemies.bat]
+speed = 3.2
+size = [1.0, 0.7]
+behavior = "fly"
+flying = true
+score = 20
+
+[enemies.ghost]
+speed = 1.8
+size = [1.0, 1.1]
+behavior = "chase"
+flying = true
+score = 25
+
+[enemies.alien]
+speed = 1.4
+size = [1.4, 1.0]
+behavior = "march"
+flying = true
+score = 30
+
+[enemy_rules]
+chase_range = 9.0          # platformer: chasers start within this distance
+fly_amplitude = 1.2
+fly_frequency = 2.0
+wander_turn = 1.6          # seconds between direction changes
+shoot_interval = 1.6       # seconds between shots per group (shooter: whole fleet)
+shoot_speed = 9.0
+stomp_bounce = 11.0
+
+[pickups.coin]
+value = 1
+size = 0.6
+
+[pickups.gem]
+value = 5
+size = 0.7
+
+[pickups.star]
+value = 10
+size = 0.8
+
+[pickups.apple]
+value = 2
+size = 0.7
+
+[pickups.heart]
+value = 0
+size = 0.7
+
+[pickups.key]
+value = 0
+size = 0.7
+
+[hazards.spike]
+size = [1.0, 0.6]
+
+[hazards.saw]
+size = [1.0, 1.0]
+
+[hazards.lava]
+size = [2.0, 0.5]
+
+[counts]
+platformer_enemies = 5
+arena_enemies = 4
+shooter_rows = 3
+shooter_columns = 8
+platformer_pickups = 14
+arena_pickups = 10
+hazards = 4
+lives = 3
+survive_seconds = 60
+waves = 3
+min_enemies = 1
+max_enemies = 40
+max_pickups = 60
+
+[ramp]
+waves_speed_step = 1.15    # each new wave x this speed
+speedup_per_second = 0.012 # arena: enemy speed grows this fraction per second
+speedup_fleet = 2.5        # shooter: fleet speed multiplier when one alien is left
+
+# ---------------------------------------------------------------- checks
+[checks]
+spawn_clear = 6.0          # nothing hostile this close to the spawn point
+max_chase_ratio = 0.85     # chasing enemy speed / player speed (x1.2 when hard)
+reach_margin = 0.9         # jumps must fit inside this fraction of the physics
+sim_seconds = 2.0          # the idle player must survive this long
+max_entities = 400
+
+# ---------------------------------------------------------------- look
+[colors]
+red = [0.86, 0.22, 0.2]
+orange = [0.95, 0.55, 0.15]
+yellow = [0.98, 0.85, 0.2]
+green = [0.3, 0.75, 0.3]
+blue = [0.25, 0.45, 0.9]
+purple = [0.6, 0.3, 0.8]
+pink = [0.95, 0.5, 0.7]
+black = [0.12, 0.12, 0.15]
+white = [0.95, 0.95, 0.95]
+grey = [0.55, 0.55, 0.6]
+brown = [0.55, 0.35, 0.2]
+
+# background, ground, platform, wall, decor, text
+[themes.forest]
+background = [0.55, 0.78, 0.95]
+ground = [0.36, 0.6, 0.28]
+platform = [0.55, 0.4, 0.25]
+wall = [0.4, 0.3, 0.2]
+decor = [0.25, 0.55, 0.3]
+text = [1.0, 1.0, 1.0]
+
+[themes.cave]
+background = [0.14, 0.12, 0.16]
+ground = [0.4, 0.36, 0.34]
+platform = [0.5, 0.45, 0.42]
+wall = [0.3, 0.27, 0.26]
+decor = [0.35, 0.55, 0.65]
+text = [0.95, 0.9, 0.8]
+
+[themes.space]
+background = [0.03, 0.03, 0.08]
+ground = [0.35, 0.35, 0.45]
+platform = [0.5, 0.5, 0.6]
+wall = [0.3, 0.3, 0.4]
+decor = [0.9, 0.9, 1.0]
+text = [1.0, 1.0, 1.0]
+
+[themes.desert]
+background = [0.98, 0.85, 0.6]
+ground = [0.88, 0.7, 0.4]
+platform = [0.75, 0.55, 0.3]
+wall = [0.7, 0.5, 0.3]
+decor = [0.35, 0.6, 0.3]
+text = [0.25, 0.15, 0.1]
+
+[themes.snow]
+background = [0.8, 0.9, 1.0]
+ground = [0.95, 0.97, 1.0]
+platform = [0.7, 0.82, 0.95]
+wall = [0.6, 0.72, 0.85]
+decor = [0.3, 0.5, 0.4]
+text = [0.15, 0.2, 0.35]
+
+[themes.garden]
+background = [0.6, 0.82, 0.98]
+ground = [0.55, 0.78, 0.45]
+platform = [0.7, 0.6, 0.45]
+wall = [0.5, 0.65, 0.4]
+decor = [0.3, 0.62, 0.3]
+text = [0.15, 0.2, 0.15]
+
+[themes.ocean]
+background = [0.1, 0.35, 0.55]
+ground = [0.85, 0.78, 0.55]
+platform = [0.3, 0.6, 0.6]
+wall = [0.2, 0.45, 0.5]
+decor = [0.95, 0.5, 0.55]
+text = [1.0, 1.0, 1.0]
+
+[themes.candy]
+background = [1.0, 0.85, 0.92]
+ground = [0.95, 0.55, 0.7]
+platform = [0.6, 0.85, 0.95]
+wall = [0.85, 0.6, 0.9]
+decor = [1.0, 1.0, 1.0]
+text = [0.45, 0.15, 0.35]
+
+[themes.castle]
+background = [0.35, 0.35, 0.45]
+ground = [0.5, 0.5, 0.55]
+platform = [0.6, 0.6, 0.65]
+wall = [0.42, 0.42, 0.48]
+decor = [0.75, 0.25, 0.25]
+text = [1.0, 0.95, 0.85]
+
+[themes.city]
+background = [0.7, 0.75, 0.82]
+ground = [0.35, 0.35, 0.38]
+platform = [0.6, 0.45, 0.4]
+wall = [0.5, 0.5, 0.55]
+decor = [0.95, 0.8, 0.3]
+text = [1.0, 1.0, 1.0]
+
+[themes.lava]
+background = [0.25, 0.08, 0.06]
+ground = [0.3, 0.25, 0.25]
+platform = [0.45, 0.35, 0.3]
+wall = [0.35, 0.25, 0.22]
+decor = [1.0, 0.45, 0.1]
+text = [1.0, 0.9, 0.7]
+
+[palette]
+dark_factor = 0.35       # "night" / dark palette: background x this, others x (factor + 0.4)
+muted_mix = 0.35         # muted palette: blend toward grey by this much
+
+[default_theme]
+platformer = "forest"
+arena = "garden"
+shooter = "space"
+
+[default_player]
+platformer = "knight"
+arena = "cat"
+shooter = "ship"
+arena_depth = "gnome"
+
+[default_enemy]
+platformer = "slime"
+arena = "zombie"
+shooter = "alien"
+
+[default_pickup]
+platformer = "coin"
+arena = "gem"
+
+# ---------------------------------------------------------------- music
+# Notes: C4..B5, "-" rest, "*2" two beats, "/2" half a beat.
+[music.bounce]
+bpm = 132
+wave = "square"
+notes = "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4"
+
+[music.drive]
+bpm = 150
+wave = "saw"
+notes = "A3/2 A3/2 C4/2 A3/2 E4/2 A3/2 D4/2 C4/2 A3/2 A3/2 C4/2 A3/2 G4/2 E4/2 D4 -"
+
+[music.calm]
+bpm = 84
+wave = "triangle"
+notes = "C4*2 E4 G4 A4*2 G4 E4 F4*2 A4 C5 G4*3 -"

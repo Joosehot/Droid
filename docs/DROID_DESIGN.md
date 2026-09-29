@@ -173,9 +173,13 @@ pub mod game {
 ## 5. The Droid front (`src/hot/`, the HotMotor part)
 
 Input: one sentence, e.g. "make a hard platformer with 20 coins, slimes and bats, a door at the
-end, in a night forest". Drafts exist: `rules.toml` (all numbers), `src/hot/config.rs`,
-`src/hot/request.rs` — reuse and adapt them (they predate the Senne split; the script/Rhai parts
-of that plan are dropped).
+end, in a night forest". **Already built and tested (53 unit tests, standalone, not yet wired into
+`lib.rs`): `rules.toml` (all numbers), `src/hot/config.rs` (load + validation), `src/hot/request.rs`,
+`src/hot/lexicon.rs` (closed vocabulary, closest-match hints), `src/hot/parser.rs` (sentence ->
+Request with provenance, unused-value errors), `src/hot/rules/*.rs` (16 design rules, one per file,
+each with applies/doesn't-apply tests), `src/hot/rules/judges.rs`, `src/hot/search.rs` (beam search
+with a per-shape diversity cap; finalists differ in level shape).** Build on these: add `mod.rs`,
+the art rule (asset library), the build step, the checks and the CLI. Adapt them where needed.
 
 - Lexicon: closed, synonyms map to one token, unknown word = error + closest-match hint, `--lenient`.
 - Parser → `Request` with provenance (the words behind each value). Unused values are errors ("2 what?").
