@@ -103,6 +103,8 @@ pub struct World {
     pub sprite_gen: u64,
     pub models: Vec<(String, ModelSpec)>,
     pub model_gen: u64,
+    /// The scene's entities as authored, for respawning.
+    pub templates: Vec<EntitySpec>,
     /// Sounds requested by the script this frame; drained by the app.
     pub sounds: Vec<SoundCmd>,
 }
@@ -130,6 +132,7 @@ impl World {
             sprite_gen: next_gen(),
             models: spec.models.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
             model_gen: next_gen(),
+            templates: spec.entities.clone(),
             sounds: Vec::new(),
         };
         for e in &spec.entities {

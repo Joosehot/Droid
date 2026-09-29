@@ -209,8 +209,47 @@ impl<'a> Ctx<'a> {
         let e = self.w.spawn_spec(&spec);
         self.w.name_of(e)
     }
+    /// Spawn a plain shape ("box", "sphere" or "plane") in a colour; returns its actual name.
+    pub fn spawn_shape(&mut self, name: &str, tags: &[&str], shape: &str, pos: Vec3, scale: Vec3, color: Vec3, body: BodyKind) -> String {
+        let shape = match shape {
+            "sphere" => crate::spec::Shape::Sphere,
+            "plane" => crate::spec::Shape::Plane,
+            _ => crate::spec::Shape::Box,
+        };
+        let spec = crate::spec::EntitySpec {
+            name: name.to_string(),
+            tags: tags.iter().map(|t| t.to_string()).collect(),
+            shape,
+            sprite: None,
+            model: None,
+            position: pos.into(),
+            rotation: [0.0; 3],
+            scale: scale.into(),
+            color: color.into(),
+            physics: crate::spec::PhysicsSpec { body, ..Default::default() },
+        };
+        let e = self.w.spawn_spec(&spec);
+        self.w.name_of(e)
+    }
+    /// One-shot model animation: "jump", "attack", "hit", "spin", "wave" or "nod".
+    pub fn play_anim(&mut self, n: &str, anim: &str) {
+        let anim = anim.to_string();
+        self.with::<crate::anim::Pose>(n, |p| p.oneshot = Some((anim, 0.0)));
+    }
+    pub fn remove_text(&mut self, id: &str) {
+        self.w.texts.retain(|t| t.id != id);
+    }
     pub fn destroy(&mut self, n: &str) {
         self.w.despawn(n);
+    }
+    /// Spawn again every entity of the scene that has `tag` (e.g. the next wave).
+    /// Returns how many were spawned.
+    pub fn respawn_tag(&mut self, tag: &str) -> usize {
+        let t: Vec<crate::spec::EntitySpec> = self.w.templates.iter().filter(|e| e.tags.iter().any(|x| x == tag)).cloned().collect();
+        for e in &t {
+            self.w.spawn_spec(e);
+        }
+        t.len()
     }
     pub fn destroy_tag(&mut self, tag: &str) {
         for n in self.find_tag(tag) {
