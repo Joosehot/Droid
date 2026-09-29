@@ -144,14 +144,24 @@ impl World {
     pub fn spawn_spec(&mut self, e: &EntitySpec) -> Entity {
         let name = self.unique_name(&e.name);
         let has_model = e.model.as_deref().and_then(|n| self.model_index(n)).is_some();
+        let sprite = e.sprite.as_deref().and_then(|n| self.sprite_index(n));
+        // A tiling sprite covers the entity's box; any other sprite makes it a flat quad.
+        let tiled = sprite.map_or(false, |i| self.sprites[i].1.tiles.is_some());
+        let shape = if tiled {
+            Shape::Box
+        } else if e.sprite.is_some() {
+            Shape::Plane
+        } else {
+            e.shape
+        };
         let ent = self.ecs.spawn((
             Name(name.clone()),
             Tags(e.tags.clone()),
             Transform { pos: Vec3::from(e.position), rot: Vec3::from(e.rotation), scale: Vec3::from(e.scale) },
             Visual {
-                shape: if e.sprite.is_some() { Shape::Plane } else { e.shape },
+                shape,
                 color: Vec3::from(e.color),
-                sprite: e.sprite.as_deref().and_then(|n| self.sprite_index(n)),
+                sprite,
                 model: e.model.as_deref().and_then(|n| self.model_index(n)),
                 flip_x: false,
             },

@@ -6,6 +6,7 @@
 
 pub mod ai;
 pub mod anim;
+pub mod assets;
 pub mod api;
 pub mod app;
 pub mod font;

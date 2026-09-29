@@ -33,6 +33,8 @@ rand = "0.8"
 log = "0.4"
 env_logger = "0.11"
 rodio = { version = "0.19", default-features = false }
+image = { version = "0.25", default-features = false, features = ["png"] }
+gltf = { version = "1", default-features = false, features = ["import", "utils", "names"] }
 
 [profile.dev]
 opt-level = 1

@@ -41,6 +41,15 @@ enum Cmd {
     },
     /// Convert a legacy games/<name>/game.json into the folder format
     Convert { name: String },
+    /// List the asset library (downloaded CC0 art) by kind; --check validates it
+    Assets {
+        /// Check every file exists and loads and every required kind is covered; exit 1 if not
+        #[arg(long)]
+        check: bool,
+        /// Library folder (default: the assets/ folder Droid was built from)
+        #[arg(long)]
+        dir: Option<PathBuf>,
+    },
 }
 
 /// `games/<name>` folder, or a direct path to a folder / legacy `.json`.
@@ -158,6 +167,33 @@ fn main() -> anyhow::Result<()> {
             let path = game_path(&name);
             let spec = ai::validate(project::load(&path)?)?;
             println!("OK: {} ({} entities, {} sprites, {} models)", spec.title, spec.entities.len(), spec.sprites.len(), spec.models.len());
+        }
+        Cmd::Assets { check, dir } => {
+            let lib = match dir {
+                Some(d) => droid::assets::Library::load(&d)?,
+                None => droid::assets::Library::builtin()?,
+            };
+            if check {
+                let errs = lib.validate();
+                if !errs.is_empty() {
+                    for e in &errs {
+                        eprintln!("error: {e}");
+                    }
+                    eprintln!("{} problem(s) in {}", errs.len(), lib.dir.display());
+                    std::process::exit(1);
+                }
+                let files: usize = lib.packs.iter().map(|p| p.files.len()).sum();
+                println!(
+                    "OK: {} sprites, {} tilesets, {} models from {} packs ({} files); every required kind and theme is covered",
+                    lib.sprites.len(),
+                    lib.tilesets.len(),
+                    lib.models.len(),
+                    lib.packs.len(),
+                    files
+                );
+            } else {
+                print!("{}", lib.listing());
+            }
         }
         Cmd::Convert { name } => {
             let dir = Path::new("legacy").join(&name);

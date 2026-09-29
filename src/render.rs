@@ -24,6 +24,8 @@ struct Instance {
     color: [f32; 4],
     /// Atlas rect u0, v0, u1, v1. All zero = untextured.
     uv_rect: [f32; 4],
+    /// x, y: how many times the sprite repeats across the quad (tiling); 1 = once.
+    tile: [f32; 4],
 }
 
 #[repr(C)]
@@ -74,8 +76,9 @@ pub struct Renderer {
     meshes: Vec<Mesh>,
     /// Per model: its groups as (name, pivot, mesh index).
     model_groups: Vec<Vec<(String, Vec3, usize)>>,
-    /// Per model: (min_y, height) in model units, for fitting into the entity box.
-    model_bounds: Vec<(f32, f32)>,
+    /// Per model: (min_y, height, extents of an imported mesh) in model units, for fitting
+    /// into the entity box.
+    model_bounds: Vec<(f32, f32, Option<Vec3>)>,
     model_gen: u64,
     ui_buffer: wgpu::Buffer,
     ui_capacity: usize,
@@ -90,7 +93,18 @@ struct Atlas {
     bind_group: wgpu::BindGroup,
     /// Per sprite index: u0, v0, u1, v1.
     rects: Vec<[f32; 4]>,
+    /// Per sprite index: the tiling rule, with sprite names resolved to indices.
+    tiles: Vec<Option<TileIdx>>,
     gen: u64,
+}
+
+#[derive(Clone, Copy)]
+struct TileIdx {
+    fill: usize,
+    top: Option<usize>,
+    left: Option<usize>,
+    right: Option<usize>,
+    size: f32,
 }
 
 const SHADER: &str = r#"
@@ -114,13 +128,16 @@ struct VsIn {
     @location(6) m3: vec4<f32>,
     @location(7) color: vec4<f32>,
     @location(8) uv_rect: vec4<f32>,
+    @location(10) tile: vec4<f32>,
 };
 struct VsOut {
     @builtin(position) clip: vec4<f32>,
     @location(0) normal: vec3<f32>,
     @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(2) local: vec2<f32>,
     @location(3) textured: f32,
+    @location(4) rect: vec4<f32>,
+    @location(5) rep: vec2<f32>,
 };
 
 @vertex
@@ -131,7 +148,10 @@ fn vs_main(in: VsIn) -> VsOut {
     let n = (model * vec4<f32>(in.normal, 0.0)).xyz;
     out.normal = normalize(n);
     out.color = vec4<f32>(in.color.rgb * in.vcolor, in.color.a);
-    out.uv = mix(in.uv_rect.xy, in.uv_rect.zw, in.uv);
+    let rep = max(in.tile.xy, vec2<f32>(1e-3, 1e-3));
+    out.rep = rep;
+    out.local = in.uv * rep;
+    out.rect = in.uv_rect;
     out.textured = select(0.0, 1.0, in.uv_rect.z != 0.0 || in.uv_rect.x != 0.0);
     return out;
 }
@@ -140,7 +160,11 @@ fn vs_main(in: VsIn) -> VsOut {
 fn fs_main(in: VsOut) -> @location(0) vec4<f32> {
     var base = in.color.rgb;
     if (in.textured > 0.5) {
-        let t = textureSample(atlas_tex, atlas_smp, in.uv);
+        // Repeat the sprite `rep` times: position inside the current tile, kept off the far edge.
+        let cell = floor(min(in.local, in.rep - vec2<f32>(1e-4, 1e-4)));
+        let f = clamp(in.local - cell, vec2<f32>(0.0, 0.0), vec2<f32>(0.9999, 0.9999));
+        let uv = mix(in.rect.xy, in.rect.zw, f);
+        let t = textureSampleLevel(atlas_tex, atlas_smp, uv, 0.0);
         if (t.a < 0.5) { discard; }
         base = base * t.rgb;
     }
@@ -293,7 +317,7 @@ impl Renderer {
         let instance_layout = wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Instance>() as u64,
             step_mode: wgpu::VertexStepMode::Instance,
-            attributes: &wgpu::vertex_attr_array![3 => Float32x4, 4 => Float32x4, 5 => Float32x4, 6 => Float32x4, 7 => Float32x4, 8 => Float32x4],
+            attributes: &wgpu::vertex_attr_array![3 => Float32x4, 4 => Float32x4, 5 => Float32x4, 6 => Float32x4, 7 => Float32x4, 8 => Float32x4, 10 => Float32x4],
         };
         let scene_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("scene"),
@@ -449,7 +473,7 @@ impl Renderer {
                 log::info!("built model '{name}': {} groups, {nv} verts, {nt} tris in {:.0} ms", entry.len(), t.elapsed().as_secs_f32() * 1000.0);
                 self.model_groups.push(entry);
                 let (lo, hi) = crate::models::bounds_y(m);
-                self.model_bounds.push((lo, hi - lo));
+                self.model_bounds.push((lo, hi - lo, m.imported.as_ref().map(|i| i.size)));
             }
             self.model_gen = world.model_gen;
         }
@@ -499,9 +523,14 @@ impl Renderer {
         let euler = |r: Vec3| glam::Quat::from_euler(glam::EulerRot::XYZ, r.x.to_radians(), r.y.to_radians(), r.z.to_radians());
         for (_, (t, v, pose)) in world.ecs.query::<(&Transform, &Visual, Option<&crate::anim::Pose>)>().iter() {
             let model = Mat4::from_scale_rotation_translation(t.scale, euler(t.rot), t.pos);
-            if let Some((mg, (min_y, height))) = v.model.and_then(|m| self.model_groups.get(m).zip(self.model_bounds.get(m).copied())) {
-                // Fit the model into the entity's box: feet at the box bottom, height = scale.y.
-                let k = t.scale.y / height.max(1e-4);
+            if let Some((mg, (min_y, height, extents))) = v.model.and_then(|m| self.model_groups.get(m).zip(self.model_bounds.get(m).copied())) {
+                // Fit the model into the entity's box, feet at the box bottom. Procedural models:
+                // height = scale.y. Imported meshes: the largest uniform scale that keeps the
+                // mesh inside the box (flat axes such as a floor tile's height are ignored).
+                let k = match extents {
+                    Some(size) => fit_inside(size, t.scale.abs()),
+                    None => t.scale.y / height.max(1e-4),
+                };
                 let model = Mat4::from_rotation_translation(euler(t.rot), t.pos)
                     * Mat4::from_translation(Vec3::new(0.0, -t.scale.y * 0.5, 0.0))
                     * Mat4::from_scale(Vec3::splat(k))
@@ -509,8 +538,27 @@ impl Renderer {
                 for (gname, pivot, mesh_idx) in mg {
                     let gp = pose.and_then(|p| p.groups.get(gname)).copied().unwrap_or_default();
                     let local = Mat4::from_translation(gp.offset + *pivot) * Mat4::from_quat(euler(gp.rot)) * Mat4::from_translation(-*pivot);
-                    groups[*mesh_idx].push(Instance { model: (model * local).to_cols_array_2d(), color: [v.color.x, v.color.y, v.color.z, 1.0], uv_rect: [0.0; 4] });
+                    groups[*mesh_idx].push(Instance { model: (model * local).to_cols_array_2d(), color: [v.color.x, v.color.y, v.color.z, 1.0], uv_rect: [0.0; 4], tile: ONCE });
                 }
+                continue;
+            }
+            if let Some(rule) = v.sprite.and_then(|i| self.atlas.tiles.get(i).copied().flatten()) {
+                let color = [v.color.x, v.color.y, v.color.z, 1.0];
+                let flat = world.view == View::TwoD;
+                // 2D: tiles replace the box, slightly behind sprites at the same depth.
+                // 3D: tiles cover the box's front face and the box is drawn as well.
+                let dz = if flat { -0.01 } else { t.scale.z * 0.5 + 0.002 };
+                let base = Mat4::from_rotation_translation(euler(t.rot), t.pos);
+                for q in tile_quads(&rule, t.scale.x.abs(), t.scale.y.abs()) {
+                    if let Some(rect) = self.atlas.rects.get(q.sprite) {
+                        let m = base * Mat4::from_translation(Vec3::new(q.center[0], q.center[1], dz)) * Mat4::from_scale(Vec3::new(q.size[0], q.size[1], 1.0));
+                        groups[2].push(Instance { model: m.to_cols_array_2d(), color, uv_rect: *rect, tile: [q.repeat[0], q.repeat[1], 0.0, 0.0] });
+                    }
+                }
+                if flat {
+                    continue;
+                }
+                groups[0].push(Instance { model: model.to_cols_array_2d(), color, uv_rect: [0.0; 4], tile: ONCE });
                 continue;
             }
             let idx = match v.shape {
@@ -525,7 +573,7 @@ impl Renderer {
                     uv_rect.swap(0, 2);
                 }
             }
-            groups[idx].push(Instance { model: model.to_cols_array_2d(), color: [v.color.x, v.color.y, v.color.z, 1.0], uv_rect });
+            groups[idx].push(Instance { model: model.to_cols_array_2d(), color: [v.color.x, v.color.y, v.color.z, 1.0], uv_rect, tile: ONCE });
         }
         for (i, g) in groups.iter().enumerate() {
             let m = &mut self.meshes[i];
@@ -629,6 +677,62 @@ impl Renderer {
         self.queue.submit(Some(encoder.finish()));
         frame.present();
     }
+}
+
+const ONCE: [f32; 4] = [1.0, 1.0, 0.0, 0.0];
+
+/// Uniform scale that fits a mesh of extents `size` inside a box of extents `bounds`.
+/// Axes where the mesh is flat (under 5% of its largest extent) do not limit the scale.
+fn fit_inside(size: Vec3, bounds: Vec3) -> f32 {
+    let big = size.max_element().max(1e-6);
+    let mut k = f32::INFINITY;
+    for (s, b) in [(size.x, bounds.x), (size.y, bounds.y), (size.z, bounds.z)] {
+        if s > 0.05 * big {
+            k = k.min(b / s);
+        }
+    }
+    if k.is_finite() { k } else { bounds.y / big }
+}
+
+/// One quad of a tiled box, in the box's own (unscaled, centred) coordinates.
+#[derive(Debug, PartialEq)]
+struct TileQuad {
+    sprite: usize,
+    center: [f32; 2],
+    size: [f32; 2],
+    repeat: [f32; 2],
+}
+
+/// Split a `w` x `h` box into quads: a top row (caps + middle) and the fill below it.
+/// Tiles start at the top-left corner; partial tiles are cut at the right and bottom.
+fn tile_quads(rule: &TileIdx, w: f32, h: f32) -> Vec<TileQuad> {
+    let s = rule.size.max(1e-3);
+    let mut out = Vec::new();
+    if w <= 0.0 || h <= 0.0 {
+        return out;
+    }
+    let (x0, y1) = (-w * 0.5, h * 0.5);
+    let mut quad = |sprite: usize, x: f32, y_top: f32, qw: f32, qh: f32| {
+        if qw > 1e-4 && qh > 1e-4 {
+            out.push(TileQuad { sprite, center: [x + qw * 0.5, y_top - qh * 0.5], size: [qw, qh], repeat: [qw / s, qh / s] });
+        }
+    };
+    let mut fill_top = y1;
+    if let Some(top) = rule.top {
+        let th = s.min(h);
+        let caps = rule.left.is_some() && rule.right.is_some() && w >= 2.0 * s;
+        let (mut mx, mut mw) = (x0, w);
+        if caps {
+            quad(rule.left.unwrap_or(top), x0, y1, s, th);
+            quad(rule.right.unwrap_or(top), x0 + w - s, y1, s, th);
+            mx += s;
+            mw -= 2.0 * s;
+        }
+        quad(top, mx, y1, mw, th);
+        fill_top = y1 - th;
+    }
+    quad(rule.fill, x0, fill_top, w, fill_top + h * 0.5);
+    out
 }
 
 fn srgb_to_linear(c: f32) -> f32 {
@@ -737,7 +841,7 @@ fn build_atlas(
 ) -> Atlas {
     const PAD: u32 = 1;
     let sizes: Vec<(u32, u32)> = sprites.iter().map(|(_, s)| s.size()).collect();
-    let max_w: u32 = 1024;
+    let max_w: u32 = 2048;
     // Shelf packing.
     let mut places: Vec<(u32, u32)> = Vec::with_capacity(sizes.len());
     let (mut x, mut y, mut shelf_h) = (PAD, PAD, 0u32);
@@ -800,5 +904,54 @@ fn build_atlas(
             wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::Sampler(sampler) },
         ],
     });
-    Atlas { bind_group, rects, gen }
+    let index = |n: &str| sprites.iter().position(|(m, _)| m == n);
+    let tiles = sprites
+        .iter()
+        .map(|(_, s)| {
+            let t = s.tiles.as_ref()?;
+            Some(TileIdx { fill: index(&t.fill)?, top: t.top.as_deref().and_then(index), left: t.left.as_deref().and_then(index), right: t.right.as_deref().and_then(index), size: t.size })
+        })
+        .collect();
+    Atlas { bind_group, rects, tiles, gen }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn rule(top: bool, caps: bool) -> TileIdx {
+        TileIdx { fill: 0, top: top.then_some(1), left: caps.then_some(2), right: caps.then_some(3), size: 1.0 }
+    }
+
+    #[test]
+    fn fill_only_repeats_over_the_box() {
+        let q = tile_quads(&rule(false, false), 6.0, 2.0);
+        assert_eq!(q, vec![TileQuad { sprite: 0, center: [0.0, 0.0], size: [6.0, 2.0], repeat: [6.0, 2.0] }]);
+    }
+
+    #[test]
+    fn top_row_with_caps_and_fill_below() {
+        let q = tile_quads(&rule(true, true), 5.0, 3.0);
+        assert_eq!(q.len(), 4);
+        assert_eq!(q[0], TileQuad { sprite: 2, center: [-2.0, 1.0], size: [1.0, 1.0], repeat: [1.0, 1.0] });
+        assert_eq!(q[1], TileQuad { sprite: 3, center: [2.0, 1.0], size: [1.0, 1.0], repeat: [1.0, 1.0] });
+        assert_eq!(q[2], TileQuad { sprite: 1, center: [0.0, 1.0], size: [3.0, 1.0], repeat: [3.0, 1.0] });
+        assert_eq!(q[3], TileQuad { sprite: 0, center: [0.0, -0.5], size: [5.0, 2.0], repeat: [5.0, 2.0] });
+    }
+
+    #[test]
+    fn meshes_fit_inside_their_box() {
+        // A character 1 tall in a 1 x 1.4 x 1 box: height decides.
+        assert!((fit_inside(Vec3::new(0.5, 1.0, 0.3), Vec3::new(1.0, 1.4, 1.0)) - 1.4).abs() < 1e-5);
+        // A wide flat ship in a cube: width decides, it stays inside.
+        assert!((fit_inside(Vec3::new(2.0, 0.5, 2.0), Vec3::splat(1.5)) - 0.75).abs() < 1e-5);
+        // A floor tile with no height: its height does not blow the scale up.
+        assert!((fit_inside(Vec3::new(2.0, 0.0, 2.0), Vec3::new(4.0, 0.1, 4.0)) - 2.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn thin_platform_is_only_its_top_row() {
+        let q = tile_quads(&rule(true, true), 1.5, 0.5);
+        assert_eq!(q, vec![TileQuad { sprite: 1, center: [0.0, 0.0], size: [1.5, 0.5], repeat: [1.5, 0.5] }]);
+    }
 }

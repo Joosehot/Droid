@@ -1,0 +1,370 @@
+# Every downloaded pack the asset library uses. assets/fetch.sh reads this file: it
+# downloads `url`, checks `sha256`, and unpacks only `files` into packs/<id>/ (zip packs)
+# or saves the download as files[0] (single-file packs), and writes packs/<id>/LICENSE.txt
+# from `licence_file` inside the zip (or from `licence` + `page` when there is none).
+# Keep one key per line and one file per line: fetch.sh parses it line by line.
+
+[[pack]]
+id = "kenney_1bit_pack"
+title = "1-Bit Pack"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/1-bit-pack"
+url = "https://kenney.nl/media/pages/assets/1-bit-pack/aa867a1f37-1677578516/kenney_1-bit-pack.zip"
+sha256 = "129a0e74e1dc9091a769d5118be5c88780484c7a3771ee33ac9ef0df02583a9a"
+licence_file = "License.txt"
+files = [
+  "Tilesheet/colored-transparent_packed.png",
+]
+
+[[pack]]
+id = "kenney_background_elements"
+title = "Background Elements"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/background-elements"
+url = "https://kenney.nl/media/pages/assets/background-elements/b66a1ddec7-1677670395/kenney_background-elements.zip"
+sha256 = "31ffecec57bd51263f68e96e288ad06ac28eb1dfb41edb06b006a1b42cc10e41"
+licence_file = "License.txt"
+files = [
+  "PNG/Flat/cloud1.png",
+  "PNG/Flat/cloud4.png",
+  "PNG/tree03.png",
+  "PNG/tree05.png",
+]
+
+[[pack]]
+id = "kenney_cube_pets"
+title = "Cube Pets"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/cube-pets"
+url = "https://kenney.nl/media/pages/assets/cube-pets/44e58e945f-1774520254/kenney_cube-pets_1.0.zip"
+sha256 = "b3bdc99a2ec92c687b875718c5d01e9231d2711ed0e2845f295b474bb42a1283"
+licence_file = "License.txt"
+files = [
+  "Models/GLB format/Textures/colormap.png",
+  "Models/GLB format/animal-cat.glb",
+]
+
+[[pack]]
+id = "kenney_graveyard_kit"
+title = "Graveyard Kit 5.0"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/graveyard-kit"
+url = "https://kenney.nl/media/pages/assets/graveyard-kit/ba8d4b4517-1760691807/kenney_graveyard-kit_5.0.zip"
+sha256 = "1a93613f2e5675f3310acf49ec9ef13ae7adeb756ac3b205bfb6cc9311a81062"
+licence_file = "License.txt"
+files = [
+  "Models/GLB format/Textures/colormap.png",
+  "Models/GLB format/character-ghost.glb",
+  "Models/GLB format/character-skeleton.glb",
+  "Models/GLB format/character-vampire.glb",
+  "Models/GLB format/character-zombie.glb",
+  "Models/GLB format/pine-crooked.glb",
+  "Models/GLB format/rocks-tall.glb",
+  "Models/GLB format/stone-wall.glb",
+]
+
+[[pack]]
+id = "kenney_mini_arena"
+title = "Mini Arena"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/mini-arena"
+url = "https://kenney.nl/media/pages/assets/mini-arena/88f977a0cb-1709220730/kenney_mini-arena.zip"
+sha256 = "514760c2bc2457027451534a0b06a23f98beece166fb11ed2321226276b83c2c"
+licence_file = "License.txt"
+files = [
+  "Models/GLB format/Textures/colormap.png",
+  "Models/GLB format/character-soldier.glb",
+]
+
+[[pack]]
+id = "kenney_mini_characters"
+title = "Mini Characters"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/mini-characters"
+url = "https://kenney.nl/media/pages/assets/mini-characters/bfc7e272b4-1774770718/kenney_mini-characters.zip"
+sha256 = "9e1d48e6d7b8479ebbe84df71eb5bd8e1b3f0da546dea641890dccc8a02d0999"
+licence_file = "License.txt"
+files = [
+  "Models/GLB format/Textures/colormap.png",
+  "Models/GLB format/character-female-a.glb",
+  "Models/GLB format/character-male-a.glb",
+]
+
+[[pack]]
+id = "kenney_mini_dungeon"
+title = "Mini Dungeon"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/mini-dungeon"
+url = "https://kenney.nl/media/pages/assets/mini-dungeon/6cd72dc849-1785314274/kenney_mini-dungeon.zip"
+sha256 = "19c4648680cb1d2e8836cade96cbf9781c0c1f45fbc6d2ce41cee8239a3ec4d8"
+licence_file = "License.txt"
+files = [
+  "Models/GLB format/Textures/colormap.png",
+  "Models/GLB format/character-human.glb",
+  "Models/GLB format/coin.glb",
+  "Models/GLB format/floor.glb",
+  "Models/GLB format/key.glb",
+  "Models/GLB format/wall.glb",
+]
+
+[[pack]]
+id = "kenney_new_platformer_pack"
+title = "New Platformer Pack 1.1"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/new-platformer-pack"
+url = "https://kenney.nl/media/pages/assets/new-platformer-pack/1896103897-1764756702/kenney_new-platformer-pack-1.1.zip"
+sha256 = "553b907f3f0e505ab65f56f245ccaff3123c8fe3f3a0dfce9373b996bfc18cc2"
+licence_file = "License.txt"
+files = [
+  "Sprites/Characters/Default/character_green_walk_a.png",
+  "Sprites/Characters/Default/character_green_walk_b.png",
+  "Sprites/Enemies/Default/frog_idle.png",
+  "Sprites/Enemies/Default/frog_jump.png",
+  "Sprites/Enemies/Default/saw_a.png",
+  "Sprites/Enemies/Default/saw_b.png",
+  "Sprites/Enemies/Default/slime_block_walk_a.png",
+  "Sprites/Enemies/Default/slime_block_walk_b.png",
+  "Sprites/Enemies/Default/slime_fire_walk_a.png",
+  "Sprites/Enemies/Default/slime_fire_walk_b.png",
+  "Sprites/Enemies/Default/slime_normal_walk_a.png",
+  "Sprites/Enemies/Default/slime_normal_walk_b.png",
+  "Sprites/Tiles/Default/bomb.png",
+  "Sprites/Tiles/Default/bomb_active.png",
+  "Sprites/Tiles/Default/bricks_grey.png",
+  "Sprites/Tiles/Default/bush.png",
+  "Sprites/Tiles/Default/cactus.png",
+  "Sprites/Tiles/Default/coin_gold.png",
+  "Sprites/Tiles/Default/coin_gold_side.png",
+  "Sprites/Tiles/Default/coin_silver.png",
+  "Sprites/Tiles/Default/coin_silver_side.png",
+  "Sprites/Tiles/Default/door_closed.png",
+  "Sprites/Tiles/Default/door_closed_top.png",
+  "Sprites/Tiles/Default/fireball.png",
+  "Sprites/Tiles/Default/flag_red_a.png",
+  "Sprites/Tiles/Default/flag_red_b.png",
+  "Sprites/Tiles/Default/gem_blue.png",
+  "Sprites/Tiles/Default/gem_red.png",
+  "Sprites/Tiles/Default/heart.png",
+  "Sprites/Tiles/Default/key_yellow.png",
+  "Sprites/Tiles/Default/lava.png",
+  "Sprites/Tiles/Default/lava_top.png",
+  "Sprites/Tiles/Default/rock.png",
+  "Sprites/Tiles/Default/spikes.png",
+  "Sprites/Tiles/Default/star.png",
+  "Sprites/Tiles/Default/terrain_dirt_block_center.png",
+  "Sprites/Tiles/Default/terrain_dirt_block_top.png",
+  "Sprites/Tiles/Default/terrain_dirt_horizontal_left.png",
+  "Sprites/Tiles/Default/terrain_dirt_horizontal_middle.png",
+  "Sprites/Tiles/Default/terrain_dirt_horizontal_right.png",
+  "Sprites/Tiles/Default/terrain_grass_block_center.png",
+  "Sprites/Tiles/Default/terrain_grass_block_top.png",
+  "Sprites/Tiles/Default/terrain_grass_horizontal_left.png",
+  "Sprites/Tiles/Default/terrain_grass_horizontal_middle.png",
+  "Sprites/Tiles/Default/terrain_grass_horizontal_right.png",
+  "Sprites/Tiles/Default/terrain_purple_block_center.png",
+  "Sprites/Tiles/Default/terrain_purple_block_top.png",
+  "Sprites/Tiles/Default/terrain_purple_horizontal_left.png",
+  "Sprites/Tiles/Default/terrain_purple_horizontal_middle.png",
+  "Sprites/Tiles/Default/terrain_purple_horizontal_right.png",
+  "Sprites/Tiles/Default/terrain_sand_block_center.png",
+  "Sprites/Tiles/Default/terrain_sand_block_top.png",
+  "Sprites/Tiles/Default/terrain_sand_horizontal_left.png",
+  "Sprites/Tiles/Default/terrain_sand_horizontal_middle.png",
+  "Sprites/Tiles/Default/terrain_sand_horizontal_right.png",
+  "Sprites/Tiles/Default/terrain_snow_block_center.png",
+  "Sprites/Tiles/Default/terrain_snow_block_top.png",
+  "Sprites/Tiles/Default/terrain_snow_horizontal_left.png",
+  "Sprites/Tiles/Default/terrain_snow_horizontal_middle.png",
+  "Sprites/Tiles/Default/terrain_snow_horizontal_right.png",
+  "Sprites/Tiles/Default/terrain_stone_block_top.png",
+  "Sprites/Tiles/Default/terrain_stone_horizontal_left.png",
+  "Sprites/Tiles/Default/terrain_stone_horizontal_middle.png",
+  "Sprites/Tiles/Default/terrain_stone_horizontal_right.png",
+]
+
+[[pack]]
+id = "kenney_pixel_platformer"
+title = "Pixel Platformer"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/pixel-platformer"
+url = "https://kenney.nl/media/pages/assets/pixel-platformer/33bb4921eb-1696667883/kenney_pixel-platformer.zip"
+sha256 = "d01a196dbe3cc964e00d83ba3b987df62f332dc9260c9f941b4fbcc9047130f4"
+licence_file = "License.txt"
+files = [
+  "Tilemap/tilemap-characters_packed.png",
+  "Tilemap/tilemap_packed.png",
+]
+
+[[pack]]
+id = "kenney_pixel_shmup"
+title = "Pixel Shmup"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/pixel-shmup"
+url = "https://kenney.nl/media/pages/assets/pixel-shmup/640246b9cc-1677495782/kenney_pixel-shmup.zip"
+sha256 = "e33fd626b799de343f18c81ebaa6f3bc161772fdd717acf3f223589ce74cf952"
+licence_file = "License.txt"
+files = [
+  "Tilemap/ships_packed.png",
+  "Tilemap/tiles_packed.png",
+]
+
+[[pack]]
+id = "kenney_platformer_kit"
+title = "Platformer Kit"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/platformer-kit"
+url = "https://kenney.nl/media/pages/assets/platformer-kit/1585cf62b4-1775122253/kenney_platformer-kit.zip"
+sha256 = "899605d237367688c6b42e41fff2206c0fb8d626163158294556353f7baa7c1b"
+licence_file = "License.txt"
+files = [
+  "Models/GLB format/Textures/colormap.png",
+  "Models/GLB format/block-grass.glb",
+  "Models/GLB format/block-snow.glb",
+  "Models/GLB format/bomb.glb",
+  "Models/GLB format/character-oobi.glb",
+  "Models/GLB format/coin-gold.glb",
+  "Models/GLB format/door-rotate.glb",
+  "Models/GLB format/flag.glb",
+  "Models/GLB format/heart.glb",
+  "Models/GLB format/jewel.glb",
+  "Models/GLB format/key.glb",
+  "Models/GLB format/plant.glb",
+  "Models/GLB format/rocks.glb",
+  "Models/GLB format/saw.glb",
+  "Models/GLB format/spike-block.glb",
+  "Models/GLB format/star.glb",
+  "Models/GLB format/trap-spikes.glb",
+  "Models/GLB format/tree-pine.glb",
+  "Models/GLB format/tree.glb",
+]
+
+[[pack]]
+id = "kenney_space_kit"
+title = "Space Kit"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/space-kit"
+url = "https://kenney.nl/media/pages/assets/space-kit/20874c75ac-1677698978/kenney_space-kit.zip"
+sha256 = "d5d7cdf2635ed5a43a9187deaf409b6f47484e402321128341d3c3698e9ef4d9"
+licence_file = "License.txt"
+files = [
+  "Models/GLTF format/alien.glb",
+  "Models/GLTF format/craft_speederA.glb",
+  "Models/GLTF format/gate_simple.glb",
+]
+
+[[pack]]
+id = "kenney_space_shooter_remastered"
+title = "Space Shooter Remastered"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/space-shooter-remastered"
+url = "https://kenney.nl/media/pages/assets/space-shooter-remastered/2cbf3c45c8-1774771931/kenney_space-shooter-remastered.zip"
+sha256 = "0edbe0ab5cda6c44901d8c42f150268fdfa0c8d48492098669f37e9c296929b5"
+licence_file = "license.txt"
+files = [
+  "PNG/Enemies/enemyGreen1.png",
+  "PNG/Enemies/enemyRed2.png",
+  "PNG/Lasers/laserBlue01.png",
+  "PNG/Lasers/laserRed01.png",
+  "PNG/playerShip1_blue.png",
+]
+
+[[pack]]
+id = "kenney_tiny_dungeon"
+title = "Tiny Dungeon"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/tiny-dungeon"
+url = "https://kenney.nl/media/pages/assets/tiny-dungeon/f8422efb44-1674742415/kenney_tiny-dungeon.zip"
+sha256 = "c109438ab06f65fd80f9b2686a4cf9c7c11dc64444b47333ec71d602f8bb5fc7"
+licence_file = "License.txt"
+files = [
+  "Tilemap/tilemap_packed.png",
+]
+
+[[pack]]
+id = "kenney_toon_characters"
+title = "Toon Characters 1"
+author = "Kenney (www.kenney.nl)"
+licence = "CC0-1.0"
+page = "https://kenney.nl/assets/toon-characters"
+url = "https://kenney.nl/media/pages/assets/toon-characters/4e8a6e4e53-1774770819/kenney_toon-characters.zip"
+sha256 = "d4c0eb31f9d9af074315af251a53e8c74925dec84fbd53703c91c9ed4a4cace9"
+licence_file = "License.txt"
+files = [
+  "Zombie/PNG/Poses/character_zombie_walk0.png",
+  "Zombie/PNG/Poses/character_zombie_walk1.png",
+  "Zombie/PNG/Poses/character_zombie_walk2.png",
+]
+
+[[pack]]
+id = "quaternius_bat"
+title = "Bat"
+author = "Quaternius (quaternius.com)"
+licence = "CC0-1.0"
+page = "https://poly.pizza/m/hNO9XvjlKa"
+url = "https://static.poly.pizza/4ae13ae9-c257-41ed-86b5-1b4760924ebc.glb"
+sha256 = "ff20d0c0d68be4ed4ba3a402b8ceaeaf54de5d0c9dc3968117749214aee63c9b"
+files = [
+  "bat.glb",
+]
+
+[[pack]]
+id = "quaternius_green_blob"
+title = "Green Blob"
+author = "Quaternius (quaternius.com)"
+licence = "CC0-1.0"
+page = "https://poly.pizza/m/y4kJh8EeYS"
+url = "https://static.poly.pizza/64ab590e-1f77-4678-b357-78c430fd73bf.glb"
+sha256 = "31c46edd6306e4ab21bec4608b41003baa74f430f27d357b90c9b6401d88a584"
+files = [
+  "green_blob.glb",
+]
+
+[[pack]]
+id = "quaternius_slime"
+title = "Slime"
+author = "Quaternius (quaternius.com)"
+licence = "CC0-1.0"
+page = "https://poly.pizza/m/LyjSUKHKnh"
+url = "https://static.poly.pizza/195565b4-842a-44e9-a59a-5ebb1d133255.glb"
+sha256 = "21d9819032c8cf6e5cacd20ffb83c4bc781f65843f707b2a0dcc71ba6e75d75a"
+files = [
+  "slime.glb",
+]
+
+[[pack]]
+id = "quaternius_spider"
+title = "Spider"
+author = "Quaternius (quaternius.com)"
+licence = "CC0-1.0"
+page = "https://poly.pizza/m/yRYJiAJyiM"
+url = "https://static.poly.pizza/4259fbdb-afb5-4d40-9108-363625dd6b6e.glb"
+sha256 = "d759e35f6cf5adc7eb7e3f70135cd2a808787fc36337a523015592ba840ccd6d"
+files = [
+  "spider.glb",
+]
+
+[[pack]]
+id = "quaternius_teleporter"
+title = "Teleporter Base"
+author = "Quaternius (quaternius.com)"
+licence = "CC0-1.0"
+page = "https://poly.pizza/m/OIezStCmak"
+url = "https://static.poly.pizza/39432e22-8304-40c5-8fc6-0fdf2a19c7e1.glb"
+sha256 = "29a296a33fc557c3765fec79cf06d6a262949b1fe6adca4c69ca7b2d3ecb2ac3"
+files = [
+  "teleporter.glb",
+]

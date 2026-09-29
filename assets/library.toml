@@ -1,0 +1,1095 @@
+# Droid asset library: real CC0 art downloaded from the internet (see packs.toml, CREDITS.md).
+#
+# Adding an asset = adding its files under packs/<pack>/ (and to that pack's `files` in
+# packs.toml) plus an entry here. No code changes.
+#
+# [[sprite]]   2D art. `frames` are images relative to packs/<pack>/: { file = "x.png" },
+#              { sheet = "sheet.png", tile = [col, row] } (with `tile_size`, optional `spacing`
+#              and `margin` on the sprite), or { stack = [top, bottom] } for tall things.
+#              `fps` animates the frames; `tint = true` means colour words may multiply it.
+# [[tileset]]  tiles that draw ground, platforms and walls for a `theme` (forest, cave, snow,
+#              desert, castle, ...). Every slot is one image like a frame.
+# [[model]]    3D art: a glTF/GLB (or OBJ) file; `groups` maps node names to the animation
+#              groups body/head/arm_l/arm_r/leg_l/leg_r/tail (no groups = guessed from names).
+#
+# `kinds` are lexicon words the asset can depict. `style` groups assets that look alike.
+
+# ============================================================== 2D: players
+
+[[sprite]]
+id = "td_knight"
+kinds = ["knight"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [0, 8] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "td_knight_visor"
+kinds = ["knight"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [1, 8] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "onebit_knight"
+kinds = ["knight"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [27, 0] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "onebit_cat"
+kinds = ["cat"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [30, 7] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "np_frog"
+kinds = ["frog"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Enemies/Default/frog_idle.png" }, { file = "Sprites/Enemies/Default/frog_jump.png" }]
+fps = 3
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "shmup_plane_blue"
+kinds = ["ship"]
+pack = "kenney_pixel_shmup"
+frames = [{ sheet = "Tilemap/ships_packed.png", tile = [0, 1] }]
+tile_size = [32, 32]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "ssr_ship_blue"
+kinds = ["ship"]
+pack = "kenney_space_shooter_remastered"
+frames = [{ file = "PNG/playerShip1_blue.png" }]
+tint = false
+style = ["vector", "space"]
+
+[[sprite]]
+id = "td_gnome"
+kinds = ["gnome"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [0, 7] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "onebit_gnome"
+kinds = ["gnome"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [24, 6] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "np_hero_green"
+kinds = ["hero"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Characters/Default/character_green_walk_a.png" }, { file = "Sprites/Characters/Default/character_green_walk_b.png" }]
+fps = 8
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_alien_hero"
+kinds = ["hero", "alien"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap-characters_packed.png", tile = [0, 0] }, { sheet = "Tilemap/tilemap-characters_packed.png", tile = [1, 0] }]
+tile_size = [24, 24]
+fps = 6
+tint = false
+style = ["pixel"]
+
+# ============================================================== 2D: enemies
+
+[[sprite]]
+id = "np_slime_purple"
+kinds = ["slime"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Enemies/Default/slime_normal_walk_a.png" }, { file = "Sprites/Enemies/Default/slime_normal_walk_b.png" }]
+fps = 4
+tint = true
+style = ["vector"]
+
+[[sprite]]
+id = "np_slime_fire"
+kinds = ["slime"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Enemies/Default/slime_fire_walk_a.png" }, { file = "Sprites/Enemies/Default/slime_fire_walk_b.png" }]
+fps = 4
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "td_slime"
+kinds = ["slime", "blob"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [0, 9] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "onebit_slime"
+kinds = ["slime", "blob"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [20, 5] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "td_spider"
+kinds = ["spider"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [2, 10] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "onebit_spider"
+kinds = ["spider"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [30, 5] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "onebit_skeleton"
+kinds = ["skeleton"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [29, 6] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "toon_zombie"
+kinds = ["zombie"]
+pack = "kenney_toon_characters"
+frames = [{ file = "Zombie/PNG/Poses/character_zombie_walk0.png" }, { file = "Zombie/PNG/Poses/character_zombie_walk1.png" }, { file = "Zombie/PNG/Poses/character_zombie_walk2.png" }]
+fps = 6
+tint = false
+style = ["vector", "toon"]
+
+[[sprite]]
+id = "np_slime_block"
+kinds = ["blob"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Enemies/Default/slime_block_walk_a.png" }, { file = "Sprites/Enemies/Default/slime_block_walk_b.png" }]
+fps = 4
+tint = true
+style = ["vector"]
+
+[[sprite]]
+id = "td_bat"
+kinds = ["bat"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [0, 10] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "pp_bat"
+kinds = ["bat"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap-characters_packed.png", tile = [6, 2] }, { sheet = "Tilemap/tilemap-characters_packed.png", tile = [7, 2] }]
+tile_size = [24, 24]
+fps = 6
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "onebit_bat"
+kinds = ["bat"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [26, 8] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "td_ghost"
+kinds = ["ghost"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [1, 10] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "onebit_ghost"
+kinds = ["ghost", "blob"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [27, 8] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "ssr_alien_green"
+kinds = ["alien"]
+pack = "kenney_space_shooter_remastered"
+frames = [{ file = "PNG/Enemies/enemyGreen1.png" }]
+tint = false
+style = ["vector", "space"]
+
+[[sprite]]
+id = "ssr_alien_red"
+kinds = ["alien"]
+pack = "kenney_space_shooter_remastered"
+frames = [{ file = "PNG/Enemies/enemyRed2.png" }]
+tint = false
+style = ["vector", "space"]
+
+[[sprite]]
+id = "shmup_plane_grey"
+kinds = ["alien", "enemy"]
+pack = "kenney_pixel_shmup"
+frames = [{ sheet = "Tilemap/ships_packed.png", tile = [2, 4] }]
+tile_size = [32, 32]
+tint = true
+style = ["pixel"]
+
+# ============================================================== 2D: pickups
+
+[[sprite]]
+id = "np_coin_gold"
+kinds = ["coin"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/coin_gold.png" }, { file = "Sprites/Tiles/Default/coin_gold_side.png" }]
+fps = 4
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "np_coin_silver"
+kinds = ["coin"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/coin_silver.png" }, { file = "Sprites/Tiles/Default/coin_silver_side.png" }]
+fps = 4
+tint = true
+style = ["vector"]
+
+[[sprite]]
+id = "pp_coin"
+kinds = ["coin"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [11, 7] }, { sheet = "Tilemap/tilemap_packed.png", tile = [12, 7] }]
+tile_size = [18, 18]
+fps = 4
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "np_gem_blue"
+kinds = ["gem"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/gem_blue.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "np_gem_red"
+kinds = ["gem"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/gem_red.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_gem"
+kinds = ["gem"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [7, 3] }]
+tile_size = [18, 18]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "np_star"
+kinds = ["star"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/star.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "onebit_apple"
+kinds = ["apple"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [33, 18] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "np_heart"
+kinds = ["heart"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/heart.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_heart"
+kinds = ["heart"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [4, 2] }]
+tile_size = [18, 18]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "np_key_yellow"
+kinds = ["key"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/key_yellow.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_key"
+kinds = ["key"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [7, 1] }]
+tile_size = [18, 18]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "onebit_shield"
+kinds = ["shield"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [37, 4] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+# ============================================================== 2D: hazards
+
+[[sprite]]
+id = "np_spikes"
+kinds = ["spike"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/spikes.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_spikes"
+kinds = ["spike"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [8, 3] }]
+tile_size = [18, 18]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "td_spikes"
+kinds = ["spike"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [5, 3] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "np_saw"
+kinds = ["saw"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Enemies/Default/saw_a.png" }, { file = "Sprites/Enemies/Default/saw_b.png" }]
+fps = 10
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_saw"
+kinds = ["saw"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap-characters_packed.png", tile = [8, 0] }]
+tile_size = [24, 24]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "np_lava"
+kinds = ["lava"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/lava_top.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "np_lava_fill"
+kinds = ["lava_fill"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/lava.png" }]
+tint = false
+style = ["vector"]
+
+# ============================================================== 2D: exits
+
+[[sprite]]
+id = "np_door"
+kinds = ["door", "exit"]
+pack = "kenney_new_platformer_pack"
+frames = [{ stack = [{ file = "Sprites/Tiles/Default/door_closed_top.png" }, { file = "Sprites/Tiles/Default/door_closed.png" }] }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "pp_door"
+kinds = ["door", "exit"]
+pack = "kenney_pixel_platformer"
+frames = [{ stack = [{ sheet = "Tilemap/tilemap_packed.png", tile = [10, 6] }, { sheet = "Tilemap/tilemap_packed.png", tile = [10, 7] }] }]
+tile_size = [18, 18]
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "td_door"
+kinds = ["door", "exit"]
+pack = "kenney_tiny_dungeon"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [10, 3] }]
+tile_size = [16, 16]
+tint = false
+style = ["pixel", "tiny"]
+
+[[sprite]]
+id = "np_flag_red"
+kinds = ["flag", "exit"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/flag_red_a.png" }, { file = "Sprites/Tiles/Default/flag_red_b.png" }]
+fps = 4
+tint = true
+style = ["vector"]
+
+[[sprite]]
+id = "pp_flag"
+kinds = ["flag", "exit"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [11, 5] }, { sheet = "Tilemap/tilemap_packed.png", tile = [12, 5] }]
+tile_size = [18, 18]
+fps = 4
+tint = false
+style = ["pixel"]
+
+[[sprite]]
+id = "onebit_portal"
+kinds = ["portal", "exit"]
+pack = "kenney_1bit_pack"
+frames = [
+  { sheet = "Tilesheet/colored-transparent_packed.png", tile = [19, 14] },
+  { sheet = "Tilesheet/colored-transparent_packed.png", tile = [20, 14] },
+  { sheet = "Tilesheet/colored-transparent_packed.png", tile = [21, 14] },
+  { sheet = "Tilesheet/colored-transparent_packed.png", tile = [22, 14] },
+]
+tile_size = [16, 16]
+fps = 8
+tint = true
+style = ["pixel", "1bit"]
+
+# ============================================================== 2D: projectiles
+
+[[sprite]]
+id = "ssr_laser_blue"
+kinds = ["shot"]
+pack = "kenney_space_shooter_remastered"
+frames = [{ file = "PNG/Lasers/laserBlue01.png" }]
+tint = false
+style = ["vector", "space"]
+
+[[sprite]]
+id = "ssr_laser_red"
+kinds = ["shot", "bomb"]
+pack = "kenney_space_shooter_remastered"
+frames = [{ file = "PNG/Lasers/laserRed01.png" }]
+tint = false
+style = ["vector", "space"]
+
+[[sprite]]
+id = "shmup_shot"
+kinds = ["shot"]
+pack = "kenney_pixel_shmup"
+frames = [{ sheet = "Tilemap/tiles_packed.png", tile = [0, 0] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel"]
+
+[[sprite]]
+id = "np_fireball"
+kinds = ["shot"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/fireball.png" }]
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "np_bomb"
+kinds = ["bomb"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/bomb.png" }, { file = "Sprites/Tiles/Default/bomb_active.png" }]
+fps = 4
+tint = false
+style = ["vector"]
+
+[[sprite]]
+id = "onebit_bomb"
+kinds = ["bomb"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [45, 9] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+# ============================================================== 2D: decor
+
+[[sprite]]
+id = "bg_tree"
+kinds = ["tree"]
+pack = "kenney_background_elements"
+frames = [{ file = "PNG/tree05.png" }]
+tint = false
+style = ["vector", "flat"]
+
+[[sprite]]
+id = "bg_pine"
+kinds = ["tree"]
+pack = "kenney_background_elements"
+frames = [{ file = "PNG/tree03.png" }]
+tint = false
+style = ["vector", "flat"]
+
+[[sprite]]
+id = "pp_tree"
+kinds = ["tree"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [6, 6] }]
+tile_size = [18, 18]
+tint = true
+style = ["pixel"]
+
+[[sprite]]
+id = "onebit_tree"
+kinds = ["tree"]
+pack = "kenney_1bit_pack"
+frames = [{ sheet = "Tilesheet/colored-transparent_packed.png", tile = [0, 1] }]
+tile_size = [16, 16]
+tint = true
+style = ["pixel", "1bit"]
+
+[[sprite]]
+id = "np_bush"
+kinds = ["bush"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/bush.png" }]
+tint = true
+style = ["vector"]
+
+[[sprite]]
+id = "pp_bush"
+kinds = ["bush"]
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "Tilemap/tilemap_packed.png", tile = [5, 6] }]
+tile_size = [18, 18]
+tint = true
+style = ["pixel"]
+
+[[sprite]]
+id = "np_rock"
+kinds = ["rock"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/rock.png" }]
+tint = true
+style = ["vector"]
+
+[[sprite]]
+id = "bg_cloud"
+kinds = ["cloud"]
+pack = "kenney_background_elements"
+frames = [{ file = "PNG/Flat/cloud1.png" }]
+tint = true
+style = ["vector", "flat"]
+
+[[sprite]]
+id = "bg_cloud_small"
+kinds = ["cloud"]
+pack = "kenney_background_elements"
+frames = [{ file = "PNG/Flat/cloud4.png" }]
+tint = true
+style = ["vector", "flat"]
+
+[[sprite]]
+id = "np_cactus"
+kinds = ["cactus"]
+pack = "kenney_new_platformer_pack"
+frames = [{ file = "Sprites/Tiles/Default/cactus.png" }]
+tint = false
+style = ["vector"]
+
+# ============================================================== 2D: tiles by theme
+# ground_top / ground_fill draw the ground, platform_left/mid/right a floating platform,
+# wall a vertical wall.
+
+[[tileset]]
+id = "np_forest"
+theme = ["forest", "grass", "hills"]
+pack = "kenney_new_platformer_pack"
+style = ["vector"]
+ground_top = { file = "Sprites/Tiles/Default/terrain_grass_block_top.png" }
+ground_fill = { file = "Sprites/Tiles/Default/terrain_grass_block_center.png" }
+platform_left = { file = "Sprites/Tiles/Default/terrain_grass_horizontal_left.png" }
+platform_mid = { file = "Sprites/Tiles/Default/terrain_grass_horizontal_middle.png" }
+platform_right = { file = "Sprites/Tiles/Default/terrain_grass_horizontal_right.png" }
+wall = { file = "Sprites/Tiles/Default/terrain_grass_block_center.png" }
+
+[[tileset]]
+id = "np_cave"
+theme = ["cave", "mountain", "rock"]
+pack = "kenney_new_platformer_pack"
+style = ["vector"]
+ground_top = { file = "Sprites/Tiles/Default/terrain_dirt_block_top.png" }
+ground_fill = { file = "Sprites/Tiles/Default/terrain_dirt_block_center.png" }
+platform_left = { file = "Sprites/Tiles/Default/terrain_dirt_horizontal_left.png" }
+platform_mid = { file = "Sprites/Tiles/Default/terrain_dirt_horizontal_middle.png" }
+platform_right = { file = "Sprites/Tiles/Default/terrain_dirt_horizontal_right.png" }
+wall = { file = "Sprites/Tiles/Default/terrain_dirt_block_center.png" }
+
+[[tileset]]
+id = "np_snow"
+theme = ["snow", "ice", "winter"]
+pack = "kenney_new_platformer_pack"
+style = ["vector"]
+ground_top = { file = "Sprites/Tiles/Default/terrain_snow_block_top.png" }
+ground_fill = { file = "Sprites/Tiles/Default/terrain_snow_block_center.png" }
+platform_left = { file = "Sprites/Tiles/Default/terrain_snow_horizontal_left.png" }
+platform_mid = { file = "Sprites/Tiles/Default/terrain_snow_horizontal_middle.png" }
+platform_right = { file = "Sprites/Tiles/Default/terrain_snow_horizontal_right.png" }
+wall = { file = "Sprites/Tiles/Default/terrain_snow_block_center.png" }
+
+[[tileset]]
+id = "np_desert"
+theme = ["desert", "sand", "beach"]
+pack = "kenney_new_platformer_pack"
+style = ["vector"]
+ground_top = { file = "Sprites/Tiles/Default/terrain_sand_block_top.png" }
+ground_fill = { file = "Sprites/Tiles/Default/terrain_sand_block_center.png" }
+platform_left = { file = "Sprites/Tiles/Default/terrain_sand_horizontal_left.png" }
+platform_mid = { file = "Sprites/Tiles/Default/terrain_sand_horizontal_middle.png" }
+platform_right = { file = "Sprites/Tiles/Default/terrain_sand_horizontal_right.png" }
+wall = { file = "Sprites/Tiles/Default/terrain_sand_block_center.png" }
+
+[[tileset]]
+id = "np_castle"
+theme = ["castle", "dungeon", "stone"]
+pack = "kenney_new_platformer_pack"
+style = ["vector"]
+ground_top = { file = "Sprites/Tiles/Default/terrain_stone_block_top.png" }
+ground_fill = { file = "Sprites/Tiles/Default/bricks_grey.png" }
+platform_left = { file = "Sprites/Tiles/Default/terrain_stone_horizontal_left.png" }
+platform_mid = { file = "Sprites/Tiles/Default/terrain_stone_horizontal_middle.png" }
+platform_right = { file = "Sprites/Tiles/Default/terrain_stone_horizontal_right.png" }
+wall = { file = "Sprites/Tiles/Default/bricks_grey.png" }
+
+[[tileset]]
+id = "np_purple"
+theme = ["purple", "candy", "alien"]
+pack = "kenney_new_platformer_pack"
+style = ["vector"]
+ground_top = { file = "Sprites/Tiles/Default/terrain_purple_block_top.png" }
+ground_fill = { file = "Sprites/Tiles/Default/terrain_purple_block_center.png" }
+platform_left = { file = "Sprites/Tiles/Default/terrain_purple_horizontal_left.png" }
+platform_mid = { file = "Sprites/Tiles/Default/terrain_purple_horizontal_middle.png" }
+platform_right = { file = "Sprites/Tiles/Default/terrain_purple_horizontal_right.png" }
+wall = { file = "Sprites/Tiles/Default/terrain_purple_block_center.png" }
+
+[[tileset]]
+id = "pp_forest"
+theme = ["forest", "grass"]
+pack = "kenney_pixel_platformer"
+style = ["pixel"]
+tile_size = [18, 18]
+ground_top = { sheet = "Tilemap/tilemap_packed.png", tile = [2, 1] }
+ground_fill = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 1] }
+platform_left = { sheet = "Tilemap/tilemap_packed.png", tile = [1, 0] }
+platform_mid = { sheet = "Tilemap/tilemap_packed.png", tile = [2, 0] }
+platform_right = { sheet = "Tilemap/tilemap_packed.png", tile = [3, 0] }
+wall = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 1] }
+
+[[tileset]]
+id = "pp_desert"
+theme = ["desert", "sand"]
+pack = "kenney_pixel_platformer"
+style = ["pixel"]
+tile_size = [18, 18]
+ground_top = { sheet = "Tilemap/tilemap_packed.png", tile = [2, 3] }
+ground_fill = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 1] }
+platform_left = { sheet = "Tilemap/tilemap_packed.png", tile = [1, 2] }
+platform_mid = { sheet = "Tilemap/tilemap_packed.png", tile = [2, 2] }
+platform_right = { sheet = "Tilemap/tilemap_packed.png", tile = [3, 2] }
+wall = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 1] }
+
+[[tileset]]
+id = "pp_snow"
+theme = ["snow", "winter"]
+pack = "kenney_pixel_platformer"
+style = ["pixel"]
+tile_size = [18, 18]
+ground_top = { sheet = "Tilemap/tilemap_packed.png", tile = [2, 5] }
+ground_fill = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 1] }
+platform_left = { sheet = "Tilemap/tilemap_packed.png", tile = [1, 4] }
+platform_mid = { sheet = "Tilemap/tilemap_packed.png", tile = [2, 4] }
+platform_right = { sheet = "Tilemap/tilemap_packed.png", tile = [3, 4] }
+wall = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 1] }
+
+[[tileset]]
+id = "td_castle"
+theme = ["castle", "dungeon"]
+pack = "kenney_tiny_dungeon"
+style = ["pixel", "tiny"]
+tile_size = [16, 16]
+ground_top = { sheet = "Tilemap/tilemap_packed.png", tile = [1, 3] }
+ground_fill = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 3] }
+platform_left = { sheet = "Tilemap/tilemap_packed.png", tile = [0, 3] }
+platform_mid = { sheet = "Tilemap/tilemap_packed.png", tile = [1, 3] }
+platform_right = { sheet = "Tilemap/tilemap_packed.png", tile = [3, 3] }
+wall = { sheet = "Tilemap/tilemap_packed.png", tile = [4, 3] }
+
+[[tileset]]
+id = "td_cave"
+theme = ["cave"]
+pack = "kenney_tiny_dungeon"
+style = ["pixel", "tiny"]
+tile_size = [16, 16]
+ground_top = { sheet = "Tilemap/tilemap_packed.png", tile = [0, 2] }
+ground_fill = { sheet = "Tilemap/tilemap_packed.png", tile = [0, 0] }
+platform_left = { sheet = "Tilemap/tilemap_packed.png", tile = [0, 3] }
+platform_mid = { sheet = "Tilemap/tilemap_packed.png", tile = [1, 3] }
+platform_right = { sheet = "Tilemap/tilemap_packed.png", tile = [3, 3] }
+wall = { sheet = "Tilemap/tilemap_packed.png", tile = [0, 1] }
+
+# ============================================================== 3D: characters
+
+[[model]]
+id = "arena_knight"
+kinds = ["knight"]
+pack = "kenney_mini_arena"
+file = "Models/GLB format/character-soldier.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r", "leg-left" = "leg_l", "leg-right" = "leg_r", "head" = "head" }
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "dungeon_knight"
+kinds = ["knight", "humanoid"]
+pack = "kenney_mini_dungeon"
+file = "Models/GLB format/character-human.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r", "leg-left" = "leg_l", "leg-right" = "leg_r", "head" = "head" }
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "mini_male"
+kinds = ["humanoid"]
+pack = "kenney_mini_characters"
+file = "Models/GLB format/character-male-a.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "mini_female"
+kinds = ["humanoid"]
+pack = "kenney_mini_characters"
+file = "Models/GLB format/character-female-a.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "pets_cat"
+kinds = ["cat"]
+pack = "kenney_cube_pets"
+file = "Models/GLB format/animal-cat.glb"
+groups = { "leg-front-left" = "leg_l", "leg-back-right" = "leg_l", "leg-front-right" = "leg_r", "leg-back-left" = "leg_r", "tail" = "tail" }
+style = ["lowpoly", "cube"]
+
+[[model]]
+id = "graveyard_zombie"
+kinds = ["zombie"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/character-zombie.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r", "leg-left" = "leg_l", "leg-right" = "leg_r", "head" = "head" }
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "graveyard_skeleton"
+kinds = ["skeleton"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/character-skeleton.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r", "leg-left" = "leg_l", "leg-right" = "leg_r", "head" = "head" }
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "graveyard_ghost"
+kinds = ["ghost"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/character-ghost.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r" }
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "graveyard_vampire"
+kinds = ["vampire", "humanoid"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/character-vampire.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r", "leg-left" = "leg_l", "leg-right" = "leg_r", "head" = "head" }
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "q_slime"
+kinds = ["slime", "blob"]
+pack = "quaternius_slime"
+file = "slime.glb"
+style = ["lowpoly", "quaternius"]
+
+[[model]]
+id = "q_green_blob"
+kinds = ["blob", "slime"]
+pack = "quaternius_green_blob"
+file = "green_blob.glb"
+style = ["lowpoly", "quaternius"]
+
+[[model]]
+id = "pk_oobi"
+kinds = ["blob"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/character-oobi.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "q_bat"
+kinds = ["bat"]
+pack = "quaternius_bat"
+file = "bat.glb"
+style = ["lowpoly", "quaternius"]
+
+[[model]]
+id = "q_spider"
+kinds = ["spider"]
+pack = "quaternius_spider"
+file = "spider.glb"
+style = ["lowpoly", "quaternius"]
+
+[[model]]
+id = "space_alien"
+kinds = ["alien"]
+pack = "kenney_space_kit"
+file = "Models/GLTF format/alien.glb"
+style = ["lowpoly", "space"]
+
+[[model]]
+id = "space_ship"
+kinds = ["ship"]
+pack = "kenney_space_kit"
+file = "Models/GLTF format/craft_speederA.glb"
+style = ["lowpoly", "space"]
+
+# ============================================================== 3D: pickups, hazards, exits
+
+[[model]]
+id = "pk_coin"
+kinds = ["coin"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/coin-gold.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "dungeon_coin"
+kinds = ["coin"]
+pack = "kenney_mini_dungeon"
+file = "Models/GLB format/coin.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "pk_gem"
+kinds = ["gem"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/jewel.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_star"
+kinds = ["star"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/star.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_heart"
+kinds = ["heart"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/heart.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_key"
+kinds = ["key"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/key.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "dungeon_key"
+kinds = ["key"]
+pack = "kenney_mini_dungeon"
+file = "Models/GLB format/key.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "pk_spikes"
+kinds = ["spike"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/trap-spikes.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_spike_block"
+kinds = ["spike"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/spike-block.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_saw"
+kinds = ["saw"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/saw.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_bomb"
+kinds = ["bomb"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/bomb.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_door"
+kinds = ["door", "exit"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/door-rotate.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_flag"
+kinds = ["flag", "exit"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/flag.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "space_gate"
+kinds = ["portal", "exit"]
+pack = "kenney_space_kit"
+file = "Models/GLTF format/gate_simple.glb"
+style = ["lowpoly", "space"]
+
+[[model]]
+id = "q_teleporter"
+kinds = ["portal", "exit"]
+pack = "quaternius_teleporter"
+file = "teleporter.glb"
+style = ["lowpoly", "quaternius"]
+
+# ============================================================== 3D: decor and level pieces
+
+[[model]]
+id = "pk_tree"
+kinds = ["tree"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/tree.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_pine"
+kinds = ["tree"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/tree-pine.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "graveyard_pine"
+kinds = ["tree"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/pine-crooked.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "pk_rocks"
+kinds = ["rock"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/rocks.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "graveyard_rocks"
+kinds = ["rock"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/rocks-tall.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "pk_plant"
+kinds = ["bush"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/plant.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "dungeon_floor"
+kinds = ["floor"]
+pack = "kenney_mini_dungeon"
+file = "Models/GLB format/floor.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "pk_block_grass"
+kinds = ["floor", "ground"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/block-grass.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "pk_block_snow"
+kinds = ["floor", "ground"]
+pack = "kenney_platformer_kit"
+file = "Models/GLB format/block-snow.glb"
+style = ["lowpoly"]
+
+[[model]]
+id = "dungeon_wall"
+kinds = ["wall"]
+pack = "kenney_mini_dungeon"
+file = "Models/GLB format/wall.glb"
+style = ["lowpoly", "mini"]
+
+[[model]]
+id = "graveyard_stone_wall"
+kinds = ["wall", "fence"]
+pack = "kenney_graveyard_kit"
+file = "Models/GLB format/stone-wall.glb"
+style = ["lowpoly", "mini"]
