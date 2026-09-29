@@ -186,8 +186,8 @@ of that plan are dropped).
   Words "hard/easy/fast/slow/simple" shift the profile. Stated words give an evidence bonus.
 - Judges for cross-rule interactions (see `rules.toml [judges]`). Beam search, deterministic ties.
 - Build: level geometry from a PRNG seeded by a hash of the sentence + chosen variants
-  (deterministic), entities into `scene.toml`, art from the asset library (recoloured by
-  theme and colour words), camera/background into `game.toml`, and **`behavior.txt` in the
+  (deterministic), entities into `scene.toml`, art from the asset library (downloaded CC0 packs;
+  tinted by colour words; tiles by theme), camera/background into `game.toml`, and **`behavior.txt` in the
   Senne language** (speeds, ranges, counts filled in from rules.toml and the profile). Senne
   compiles it to `src/main.rs`.
 - Checks on each finalist, best first; a failing finalist is dropped and the next tried; if none
@@ -201,7 +201,7 @@ of that plan are dropped).
   5. `DROID_SIM=<checks.sim_seconds>` on the built binary: no error, status not "lost", player exists
 - Output `games/<slug>/`: `Cargo.toml`, `sentence.txt`, `behavior.txt`, `why.txt` (every piece →
   rule/variant → words), `src/main.rs`, `game/game.toml`, `game/scene.toml`, `game/sprites/*.txt`,
-  `game/models/*.toml`. Written to a temp dir and moved into place only after checks pass.
+  `game/models/*`, `game/images/*` (the library files the game uses). Written to a temp dir and moved into place only after checks pass.
 - CLI (`droid`): `make <name> "<sentence>" [--explain] [--rules F] [--lenient] [--run] [--no-build]`,
   `edit <name> "<more words>"` (appends ", <more words>" to sentence.txt and remakes; later
   words override earlier ones), `explain "<sentence>"`, `vocabulary`, `assets [--check]`, and the
@@ -215,42 +215,70 @@ of that plan are dropped).
   collector, a space shooter with waves. Plus tests: unknown word hint, impossible request error,
   modifiers change choices, rules.toml typo rejected.
 
-## 6. The asset library (`assets/`, Droid)
+## 6. The asset library (`assets/`, Droid): real art from the internet
 
-Hand-made, versioned art the front chooses from (the "art" rule). Adding an asset is adding
-files, no code.
+The library is built from free, redistributable asset packs downloaded from the internet, not
+drawn by hand. Preferred source: **Kenney (https://kenney.nl/assets), all CC0**. Other CC0 packs
+(OpenGameArt, itch.io "CC0") are fine if needed. Only CC0 or CC-BY (with attribution); record the
+licence of everything. Adding an asset is adding files and a `library.toml` entry, no code.
+
 ```
-assets/library.toml
-assets/sprites/<file>.txt     palette lines `c = r g b` or `#rrggbb`, a `---` line, pixel rows ('.' = transparent)
-assets/models/<file>.toml     model parts with animation groups (see legacy/demo3d/models/hero.toml)
+assets/library.toml                  the index (below)
+assets/packs.toml                    every downloaded pack: name, url, licence, sha256 of the zip
+assets/fetch.sh                      re-downloads packs from packs.toml, verifies sha256, unpacks the files the library uses
+assets/packs/<pack>/...              only the files the library uses (keep the repo small: no full zips)
+assets/packs/<pack>/LICENSE.txt      the pack's licence text
+assets/CREDITS.md                    one line per pack (name, author, licence, url)
 ```
+
+Engine support to add (runtime, `src/`):
+- **PNG sprites**: a sprite can be a PNG file or a frame cut from a spritesheet/tilesheet
+  (`sheet = "file.png"`, `tile = [col, row]`, `tile_size = [w, h]`, optional spacing/margin).
+  Loaded into the existing sprite atlas (nearest filtering, alpha cut-out). Text sprites keep working.
+- **3D models from glTF/GLB (and OBJ if a pack only has OBJ)**: loaded into the existing mesh path.
+  Kenney 3D kits colour faces through a small colormap texture; bake that into vertex colours by
+  sampling the texture at each vertex UV, so no textured pipeline is needed. Map node names to
+  animation groups where the model has separate limb nodes (e.g. "arm-left" -> `arm_l`), so the
+  procedural walk/idle animation works; otherwise the model is one `body` group. Normalise so feet
+  are at y = 0. The procedural SDF models keep working.
+
 `library.toml`:
 ```toml
 [[sprite]]
-id = "slime_round"
-kinds = ["slime"]                  # lexicon kinds it can depict
-frames = ["slime_round_1.txt", "slime_round_2.txt"]
+id = "kenney_slime_green"
+kinds = ["slime"]                          # lexicon kinds it can depict
+pack = "kenney_pixel_platformer"
+frames = [{ sheet = "tilemap-characters.png", tile = [0, 2] }, { sheet = "tilemap-characters.png", tile = [1, 2] }]
+tile_size = [24, 24]
 fps = 4
-main = "a"                         # palette char that takes the entity's colour (optional)
-shade = "b"                        # palette char that takes a darker version (optional)
-style = ["cute"]                   # free tags the art rule can prefer ("retro", "cute", "spooky")
+tint = true                                # may be tinted by colour words (multiply)
+style = ["pixel"]
 
 [[model]]
-id = "gnome"
-kinds = ["gnome", "knight"]
-file = "gnome.toml"
-main_group = "body"                # group whose parts take the entity's colour (optional)
+id = "kenney_character_knight"
+kinds = ["knight"]
+pack = "kenney_mini_characters"
+file = "character-knight.glb"
+groups = { "arm-left" = "arm_l", "arm-right" = "arm_r", "leg-left" = "leg_l", "leg-right" = "leg_r", "head" = "head" }
+style = ["lowpoly"]
 ```
 Coverage required (validated by `droid assets --check` and a test):
-- sprites (2 frames for creatures, 1 for items): knight cat frog ship gnome (players); slime spider
-  skeleton zombie blob bat ghost alien (enemies); coin gem star apple heart key (pickups); spike
-  saw lava (hazards); door flag portal (exits); shot bomb (projectiles); decor: tree bush rock cloud.
-  At least two different assets for slime, coin and the knight so the art rule has a real choice.
-- models (3D arenas): gnome/knight/cat humanoid-ish players, zombie, skeleton, slime/blob, ghost,
-  bat, spider; coin gem star heart key; tree rock; door portal flag; spike.
+- 2D (sprites, animated where the pack has frames): players knight cat frog ship gnome; enemies
+  slime spider skeleton zombie blob bat ghost alien; pickups coin gem star apple heart key; hazards
+  spike saw lava; exits door flag portal; projectiles shot bomb; tiles for ground/platform/wall in
+  at least forest, cave, snow, desert, castle looks (so levels are drawn with real tiles, not
+  coloured boxes); decor tree bush rock cloud. At least two different assets for slime, coin and the
+  player knight so the art rule has a real choice.
+- 3D (models): player characters (knight, gnome/cat or any humanoid set), zombie, skeleton, slime/blob,
+  ghost, bat, spider; coin gem star heart key; tree rock; door portal flag; spike; floor/wall pieces.
+- If a kind truly has no CC0 art anywhere, fall back to a text sprite / SDF model and list that in CREDITS.md.
+
 Rust: `src/assets.rs` with `Library::load(dir)`, `Library::builtin()` (the repo's `assets/` via
-`env!("CARGO_MANIFEST_DIR")`), lookups by kind, `recolor(asset, main_rgb) -> Vec<SpriteSpec>`,
-validation (every file parses, frames of one asset share a size, every required kind covered).
+`env!("CARGO_MANIFEST_DIR")`), lookups by kind, validation (every referenced file exists, frames of
+one asset share a size, every required kind covered). The Droid front copies the chosen files into
+the game's `game/` folder (so a game crate is self-contained) and references them from scene.toml.
+Tiles: the level builder draws ground/platforms/walls with tile sprites (repeated quads) chosen by
+theme, instead of flat coloured boxes; collision boxes stay as they are.
 
 ## 7. Definition of done
 
