@@ -54,7 +54,7 @@ pub const TUNING: VoiceTuning = VoiceTuning {
     floor_fall_secs: 0.5,
     floor_rise_db_per_sec: 0.5,
     gate_db: 14.0,
-    span_db: 42.0,
+    span_db: 36.0,
     attack_secs: 0.03,
     release_secs: 0.35,
 };

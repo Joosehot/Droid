@@ -81,11 +81,13 @@ impl<'a> Ctx<'a> {
     pub fn voice(&self) -> f32 {
         crate::voice::level(self.w.time)
     }
+    /// A random number in `lo..hi`. With `DROID_SEED=<n>` the numbers come from that seed (the
+    /// same run twice gives the same game: headless checks); otherwise from the system.
     pub fn random(&self, lo: f32, hi: f32) -> f32 {
         if hi <= lo {
             lo
         } else {
-            lo + rand::random::<f32>() * (hi - lo)
+            lo + crate::seeded::next_f32() * (hi - lo)
         }
     }
 
@@ -289,6 +291,18 @@ impl<'a> Ctx<'a> {
             t.y = y;
             t.size = size;
         }
+    }
+    /// A filled rectangle on the screen: `x`, `y` (top left), `w`, `h` in fractions of the
+    /// screen, drawn under the texts; the same `id` moves and recolours it.
+    pub fn rect_at(&mut self, id: &str, x: f32, y: f32, w: f32, h: f32, color: Vec3) {
+        let r = crate::world::UiRect { id: id.to_string(), x, y, w: w.max(0.0), h: h.max(0.0), color: color.into() };
+        match self.w.rects.iter_mut().find(|r| r.id == id) {
+            Some(old) => *old = r,
+            None => self.w.rects.push(r),
+        }
+    }
+    pub fn remove_rect(&mut self, id: &str) {
+        self.w.rects.retain(|r| r.id != id);
     }
     pub fn text_color(&mut self, id: &str, c: Vec3) {
         if let Some(t) = self.w.texts.iter_mut().find(|t| t.id == id) {

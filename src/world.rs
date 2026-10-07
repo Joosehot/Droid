@@ -79,6 +79,18 @@ impl Camera {
     }
 }
 
+/// A filled rectangle on the screen (game code's bars and meters): position and size in
+/// fractions of the screen from the top left, drawn in order under the texts.
+#[derive(Clone, Debug, PartialEq)]
+pub struct UiRect {
+    pub id: String,
+    pub x: f32,
+    pub y: f32,
+    pub w: f32,
+    pub h: f32,
+    pub color: [f32; 3],
+}
+
 pub struct World {
     pub ecs: hecs::World,
     pub by_name: HashMap<String, Entity>,
@@ -90,6 +102,8 @@ pub struct World {
     pub time: f32,
     pub dt: f32,
     pub texts: Vec<TextSpec>,
+    /// Screen rectangles set by game code ([`crate::api::Ctx::rect_at`]).
+    pub rects: Vec<UiRect>,
     /// Collision pairs found by physics this frame.
     pub collisions: Vec<(Entity, Entity)>,
     pub restart_requested: bool,
@@ -124,6 +138,7 @@ impl World {
             time: 0.0,
             dt: 0.0,
             texts: spec.texts.clone(),
+            rects: Vec::new(),
             collisions: Vec::new(),
             restart_requested: false,
             spawn_counter: 0,

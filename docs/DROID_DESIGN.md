@@ -48,11 +48,14 @@ pub trait Game {
 exists, pos, vel, scale, grounded, has_tag, find_tag (sorted names), count_tag, set_pos, move_by,
 set_vel, set_vel_x/y/z, set_scale, set_rotation, set_color, set_flip_x, set_solid, set_sprite, add_tag,
 animate_sprite, squash, spawn_sprite, spawn_shape, respawn_tag, respawn (one scene entity by name),
-destroy, destroy_tag, play_anim, text, text_at, text_color, remove_text, play_sound, play_music, restart,
-and `voice()`: microphone loudness 0..1 (`src/voice.rs`; speech ~0.3, a shout 0.8+; 0 without a
+destroy, destroy_tag, play_anim, text, text_at, text_color, remove_text, rect_at / remove_rect (filled
+screen rectangles in screen fractions, under the texts: bars and meters), play_sound, play_music, restart,
+and `voice()`: microphone loudness 0..1 (`src/voice.rs`; speech ~0.4, a shout 0.8+; 0 without a
 microphone; headless it is 0 or the `DROID_VOICE` schedule, e.g. `0:0,4:0.9,8:0`).
 Scripted keys: `DROID_KEYS="up@2,up@2.6,space@8-9.5"` taps (`key@seconds`, down for 0.1 s) or
 holds (`key@from-to`) keys on the game clock, headless and in the window (`src/keys.rs`).
+`DROID_SEED=<n>` makes `random` repeatable (`src/seeded.rs`); `DROID_TRACE=1` (or a list of text
+ids) prints every on-screen text change during a `DROID_SIM` run to stderr, with its time.
 `use droid::prelude::*;` brings Game, Ctx, Status, Vec3, vec2, vec3, BodyKind.
 
 Conventions the data and the code share:

@@ -603,6 +603,9 @@ impl Renderer {
             texts.push((e.as_str(), 0.02, 0.9, 16.0, [1.0, 0.3, 0.3]));
         }
         let to_ndc = |px: f32, py: f32, w: f32, h: f32| [px / sw * 2.0 - 1.0, 1.0 - py / sh * 2.0, w / sw * 2.0, h / sh * 2.0];
+        for r in &world.rects {
+            quads.push(UiQuad { rect: to_ndc(r.x * sw, r.y * sh, r.w * sw, r.h * sh), color: [r.color[0], r.color[1], r.color[2], 1.0] });
+        }
         for (text, x, y, size, color) in texts {
             font::layout(text, x * sw, y * sh, size, |px, py, w, h| {
                 quads.push(UiQuad { rect: to_ndc(px, py, w, h), color: [color[0], color[1], color[2], 1.0] });
