@@ -98,6 +98,11 @@ pub fn effect(name: &str) -> Vec<f32> {
         }
         "bounce" => render(500.0, 250.0, 0.08, "sine", 0.3, 0.005, 1.0),
         "step" => render(150.0, 100.0, 0.05, "noise", 0.15, 0.005, 2.0),
+        "splash" => {
+            let mut a = render(900.0, 200.0, 0.12, "noise", 0.4, 0.005, 1.5);
+            a.extend(render(300.0, 120.0, 0.3, "noise", 0.25, 0.01, 2.0));
+            a
+        }
         _ => render(440.0, 440.0, 0.1, "sine", 0.2, 0.01, 1.0),
     }
 }

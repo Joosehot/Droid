@@ -1,0 +1,384 @@
+[[entities]]
+name = "sky"
+shape = "box"
+position = [0.0, 9.0, -3.0]
+scale = [60.0, 5.0, 0.02]
+color = [0.62, 0.78, 0.93]
+
+[[entities]]
+name = "haze"
+shape = "box"
+position = [0.0, 7.6, -2.9]
+scale = [60.0, 1.4, 0.02]
+color = [0.8, 0.88, 0.96]
+
+[[entities]]
+name = "cloud_1"
+shape = "plane"
+sprite = "cloud_a"
+position = [-11.0, 9.0, -2.8]
+scale = [3.6, 1.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_2"
+shape = "plane"
+sprite = "cloud_b"
+position = [8.0, 9.4, -2.8]
+scale = [3.0, 1.3, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_3"
+shape = "plane"
+sprite = "cloud_a"
+position = [15.0, 8.7, -2.8]
+scale = [2.4, 1.1, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_1"
+shape = "plane"
+sprite = "pine"
+position = [-16.8, 8.2, -2.5]
+scale = [0.81, 1.8, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_2"
+shape = "plane"
+sprite = "pine"
+position = [-15.6, 8.35, -2.5]
+scale = [0.9450000000000001, 2.1, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_3"
+shape = "plane"
+sprite = "pine"
+position = [4.5, 8.15, -2.5]
+scale = [0.765, 1.7, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_4"
+shape = "plane"
+sprite = "pine"
+position = [6.0, 8.35, -2.5]
+scale = [0.9450000000000001, 2.1, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_5"
+shape = "plane"
+sprite = "pine"
+position = [12.0, 8.25, -2.5]
+scale = [0.855, 1.9, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_6"
+shape = "plane"
+sprite = "pine"
+position = [13.4, 8.4, -2.5]
+scale = [0.9900000000000001, 2.2, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_7"
+shape = "plane"
+sprite = "pine"
+position = [15.0, 8.1, -2.5]
+scale = [0.7200000000000001, 1.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "pine_8"
+shape = "plane"
+sprite = "pine"
+position = [16.6, 8.3, -2.5]
+scale = [0.9, 2.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "ice"
+shape = "box"
+position = [0.0, 6.0, -0.5]
+scale = [60.0, 2.0, 0.02]
+color = [0.7, 0.86, 0.96]
+
+[[entities]]
+name = "ice_shine"
+shape = "box"
+position = [0.0, 5.25, -0.48]
+scale = [60.0, 0.25, 0.02]
+color = [0.82, 0.93, 1.0]
+
+[[entities]]
+name = "snow"
+shape = "box"
+position = [0.0, 7.15, -0.45]
+scale = [60.0, 0.3, 0.02]
+color = [0.97, 0.98, 1.0]
+
+[[entities]]
+name = "hole"
+tags = ["hole"]
+shape = "box"
+position = [0.0, 6.0, -0.4]
+scale = [1.2, 2.32, 0.02]
+color = [0.0066, 0.0658, 0.1636]
+
+[[entities]]
+name = "hole_rim_l"
+shape = "box"
+position = [-0.75, 7.25, -0.3]
+scale = [0.35, 0.18, 0.02]
+color = [0.88, 0.94, 1.0]
+
+[[entities]]
+name = "hole_rim_r"
+shape = "box"
+position = [0.75, 7.25, -0.3]
+scale = [0.35, 0.18, 0.02]
+color = [0.88, 0.94, 1.0]
+
+[[entities]]
+name = "player"
+shape = "plane"
+sprite = "fisherman"
+position = [-1.9, 8.25, 0.0]
+scale = [1.6, 2.3, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "rod"
+shape = "box"
+position = [-0.55, 8.45, -0.05]
+rotation = [0.0, 0.0, -66.0]
+scale = [0.08, 1.35, 0.02]
+color = [0.25, 0.18, 0.12]
+
+[[entities]]
+name = "rod_line"
+shape = "box"
+position = [0.0, 7.25, -0.1]
+scale = [0.06, 2.5, 0.06]
+color = [0.92, 0.92, 0.88]
+
+[[entities]]
+name = "hook"
+tags = ["hook"]
+shape = "plane"
+sprite = "hook"
+position = [0.0, 6.0, 0.0]
+scale = [0.45, 0.75, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "water_top"
+shape = "box"
+position = [0.0, 2.5, -3.0]
+scale = [60.0, 5.0, 0.02]
+color = [0.0066, 0.0658, 0.1636]
+
+[[entities]]
+name = "water_mid"
+shape = "box"
+position = [0.0, -2.5, -3.0]
+scale = [60.0, 5.0, 0.02]
+color = [0.0026, 0.0303, 0.0915]
+
+[[entities]]
+name = "water_deep"
+shape = "box"
+position = [0.0, -7.5, -3.0]
+scale = [60.0, 5.0, 0.02]
+color = [0.0006, 0.0097, 0.0385]
+
+[[entities]]
+name = "bottom"
+shape = "box"
+position = [0.0, -9.8, -2.0]
+scale = [60.0, 0.8, 0.02]
+color = [0.0446, 0.0278, 0.0119]
+
+[[entities]]
+name = "weed_1"
+shape = "box"
+position = [-15.0, -8.5, -1.9]
+scale = [0.22, 1.8, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_2"
+shape = "box"
+position = [-14.4, -8.1, -1.9]
+scale = [0.22, 2.6, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_3"
+shape = "box"
+position = [-6.5, -8.65, -1.9]
+scale = [0.22, 1.5, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_4"
+shape = "box"
+position = [-5.9, -8.3, -1.9]
+scale = [0.22, 2.2, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_5"
+shape = "box"
+position = [4.2, -8.0, -1.9]
+scale = [0.22, 2.8, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_6"
+shape = "box"
+position = [4.8, -8.55, -1.9]
+scale = [0.22, 1.7, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_7"
+shape = "box"
+position = [12.5, -8.4, -1.9]
+scale = [0.22, 2.0, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "weed_8"
+shape = "box"
+position = [13.1, -7.95, -1.9]
+scale = [0.22, 2.9, 0.02]
+color = [0.0119, 0.1062, 0.0303]
+
+[[entities]]
+name = "bubble_1"
+shape = "sphere"
+position = [-9.0, 1.5, -1.5]
+scale = [0.18, 0.18, 0.18]
+color = [0.1905, 0.4098, 0.6187]
+
+[[entities]]
+name = "bubble_2"
+shape = "sphere"
+position = [-8.6, 3.2, -1.5]
+scale = [0.12, 0.12, 0.12]
+color = [0.1905, 0.4098, 0.6187]
+
+[[entities]]
+name = "bubble_3"
+shape = "sphere"
+position = [7.5, -1.0, -1.5]
+scale = [0.15, 0.15, 0.15]
+color = [0.1905, 0.4098, 0.6187]
+
+[[entities]]
+name = "bubble_4"
+shape = "sphere"
+position = [7.9, 0.6, -1.5]
+scale = [0.1, 0.1, 0.1]
+color = [0.1905, 0.4098, 0.6187]
+
+[[entities]]
+name = "bubble_5"
+shape = "sphere"
+position = [-3.0, -6.0, -1.5]
+scale = [0.14, 0.14, 0.14]
+color = [0.1905, 0.4098, 0.6187]
+
+[[entities]]
+name = "bubble_6"
+shape = "sphere"
+position = [12.0, -5.0, -1.5]
+scale = [0.16, 0.16, 0.16]
+color = [0.1905, 0.4098, 0.6187]
+
+[[entities]]
+name = "perch_1"
+tags = ["perch", "fish"]
+shape = "plane"
+sprite = "perch"
+position = [-4.67, 2.5, 0.0]
+scale = [1.6, 0.75, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "roach_1"
+tags = ["roach", "fish"]
+shape = "plane"
+sprite = "roach"
+position = [10.0, 0.5, 0.0]
+scale = [1.4, 0.65, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "perch_2"
+tags = ["perch", "fish"]
+shape = "plane"
+sprite = "perch"
+position = [-12.0, -2.0, 0.0]
+scale = [1.6, 0.75, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "roach_2"
+tags = ["roach", "fish"]
+shape = "plane"
+sprite = "roach"
+position = [6.0, -4.5, 0.0]
+scale = [1.4, 0.65, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "pike_1"
+tags = ["pike", "fish"]
+shape = "plane"
+sprite = "pike"
+position = [-8.0, -7.0, 0.0]
+scale = [3.0, 0.85, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "perch_3"
+tags = ["perch", "fish"]
+shape = "plane"
+sprite = "perch"
+position = [14.0, -8.2, 0.0]
+scale = [1.6, 0.75, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false

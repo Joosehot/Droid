@@ -46,9 +46,11 @@ pub trait Game {
 
 `Ctx` (read `src/api.rs` for exact signatures): time, key, key_pressed, axis_x, axis_y, random,
 exists, pos, vel, grounded, has_tag, find_tag (sorted names), count_tag, set_pos, move_by,
-set_vel, set_vel_x/y/z, set_scale, set_color, set_flip_x, set_solid, set_sprite, add_tag,
-animate_sprite, squash, spawn_sprite, spawn_shape, respawn_tag, destroy, destroy_tag,
-play_anim, text, text_at, text_color, remove_text, play_sound, play_music, restart.
+set_vel, set_vel_x/y/z, set_scale, set_rotation, set_color, set_flip_x, set_solid, set_sprite, add_tag,
+animate_sprite, squash, spawn_sprite, spawn_shape, respawn_tag, respawn (one scene entity by name),
+destroy, destroy_tag, play_anim, text, text_at, text_color, remove_text, play_sound, play_music, restart,
+and `voice()`: microphone loudness 0..1 (`src/voice.rs`; speech ~0.3, a shout 0.8+; 0 without a
+microphone; headless it is 0 or the `DROID_VOICE` schedule, e.g. `0:0,4:0.9,8:0`).
 `use droid::prelude::*;` brings Game, Ctx, Status, Vec3, vec2, vec3, BodyKind.
 
 Conventions the data and the code share:
@@ -56,7 +58,7 @@ Conventions the data and the code share:
   role tag (`pickup`, `enemy`, `hazard`, `exit`). Player projectiles are tagged `shot`, enemy ones `bomb`.
 - Y is up. 2D lives on the XY plane. 3D arenas move on the XZ plane ("across the ground").
 - Keys: `space enter shift r x z`, letters, `left right up down`; axis_x/axis_y cover arrows and WASD.
-- Sounds: `shoot laser hit explosion jump coin pickup powerup hurt click win lose bounce step`.
+- Sounds: `shoot laser hit explosion jump coin pickup powerup hurt click win lose bounce step splash`.
 - Headless check: running a game binary with `DROID_SIM=<seconds>` prints one JSON line:
   `{"title","seconds","status","ended_at":{seconds,status}|null,"error","player":[x,y,z]|null,"entities","texts"}`.
 - `games/coin_runner/src/main.rs` is the hand-written reference for the shape of Senne's output.

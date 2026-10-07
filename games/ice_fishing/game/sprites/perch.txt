@@ -1,0 +1,17 @@
+o = #2c4a1e
+g = #6f8f2a
+k = #2f3d16
+y = #d9d27a
+r = #e8641e
+w = #f4f4ea
+b = #101010
+---
+........rr.rr........
+.......rrrrrrr.......
+r....oogkggkggkoo....
+rr..ogggkggkggkgggoo.
+rrrogggykgykggkgggwbo
+rrrgyyyyyyyyyyyyyyggo
+rr..oyyyyyyyyyyyyyoo.
+r....ooyyyyyyyyyoo...
+........r.....r......

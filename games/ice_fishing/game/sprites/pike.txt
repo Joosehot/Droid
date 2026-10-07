@@ -1,0 +1,16 @@
+o = #24331a
+g = #5b6f2c
+l = #c9cf86
+y = #e6e2b0
+b = #101010
+w = #f4f4ea
+---
+............gg..................
+g..........gggg.........gg......
+gg...ooooogggggoooooooooggo.....
+ggg.ogglgggglggggglggggglgggooo.
+gggggglgggglgggglggggglggggggwbo
+ggggyyyyyyyyyyyyyyyyyyyyyyyyyyyyo
+ggg.ooyyyyyyyyyyyyyyyyyyyyyyyoo.
+gg....oooooyyyyyyyyyyyyyoooo....
+g..........gg.........gg........

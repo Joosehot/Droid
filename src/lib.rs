@@ -18,6 +18,7 @@ pub mod render;
 pub mod script;
 pub mod sound;
 pub mod spec;
+pub mod voice;
 pub mod world;
 
 pub mod prelude {

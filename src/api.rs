@@ -75,6 +75,12 @@ impl<'a> Ctx<'a> {
         let d = &self.w.input.down;
         (d.contains("w") || d.contains("up")) as i32 as f32 - (d.contains("s") || d.contains("down")) as i32 as f32
     }
+    /// Loudness of the microphone, 0..1, smoothed: quiet ~0, normal speech ~0.3, a shout 0.8+.
+    /// 0 without a microphone. Headless (`DROID_SIM`) it is 0, or the `DROID_VOICE` schedule
+    /// (`0:0,3:0.9,6:0`: seconds:level steps, or one constant). See [`crate::voice`].
+    pub fn voice(&self) -> f32 {
+        crate::voice::level(self.w.time)
+    }
     pub fn random(&self, lo: f32, hi: f32) -> f32 {
         if hi <= lo {
             lo
@@ -144,6 +150,10 @@ impl<'a> Ctx<'a> {
     }
     pub fn set_scale(&mut self, n: &str, s: Vec3) {
         self.with::<Transform>(n, |t| t.scale = s);
+    }
+    /// Euler rotation in degrees (x, y, z); in 2D only z matters (counter-clockwise).
+    pub fn set_rotation(&mut self, n: &str, degrees: Vec3) {
+        self.with::<Transform>(n, |t| t.rot = degrees);
     }
     pub fn set_color(&mut self, n: &str, c: Vec3) {
         self.with::<Visual>(n, |v| v.color = c);
@@ -250,6 +260,13 @@ impl<'a> Ctx<'a> {
             self.w.spawn_spec(e);
         }
         t.len()
+    }
+    /// Spawn again the scene entity that was authored as `name` (its kind, art and start
+    /// position). Returns the new entity's name, or None when the scene has no such entity.
+    pub fn respawn(&mut self, name: &str) -> Option<String> {
+        let spec = self.w.templates.iter().find(|e| e.name == name).cloned()?;
+        let e = self.w.spawn_spec(&spec);
+        Some(self.w.name_of(e))
     }
     pub fn destroy_tag(&mut self, tag: &str) {
         for n in self.find_tag(tag) {
