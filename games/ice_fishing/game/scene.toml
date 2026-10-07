@@ -147,8 +147,8 @@ color = [0.88, 0.94, 1.0]
 name = "player"
 shape = "plane"
 sprite = "fisherman"
-position = [-1.9, 8.25, 0.0]
-scale = [1.6, 2.3, 1.0]
+position = [-1.5, 8.45, 0.0]
+scale = [1.0, 2.444, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [[entities]]
@@ -172,7 +172,7 @@ tags = ["hook"]
 shape = "plane"
 sprite = "hook"
 position = [0.0, 6.0, 0.0]
-scale = [0.45, 0.75, 1.0]
+scale = [0.444, 0.778, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -311,7 +311,7 @@ tags = ["perch", "fish"]
 shape = "plane"
 sprite = "perch"
 position = [-4.67, 2.5, 0.0]
-scale = [1.6, 0.75, 1.0]
+scale = [1.556, 1.056, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -324,7 +324,7 @@ tags = ["roach", "fish"]
 shape = "plane"
 sprite = "roach"
 position = [10.0, 0.5, 0.0]
-scale = [1.4, 0.65, 1.0]
+scale = [1.333, 0.889, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -336,8 +336,8 @@ name = "perch_2"
 tags = ["perch", "fish"]
 shape = "plane"
 sprite = "perch"
-position = [-12.0, -2.0, 0.0]
-scale = [1.6, 0.75, 1.0]
+position = [-6.2, 1.6, 0.0]
+scale = [1.556, 1.056, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -349,8 +349,8 @@ name = "roach_2"
 tags = ["roach", "fish"]
 shape = "plane"
 sprite = "roach"
-position = [6.0, -4.5, 0.0]
-scale = [1.4, 0.65, 1.0]
+position = [11.6, -0.3, 0.0]
+scale = [1.333, 0.889, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -363,7 +363,7 @@ tags = ["pike", "fish"]
 shape = "plane"
 sprite = "pike"
 position = [-8.0, -7.0, 0.0]
-scale = [3.0, 0.85, 1.0]
+scale = [2.722, 1.444, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]
@@ -375,8 +375,34 @@ name = "perch_3"
 tags = ["perch", "fish"]
 shape = "plane"
 sprite = "perch"
-position = [14.0, -8.2, 0.0]
-scale = [1.6, 0.75, 1.0]
+position = [13.0, -6.6, 0.0]
+scale = [1.556, 1.056, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "perch_4"
+tags = ["perch", "fish"]
+shape = "plane"
+sprite = "perch"
+position = [-7.4, 2.9, 0.0]
+scale = [1.556, 1.056, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "roach_3"
+tags = ["roach", "fish"]
+shape = "plane"
+sprite = "roach"
+position = [8.6, -0.6, 0.0]
+scale = [1.333, 0.889, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]

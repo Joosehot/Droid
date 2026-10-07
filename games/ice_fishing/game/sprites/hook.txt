@@ -1,14 +1,23 @@
-m = #c8ccd2
-d = #6e737a
-p = #e88a9a
+a = #414246
+b = #2f3033
+c = #cbcfdb
+d = #92959e
+e = #626469
+f = #1f2022
+g = #4d4e52
+h = #f0f4ff
 ---
-...mm..
-...md..
-...md..
-...md..
-...md..
-m..md..
-mm.md..
-.mmmd..
-..pp...
-.pp....
+.....ab.
+....acdb
+....bddb
+....bdef
+....bdef
+.g..bdef
+ghg.feef
+aca.feef
+aca.feef
+aca.feef
+bdb.fef.
+fefffef.
+.fdeef..
+..bff...

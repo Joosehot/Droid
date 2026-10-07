@@ -1,0 +1,55 @@
+a = #322a29
+b = #9b8382
+c = #431f18
+d = #d3604b
+e = #242a30
+f = #1d2328
+g = #2f3337
+h = #728495
+i = #5a6d7e
+j = #353639
+k = #2a0a0a
+l = #929fab
+m = #a6aab3
+n = #841f1f
+o = #f0f4ff
+p = #f6f8ff
+q = #cbcfdb
+r = #878991
+s = #db3333
+t = #14121a
+u = #4b1a10
+v = #eb5233
+w = #845148
+x = #f09c8d
+y = #3b3c3f
+z = #131314
+A = #4d4e52
+B = #fbfcff
+C = #f1f1f5
+D = #747476
+E = #505152
+F = #adaeb1
+G = #812412
+H = #252526
+I = #4d4d4e
+J = #373839
+K = #2a1a17
+L = #290c06
+---
+.............a..........
+............aba.........
+..c........abba.........
+.cdc.......abbbaef......
+..cdc.....gabbhhhifjkk..
+..cddcgeggllllhhhiimnnk.
+..cdddlhlopopooqqqrsttmj
+.uvvvvooooooooqqwxrmssyz
+uvuuuuAABBBCCCCCwxxDDDz.
+.u.....uvvECFGvwxwwDHH..
+........uvuIJGvGwKKH....
+.........u..LGGLK.......
+.............LL.........
+........................
+........................
+........................
