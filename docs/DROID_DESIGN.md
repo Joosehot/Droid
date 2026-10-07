@@ -45,12 +45,14 @@ pub trait Game {
 ```
 
 `Ctx` (read `src/api.rs` for exact signatures): time, key, key_pressed, axis_x, axis_y, random,
-exists, pos, vel, grounded, has_tag, find_tag (sorted names), count_tag, set_pos, move_by,
+exists, pos, vel, scale, grounded, has_tag, find_tag (sorted names), count_tag, set_pos, move_by,
 set_vel, set_vel_x/y/z, set_scale, set_rotation, set_color, set_flip_x, set_solid, set_sprite, add_tag,
 animate_sprite, squash, spawn_sprite, spawn_shape, respawn_tag, respawn (one scene entity by name),
 destroy, destroy_tag, play_anim, text, text_at, text_color, remove_text, play_sound, play_music, restart,
 and `voice()`: microphone loudness 0..1 (`src/voice.rs`; speech ~0.3, a shout 0.8+; 0 without a
 microphone; headless it is 0 or the `DROID_VOICE` schedule, e.g. `0:0,4:0.9,8:0`).
+Scripted keys: `DROID_KEYS="up@2,up@2.6,space@8-9.5"` taps (`key@seconds`, down for 0.1 s) or
+holds (`key@from-to`) keys on the game clock, headless and in the window (`src/keys.rs`).
 `use droid::prelude::*;` brings Game, Ctx, Status, Vec3, vec2, vec3, BodyKind.
 
 Conventions the data and the code share:
@@ -110,7 +112,15 @@ Each alien marches sideways at 1.4 units per second within 12.5 units, stepping 
 Each ghost shoots at the player at 6 units per second every 2 seconds within 10 units, using "bomb".
 Animate each slime with "slime_1" and "slime_2" at 4 frames per second.
 Animate the player with "hero_1" and "hero_2" at 8 frames per second while it walks.
+Animate each perch with "perch_struggle_1" and "perch_struggle_2" at 12 frames per second while it is hooked.
+Animate each hook with "hook_jig_1" and "hook_jig_2" at 12 frames per second while it is jigged.
+The hook hangs by its eye on a line from the rod tip down through the hole, sinking at 1.5 units per second down to -8.3.
+  ("by its eye": the line ends at the top middle of the hook; "the rod tip" is the thing tagged "rod_tip")
+The player jigs the hook with the up arrow, w or space, lifting it 0.8 units, and it flutters back down.
+Fish are drawn to a jigged hook within 5 units at 2.5 units per second.
 ```
+Ice fishing trigger: `When a jigged hook touches a fish and no fish is hooked, the fish bites, ...`
+("jigged": twitched less than `[game.tuning] jig_secs` ago).
 
 Event actions:
 ```

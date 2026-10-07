@@ -31,13 +31,18 @@ SPRITES = [
     ("roach", "struggle", "a roach, struggling, 28px"),
     ("pike", "swim", "a pike, swimming, 56px"),
     ("pike", "struggle", "a pike, struggling, 56px"),
-    ("hook", "still", "a silver hook, 16px"),
-    ("fisherman", "idle", "an ice fisherman, idle, 48px"),
+    ("hook", "jig", "a tiny silver lure fish, fluttering, 48px"),
+    ("fisherman", "idle", "an Inuit ice fisher in a fur parka, sitting, idle, 44px"),
 ]
+
+# Sprites that hang from an eye: Piksu draws them with the eye at the canvas centre. Their box
+# is cut so the eye stays in the middle across and its top is the top of the box: the game
+# hangs them "by its eye" from the top middle of the sprite.
+BY_THE_EYE = {"hook"}
 
 
 def read_sprite(path):
-    head, rows = path.read_text().split("---\n", 1)
+    head, rows = path.read_text(encoding="utf-8").split("---\n", 1)
     return head, [r for r in rows.splitlines() if r]
 
 
@@ -59,13 +64,19 @@ def main():
         cells = [(y, x) for _, _, _, rows in frames for y, r in enumerate(rows) for x, ch in enumerate(r) if ch != "."]
         y0, y1 = min(c[0] for c in cells), max(c[0] for c in cells) + 1
         x0, x1 = min(c[1] for c in cells), max(c[1] for c in cells) + 1
+        if name in BY_THE_EYE:
+            size = len(frames[0][3])
+            half = max(size // 2 - x0, x1 - size // 2)
+            x0, x1 = size // 2 - half, size // 2 + half
+            # the eye's top: the first filled row of the column through the centre
+            y0 = min(y for _, _, _, rows in frames for y, r in enumerate(rows) if r[size // 2 - 1] != "." or r[size // 2] != ".")
         for old in SPRITES_DIR.glob(f"{name}_*.txt"):
             old.unlink()
         for k, (anim, i, head, rows) in enumerate(frames):
             text = head + "---\n" + "".join(r[x0:x1] + "\n" for r in rows[y0:y1])
-            (SPRITES_DIR / f"{name}_{anim}_{i}.txt").write_text(text, newline="\n")
+            (SPRITES_DIR / f"{name}_{anim}_{i}.txt").write_text(text, encoding="utf-8", newline="\n")
             if k == 0:
-                (SPRITES_DIR / f"{name}.txt").write_text(text, newline="\n")
+                (SPRITES_DIR / f"{name}.txt").write_text(text, encoding="utf-8", newline="\n")
         w, h = x1 - x0, y1 - y0
         print(f"{name}: {len(frames)} frames, {w} x {h} px -> scale [{w * PIXEL:.3f}, {h * PIXEL:.3f}, 1.0]")
 

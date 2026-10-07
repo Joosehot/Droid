@@ -147,32 +147,44 @@ color = [0.88, 0.94, 1.0]
 name = "player"
 shape = "plane"
 sprite = "fisherman"
-position = [-1.5, 8.45, 0.0]
-scale = [1.0, 2.444, 1.0]
+position = [-1.48, 8.39, 0.0]
+scale = [1.722, 2.222, 1.0]
 color = [1.0, 1.0, 1.0]
 
+# a short jigging rod from the near mitten up to its tip right above the hole's centre
 [[entities]]
 name = "rod"
 shape = "box"
-position = [-0.55, 8.45, -0.05]
-rotation = [0.0, 0.0, -66.0]
-scale = [0.08, 1.35, 0.02]
-color = [0.25, 0.18, 0.12]
+position = [-0.395, 8.73, 0.05]
+rotation = [0.0, 0.0, -66.7]
+scale = [0.05, 0.86, 0.02]
+color = [0.16, 0.13, 0.11]
 
 [[entities]]
-name = "rod_line"
+name = "rod_handle"
 shape = "box"
-position = [0.0, 7.25, -0.1]
-scale = [0.06, 2.5, 0.06]
-color = [0.92, 0.92, 0.88]
+position = [-0.79, 8.56, 0.06]
+rotation = [0.0, 0.0, -66.7]
+scale = [0.09, 0.22, 0.02]
+color = [0.42, 0.3, 0.2]
 
+# where the line leaves the rod: the tip, over the middle of the hole
+[[entities]]
+name = "rod_tip"
+tags = ["rod_tip"]
+shape = "box"
+position = [0.0, 8.9, 0.05]
+scale = [0.06, 0.06, 0.02]
+color = [0.16, 0.13, 0.11]
+
+# the jig: a lure fish on a hook; its sprite's top middle is the hook's eye
 [[entities]]
 name = "hook"
 tags = ["hook"]
 shape = "plane"
 sprite = "hook"
 position = [0.0, 6.0, 0.0]
-scale = [0.444, 0.778, 1.0]
+scale = [1.444, 1.333, 1.0]
 color = [1.0, 1.0, 1.0]
 
 [entities.physics]

@@ -99,6 +99,10 @@ impl<'a> Ctx<'a> {
     pub fn vel(&self, n: &str) -> Vec3 {
         self.w.entity(n).and_then(|e| self.w.ecs.get::<&Body>(e).ok().map(|b| b.vel)).unwrap_or_default()
     }
+    /// The entity's size (its scale: a sprite or box is this many units across).
+    pub fn scale(&self, n: &str) -> Vec3 {
+        self.w.entity(n).and_then(|e| self.w.ecs.get::<&Transform>(e).ok().map(|t| t.scale)).unwrap_or(Vec3::ONE)
+    }
     pub fn grounded(&self, n: &str) -> bool {
         self.w.entity(n).and_then(|e| self.w.ecs.get::<&Body>(e).ok().map(|b| b.grounded)).unwrap_or(false)
     }

@@ -11,6 +11,7 @@ pub mod app;
 pub mod font;
 pub mod game;
 pub mod hot;
+pub mod keys;
 pub mod models;
 pub mod physics;
 pub mod project;

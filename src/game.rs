@@ -136,7 +136,10 @@ impl Game {
         {
             let mut w = self.world.borrow_mut();
             w.dt = dt;
+            let t0 = w.time;
             w.time += dt;
+            let t1 = w.time;
+            crate::keys::step(&mut w, t0, t1);
         }
         if let Some((game, _)) = self.native.as_mut() {
             let mut w = self.world.borrow_mut();
