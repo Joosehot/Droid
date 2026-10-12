@@ -1,0 +1,52 @@
+# Why this game is the way it is. Each line: piece  <- [rule/variant]  <- "the words that asked for it"
+# sentence: make a top-down arena where zombies chase the player, survive 60 seconds
+# score 39.550 (rules 39.250, judges +0.300)
+# judge +0.30: lives carry over between waves
+
+== decisions
+genre: arena  <- [genre/arena]  <- "top down arena"
+view: flat  <- [view/flat]  <- "top down arena"
+layout: pillars  <- [layout/pillars]
+controls: direct  <- [controls/direct]
+camera: fixed  <- [camera/fixed]
+enemy_behavior: by_kind  <- [enemy_behavior/by_kind]
+pickups: rewarding  <- [pickups/rewarding]
+goal: survive  <- [goal/survive]  <- "survive 60 seconds"
+health: lives  <- [health/lives]
+ramp: waves  <- [ramp/waves]
+palette: bright  <- [palette/bright]
+art: vector  <- [art/vector]
+music: bounce  <- [music/bounce]
+juice: full  <- [juice/full]
+hud: corner  <- [hud/corner]
+theme garden  <- [rules.toml default_theme.arena]
+player cat  <- [rules.toml default_player.arena]
+player speed 7.00 units/s  <- [controls/direct]
+zombie x4 chase at 2.30 units/s  <- [enemy behaviour (stated)]  <- "zombies chase"
+gem x10  <- [rules.toml default_pickup.arena]
+survive 60 seconds  <- [goal/survive]  <- "survive 60 seconds"
+a new wave every 15 seconds  <- [ramp/waves]
+3 lives  <- [health/lives]
+
+== art (assets/library.toml)
+player drawn as a hero (no vector cat)  <- [rules.toml art.player_fallback]
+player drawn with np_hero_green (kenney_new_platformer_pack)  <- [art/vector]  <- "cat"
+enemy:zombie drawn with toon_zombie (kenney_toon_characters)  <- [art/vector]  <- "zombie"
+pickup:gem drawn with np_gem_blue (kenney_new_platformer_pack)  <- [art/vector]  <- "gem"
+decor:bush drawn with np_bush (kenney_new_platformer_pack)  <- [art/vector]  <- "garden"
+decor:tree drawn with bg_tree (kenney_background_elements)  <- [art/vector]  <- "garden"
+ground, platforms and walls tiled with np_forest (kenney_new_platformer_pack)  <- [art/vector + rules.toml art.tile_theme.garden]  <- "garden"
+
+== level: 38 entities, seed bc6007576d4d07f8
+
+== behavior.txt
+ 1. [music/bounce + hud/corner + health/lives] At the start, the player has 3 lives, play the music "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4" at 132 beats per minute as a square wave, show "SCORE {score}" at the top left in "#f2f2f2", show "LIVES {lives}" at the top right in "#f2f2f2", show "TIME {countdown 60}" at the top in "#f2f2f2" and show "WAVE {wave}" at the bottom in "#f2f2f2".
+ 2. [controls/direct] Move the player with the arrow keys at 7 units per second and face where it moves.
+ 3. [juice/full] Animate the player with "hero_1" and "hero_2" at 8 frames per second while it walks.
+ 4. [enemy_behavior/by_kind (zombie: chase)] Each zombie moves toward the player at 2.3 units per second.
+ 5. [juice/full] Animate each zombie with "zombie_1", "zombie_2" and "zombie_3" at 6 frames per second.
+ 6. [pickups/rewarding] When the player touches a gem, destroy it, add 5 points, squash the player and play the pickup sound.
+ 7. [health/lives] When the player touches a zombie, the player loses a life, safe for 1.5 seconds.
+ 8. [ramp/waves] Every 15 seconds, start the next wave of zombies.
+ 9. [goal/survive] When the time reaches 60 seconds, the player wins "YOU SURVIVED".
+10. [every game restarts] When the player presses r, restart the game.

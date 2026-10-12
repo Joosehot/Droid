@@ -9,7 +9,7 @@
 
 use super::config::Config;
 use super::design::Design;
-use super::level::{reach_at, jump_reach, Level, Rect};
+use super::level::{jump_reach, reach_at, within_jump, Level, Rect};
 use super::request::*;
 use std::path::{Path, PathBuf};
 
@@ -63,7 +63,7 @@ pub fn level(d: &Design, cfg: &Config, lv: &Level) -> Result<(), String> {
 /// the exit must be within a jump of one of them.
 fn jump_graph(d: &Design, cfg: &Config, lv: &Level) -> Result<(), String> {
     let m = cfg.checks.reach_margin;
-    let (h, reach) = jump_reach(d);
+    let (h, _) = jump_reach(d);
     let ph = lv.player_size[1];
     let s: Vec<&super::level::Surface> = lv.surfaces.iter().filter(|s| !s.hazard).collect();
     let foot = lv.spawn[1] - ph / 2.0;
@@ -90,16 +90,7 @@ fn jump_graph(d: &Design, cfg: &Config, lv: &Level) -> Result<(), String> {
             }
         }
     }
-    let reachable = |x: f32, y: f32| {
-        s.iter().zip(&seen).any(|(sf, ok)| {
-            if !*ok {
-                return false;
-            }
-            let dx = (sf.x0 - x).max(x - sf.x1).max(0.0);
-            let dy = y - sf.top;
-            dy <= h * m + ph && dx <= reach * m / 2.0
-        })
-    };
+    let reachable = |x: f32, y: f32| s.iter().zip(&seen).any(|(sf, ok)| *ok && within_jump(d, cfg, sf, x, y, ph));
     for e in &lv.entities {
         if has_tag(e, "pickup") || has_tag(e, "exit") {
             if !reachable(e.position[0], e.position[1]) {

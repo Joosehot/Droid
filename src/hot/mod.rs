@@ -375,3 +375,81 @@ pub fn make(root: &Path, name: &str, sentence: &str, cfg: &Config, lib: &Library
 pub fn vocabulary() -> Vec<&'static str> {
     lexicon::vocabulary()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn gen(sentence: &str) -> Generated {
+        let cfg = Config::load(None).unwrap();
+        let lib = Library::builtin().unwrap();
+        let (req, out) = plan(sentence, &cfg, false).unwrap_or_else(|e| panic!("{sentence}: {e:?}"));
+        assemble(&req, &cfg, &lib, &out.finalists[0], "test_game").unwrap_or_else(|e| panic!("{sentence}: {e}"))
+    }
+
+    #[test]
+    fn the_three_genres_assemble_and_pass_their_checks() {
+        for s in [
+            "make a platformer with coins and slimes",
+            "make a top-down arena where zombies chase the player, survive 60 seconds",
+            "make a space shooter with 3 rows of aliens that shoot back",
+            "make a 3d arena where a gnome collects 8 gems and avoids blobs",
+            "make a hard platformer with 20 coins, slimes and bats, spikes, a flag at the end, in a night forest",
+        ] {
+            let g = gen(s);
+            for f in ["Cargo.toml", "sentence.txt", "behavior.txt", "why.txt", "src/main.rs", "game/game.toml", "game/scene.toml"] {
+                assert!(g.files.contains_key(f), "{s}: no {f}");
+            }
+            assert!(g.files["src/main.rs"].contains("droid::run::<TestGame>"), "{s}");
+            assert!(!g.copies.is_empty(), "{s}: no library art");
+        }
+    }
+
+    #[test]
+    fn the_same_sentence_gives_the_same_files() {
+        let a = gen("make a hard fast platformer with coins, spiders, saws and lava pits in a cave");
+        let b = gen("make a hard fast platformer with coins, spiders, saws and lava pits in a cave");
+        assert_eq!(a.files, b.files);
+        assert_eq!(a.copies, b.copies);
+    }
+
+    #[test]
+    fn behaviour_follows_the_sentence() {
+        let g = gen("make a platformer with coins and slimes");
+        let b = &g.files["behavior.txt"];
+        assert!(b.contains("Each slime patrols"), "{b}");
+        assert!(b.contains("When the player lands on a slime"), "{b}");
+        assert!(b.contains("When the player touches a coin"), "{b}");
+        let g = gen("make a top-down arena where zombies chase the player, survive 60 seconds");
+        let b = &g.files["behavior.txt"];
+        assert!(b.contains("Each zombie moves toward the player at"), "{b}");
+        assert!(b.contains("When the time reaches 60 seconds, the player wins"), "{b}");
+        assert!(g.files["game/game.toml"].contains("view = \"2d\""));
+        let g = gen("make a space shooter with 3 rows of aliens that shoot back");
+        let b = &g.files["behavior.txt"];
+        assert!(b.contains("Each alien marches sideways"), "{b}");
+        assert!(b.contains("a random alien shoots"), "{b}");
+        assert_eq!(g.files["game/scene.toml"].matches("tags = [\"alien\", \"enemy\"]").count() % 3, 0);
+    }
+
+    #[test]
+    fn slugs() {
+        assert_eq!(slug("Forest Run").unwrap(), "forest_run");
+        assert!(slug("1st").is_err());
+        assert!(slug("droid").is_err());
+        assert_eq!(camel("forest_run"), "ForestRun");
+    }
+
+    #[test]
+    fn impossible_requests_write_nothing() {
+        let cfg = Config::load(None).unwrap();
+        let lib = Library::builtin().unwrap();
+        let root = std::env::temp_dir().join(format!("droid_make_test_{}", std::process::id()));
+        let e = make(&root, "nope", "make a 3d platformer", &cfg, &lib, &Options::default()).err().unwrap();
+        assert!(e.iter().any(|m| m.contains("3d")), "{e:?}");
+        assert!(!root.join("games").join("nope").exists());
+        let e = make(&root, "nope", "make a platfromer", &cfg, &lib, &Options::default()).err().unwrap();
+        assert!(e[0].contains("platfromer") && e.iter().any(|m| m.contains("did you mean \"platformer\"")), "{e:?}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+}

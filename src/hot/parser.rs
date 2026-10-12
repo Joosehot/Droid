@@ -122,6 +122,7 @@ fn is_empty(r: &Request) -> bool {
         && r.goals.is_empty()
         && r.abilities.is_empty()
         && r.theme.is_none()
+        && r.layout.is_none()
         && r.mods.is_empty()
         && r.edits.is_empty()
 }
@@ -173,6 +174,7 @@ fn parse_clause(toks: &[Token], req: &mut Request, prev_verb: &mut Option<(Verb,
             Tok::Theme(th) => req.theme = Some(Val::new(th, w)),
             Tok::Time(ti) => req.time = Some(Val::new(ti, w)),
             Tok::Style(st) => req.style = Some(Val::new(st, w)),
+            Tok::Layout(l) => req.layout = Some(Val::new(l, w)),
             Tok::Color(col) => {
                 if c.color.is_some() {
                     return Err(Diag::new(format!("\"{all}\" has two colours for one thing")));

@@ -1,0 +1,11 @@
+title = "Night Forest"
+view = "2d"
+background = [0.193, 0.273, 0.332]
+gravity = [0.0, -40.0, 0.0]
+
+[camera]
+position = [3.0, 0.7, 20.0]
+look_at = [0.0, 0.0, 0.0]
+zoom = 14.0
+follow = "player"
+offset = [3.0, 2.0, 0.0]

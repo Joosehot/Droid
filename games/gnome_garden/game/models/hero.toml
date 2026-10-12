@@ -1,0 +1,8 @@
+file = "models/kenney_mini_dungeon/Models/GLB format/character-human.glb"
+
+[groups]
+arm-left = "arm_l"
+arm-right = "arm_r"
+head = "head"
+leg-left = "leg_l"
+leg-right = "leg_r"

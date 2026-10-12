@@ -1,0 +1,1 @@
+make a hard platformer with 20 coins, slimes and bats, spikes, a flag at the end, in a night forest

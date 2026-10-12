@@ -1,0 +1,69 @@
+# Why this game is the way it is. Each line: piece  <- [rule/variant]  <- "the words that asked for it"
+# sentence: make a hard platformer with 20 coins, slimes and bats, spikes, a flag at the end, in a night forest
+# score 41.614 (rules 40.514, judges +1.100)
+# judge +0.50: rewarding pickups on stacked platforms
+# judge +0.30: precise jumps over hazard gaps
+# judge +0.30: lookahead camera for fast running
+
+== decisions
+genre: platformer  <- [genre/platformer]  <- "platformer"
+view: flat  <- [view/flat]
+layout: stacked  <- [layout/stacked]
+controls: snappy  <- [controls/snappy]
+camera: lookahead  <- [camera/lookahead]
+enemy_behavior: aggressive  <- [enemy_behavior/aggressive]
+pickups: rewarding  <- [pickups/rewarding]
+hazards: in_gaps  <- [hazards/in_gaps]
+goal: reach_exit  <- [goal/reach_exit]  <- "flag"
+health: one_hit  <- [health/one_hit]
+palette: dark  <- [palette/dark]  <- "night"
+art: vector  <- [art/vector]
+music: drive  <- [music/drive]
+juice: full  <- [juice/full]
+hud: corner  <- [hud/corner]
+profile [challenge, pace, simplicity] = [0.85, 0.50, 0.50]  <- [profile.shift]  <- "hard"
+theme forest  <- [theme]  <- "forest"
+player knight  <- [rules.toml default_player.platformer]
+player speed 7.50 units/s  <- [controls/snappy]
+slime x3 chase at 2.51 units/s  <- [enemy_behavior/aggressive]  <- "slimes"
+bat x3 chase at 3.65 units/s  <- [enemy_behavior/aggressive]  <- "bats"
+coin x20  <- [pickups/rewarding]  <- "coins, 20 coins"
+spike x5  <- [hazards/in_gaps]  <- "spikes"
+exit flag  <- [goal/reach_exit]  <- "flag"
+one hit loses  <- [health/one_hit]
+
+== art (assets/library.toml)
+player drawn as a hero (no vector knight)  <- [rules.toml art.player_fallback]
+player drawn with np_hero_green (kenney_new_platformer_pack)  <- [art/vector]  <- "knight"
+enemy:slime drawn with np_slime_purple (kenney_new_platformer_pack)  <- [art/vector]  <- "slime"
+enemy:bat drawn with pp_bat (kenney_pixel_platformer)  <- [art/vector (no vector art for this kind; any style)]  <- "bat"
+pickup:coin drawn with np_coin_gold (kenney_new_platformer_pack)  <- [art/vector]  <- "coin"
+hazard:spike drawn with np_spikes (kenney_new_platformer_pack)  <- [art/vector]  <- "spike"
+exit drawn with np_flag_red (kenney_new_platformer_pack)  <- [art/vector]  <- "flag"
+decor:tree drawn with bg_tree (kenney_background_elements)  <- [art/vector]  <- "forest"
+decor:bush drawn with np_bush (kenney_new_platformer_pack)  <- [art/vector]  <- "forest"
+cloud drawn with bg_cloud (kenney_background_elements)  <- [art/vector]
+ground, platforms and walls tiled with np_forest (kenney_new_platformer_pack)  <- [art/vector + rules.toml art.tile_theme.forest]  <- "forest"
+
+== level: 77 entities, seed d7e90d52d19604df
+
+== behavior.txt
+ 1. [music/drive + hud/corner + goal] At the start, play the music "A3/2 A3/2 C4/2 A3/2 E4/2 A3/2 D4/2 C4/2 A3/2 A3/2 C4/2 A3/2 G4/2 E4/2 D4 -" at 150 beats per minute as a saw wave and show "COINS {score} / 20" at the top left in "#ffffff".
+ 2. [controls/snappy] Move the player sideways with the arrow keys at 7.5 units per second and face where it moves.
+ 3. [controls/snappy] The player jumps with space at 14.5 units per second, higher while held, with the jump sound.
+ 4. [juice/full] Animate the player with "hero_1" and "hero_2" at 8 frames per second while it walks.
+ 5. [enemy_behavior/aggressive (slime: chase)] Each slime moves toward the player sideways at 2.51 units per second within 9 units.
+ 6. [juice/full] Animate each slime with "slime_1" and "slime_2" at 4 frames per second.
+ 7. [enemy_behavior/aggressive (bat: chase)] Each bat moves toward the player at 3.65 units per second within 9 units.
+ 8. [juice/full] Animate each bat with "bat_1" and "bat_2" at 6 frames per second.
+ 9. [juice/full] Animate each coin with "coin_1" and "coin_2" at 4 frames per second.
+10. [juice/full] Animate each flag with "flag_1" and "flag_2" at 4 frames per second.
+11. [pickups/rewarding] When the player touches a coin, destroy it, add 1 to the score, squash the player and play the coin sound.
+12. [genre/platformer (stomping)] When the player lands on a slime, destroy it, bounce the player up at 11 units per second, squash the player and play the bounce sound.
+13. [genre/platformer (stomping)] When the player lands on a bat, destroy it, bounce the player up at 11 units per second, squash the player and play the bounce sound.
+14. [health/one_hit] When the player touches a slime, the player loses.
+15. [health/one_hit] When the player touches a bat, the player loses.
+16. [hazards/in_gaps] When the player touches a spike, the player loses.
+17. [layout.platformer.kill_y] When the player falls below -12, the player loses.
+18. [goal/reach_exit] When the player touches the flag, the player wins "LEVEL CLEAR".
+19. [every game restarts] When the player presses r, restart the game.

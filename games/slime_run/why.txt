@@ -1,0 +1,54 @@
+# Why this game is the way it is. Each line: piece  <- [rule/variant]  <- "the words that asked for it"
+# sentence: make a platformer with coins and slimes
+# score 23.050 (rules 22.250, judges +0.800)
+# judge +0.50: rewarding pickups on stacked platforms
+# judge +0.30: lookahead camera for fast running
+
+== decisions
+genre: platformer  <- [genre/platformer]  <- "platformer"
+view: flat  <- [view/flat]
+layout: stacked  <- [layout/stacked]
+controls: snappy  <- [controls/snappy]
+camera: lookahead  <- [camera/lookahead]
+enemy_behavior: by_kind  <- [enemy_behavior/by_kind]
+pickups: rewarding  <- [pickups/rewarding]
+goal: collect_all  <- [goal/collect_all]
+health: lives  <- [health/lives]
+palette: bright  <- [palette/bright]
+art: vector  <- [art/vector]
+music: bounce  <- [music/bounce]
+juice: full  <- [juice/full]
+hud: corner  <- [hud/corner]
+theme forest  <- [rules.toml default_theme.platformer]
+player knight  <- [rules.toml default_player.platformer]
+player speed 7.50 units/s  <- [controls/snappy]
+slime x5 patrol at 2.20 units/s  <- [enemy_behavior/by_kind]  <- "slimes"
+coin x14  <- [pickups/rewarding]  <- "coins"
+3 lives  <- [health/lives]
+
+== art (assets/library.toml)
+player drawn as a hero (no vector knight)  <- [rules.toml art.player_fallback]
+player drawn with np_hero_green (kenney_new_platformer_pack)  <- [art/vector]  <- "knight"
+enemy:slime drawn with np_slime_purple (kenney_new_platformer_pack)  <- [art/vector]  <- "slime"
+pickup:coin drawn with np_coin_gold (kenney_new_platformer_pack)  <- [art/vector]  <- "coin"
+decor:tree drawn with bg_tree (kenney_background_elements)  <- [art/vector]  <- "forest"
+decor:bush drawn with np_bush (kenney_new_platformer_pack)  <- [art/vector]  <- "forest"
+cloud drawn with bg_cloud (kenney_background_elements)  <- [art/vector]
+ground, platforms and walls tiled with np_forest (kenney_new_platformer_pack)  <- [art/vector + rules.toml art.tile_theme.forest]  <- "forest"
+
+== level: 48 entities, seed d2ace445b12e59cc
+
+== behavior.txt
+ 1. [music/bounce + hud/corner + health/lives] At the start, the player has 3 lives, play the music "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4" at 132 beats per minute as a square wave, show "COINS {score} / 14" at the top left in "#ffffff" and show "LIVES {lives}" at the top right in "#ffffff".
+ 2. [controls/snappy] Move the player sideways with the arrow keys at 7.5 units per second and face where it moves.
+ 3. [controls/snappy] The player jumps with space at 14.5 units per second, higher while held, with the jump sound.
+ 4. [juice/full] Animate the player with "hero_1" and "hero_2" at 8 frames per second while it walks.
+ 5. [enemy_behavior/by_kind (slime: patrol)] Each slime patrols 2.5 units to each side at 2.2 units per second.
+ 6. [juice/full] Animate each slime with "slime_1" and "slime_2" at 4 frames per second.
+ 7. [juice/full] Animate each coin with "coin_1" and "coin_2" at 4 frames per second.
+ 8. [pickups/rewarding] When the player touches a coin, destroy it, add 1 to the score, squash the player and play the coin sound.
+ 9. [genre/platformer (stomping)] When the player lands on a slime, destroy it, bounce the player up at 11 units per second, squash the player and play the bounce sound.
+10. [health/lives] When the player touches a slime, the player loses a life, safe for 1.5 seconds.
+11. [layout.platformer.kill_y] When the player falls below -12, the player loses a life and goes back to the start.
+12. [goal/collect_all] When no coins are left, the player wins "ALL COLLECTED".
+13. [every game restarts] When the player presses r, restart the game.

@@ -1,0 +1,8 @@
+[package]
+name = "slime_run"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+droid = { path = "../.." }

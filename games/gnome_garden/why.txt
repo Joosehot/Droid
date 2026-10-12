@@ -1,0 +1,47 @@
+# Why this game is the way it is. Each line: piece  <- [rule/variant]  <- "the words that asked for it"
+# sentence: make a 3d arena where a gnome collects 8 gems and avoids blobs
+# score 39.050 (rules 38.250, judges +0.800)
+# judge +0.50: open arena keeps the 3d camera clear
+# judge +0.30: animated 3d models
+
+== decisions
+genre: arena  <- [genre/arena]  <- "arena"
+view: depth  <- [view/depth]  <- "3d"
+layout: open  <- [layout/open]
+controls: direct  <- [controls/direct]
+camera: chase_cam  <- [camera/chase_cam]
+enemy_behavior: by_kind  <- [enemy_behavior/by_kind]
+pickups: rewarding  <- [pickups/rewarding]
+goal: collect_all  <- [goal/collect_all]  <- "collects gems"
+health: lives  <- [health/lives]
+ramp: steady  <- [ramp/steady]
+palette: bright  <- [palette/bright]
+art: lowpoly  <- [art/lowpoly]
+music: bounce  <- [music/bounce]
+juice: full  <- [juice/full]
+hud: corner  <- [hud/corner]
+theme garden  <- [rules.toml default_theme.arena]
+player gnome  <- [player]  <- "gnome"
+player speed 7.00 units/s  <- [controls/direct]
+blob x4 wander at 2.00 units/s  <- [enemy_behavior/by_kind]  <- "blobs"
+gem x8  <- [pickups/rewarding]  <- "gems, 8 gems"
+3 lives  <- [health/lives]
+
+== art (assets/library.toml)
+player modelled with dungeon_knight (kenney_mini_dungeon)  <- [art/lowpoly + rules.toml art.model_fallback.gnome = humanoid]  <- "gnome"
+enemy:blob modelled with q_slime (quaternius_slime)  <- [art/lowpoly]  <- "blob"
+pickup:gem modelled with pk_gem (kenney_platformer_kit)  <- [art/lowpoly]  <- "gem"
+decor:bush modelled with pk_plant (kenney_platformer_kit)  <- [art/lowpoly]  <- "garden"
+decor:tree modelled with pk_tree (kenney_platformer_kit)  <- [art/lowpoly]  <- "garden"
+
+== level: 26 entities, seed cf247d7d1c4d0d3a
+
+== behavior.txt
+ 1. [music/bounce + hud/corner + health/lives] At the start, the player has 3 lives, play the music "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4" at 132 beats per minute as a square wave, show "GEMS {score} / 8" at the top left in "#263326" and show "LIVES {lives}" at the top right in "#263326".
+ 2. [controls/direct] Move the player across the ground with the arrow keys at 7 units per second and face where it moves.
+ 3. [enemy_behavior/by_kind (blob: wander)] Each blob wanders across the ground at 2 units per second, turning every 1.6 seconds.
+ 4. [pickups/rewarding] When the player touches a gem, destroy it, add 1 to the score, play the spin animation on the player and play the pickup sound.
+ 5. [health/lives] When the player touches a blob, the player loses a life, safe for 1.5 seconds.
+ 6. [layout.platformer.kill_y] When the player falls below -12, the player goes back to the start.
+ 7. [goal/collect_all] When no gems are left, the player wins "ALL COLLECTED".
+ 8. [every game restarts] When the player presses r, restart the game.

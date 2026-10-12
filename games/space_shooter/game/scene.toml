@@ -1,0 +1,995 @@
+[[entities]]
+name = "star_1"
+shape = "sphere"
+position = [16.034, 4.672, -1.0]
+scale = [0.128, 0.128, 0.128]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_2"
+shape = "sphere"
+position = [-11.533, -3.611, -1.0]
+scale = [0.082, 0.082, 0.082]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_3"
+shape = "sphere"
+position = [-10.117, -6.942, -1.0]
+scale = [0.112, 0.112, 0.112]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_4"
+shape = "sphere"
+position = [-8.014, -8.3, -1.0]
+scale = [0.06, 0.06, 0.06]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_5"
+shape = "sphere"
+position = [4.088, -5.587, -1.0]
+scale = [0.1, 0.1, 0.1]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_6"
+shape = "sphere"
+position = [14.953, 8.882, -1.0]
+scale = [0.13, 0.13, 0.13]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_7"
+shape = "sphere"
+position = [5.421, 3.392, -1.0]
+scale = [0.102, 0.102, 0.102]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_8"
+shape = "sphere"
+position = [10.044, 6.589, -1.0]
+scale = [0.109, 0.109, 0.109]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_9"
+shape = "sphere"
+position = [-14.865, -5.527, -1.0]
+scale = [0.072, 0.072, 0.072]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_10"
+shape = "sphere"
+position = [-16.196, -8.953, -1.0]
+scale = [0.06, 0.06, 0.06]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_11"
+shape = "sphere"
+position = [-9.417, -10.324, -1.0]
+scale = [0.142, 0.142, 0.142]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_12"
+shape = "sphere"
+position = [15.596, 7.127, -1.0]
+scale = [0.159, 0.159, 0.159]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_13"
+shape = "sphere"
+position = [15.457, 9.191, -1.0]
+scale = [0.079, 0.079, 0.079]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_14"
+shape = "sphere"
+position = [-7.916, -8.174, -1.0]
+scale = [0.134, 0.134, 0.134]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_15"
+shape = "sphere"
+position = [3.172, -9.042, -1.0]
+scale = [0.147, 0.147, 0.147]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_16"
+shape = "sphere"
+position = [3.899, 1.967, -1.0]
+scale = [0.066, 0.066, 0.066]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_17"
+shape = "sphere"
+position = [-10.763, -8.274, -1.0]
+scale = [0.152, 0.152, 0.152]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_18"
+shape = "sphere"
+position = [4.89, 8.788, -1.0]
+scale = [0.117, 0.117, 0.117]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_19"
+shape = "sphere"
+position = [0.489, 5.383, -1.0]
+scale = [0.112, 0.112, 0.112]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_20"
+shape = "sphere"
+position = [18.592, 5.481, -1.0]
+scale = [0.13, 0.13, 0.13]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_21"
+shape = "sphere"
+position = [13.654, -2.195, -1.0]
+scale = [0.062, 0.062, 0.062]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_22"
+shape = "sphere"
+position = [-11.335, 3.357, -1.0]
+scale = [0.12, 0.12, 0.12]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_23"
+shape = "sphere"
+position = [6.981, 8.414, -1.0]
+scale = [0.082, 0.082, 0.082]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_24"
+shape = "sphere"
+position = [8.551, 5.315, -1.0]
+scale = [0.101, 0.101, 0.101]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_25"
+shape = "sphere"
+position = [13.179, 2.787, -1.0]
+scale = [0.087, 0.087, 0.087]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_26"
+shape = "sphere"
+position = [-12.813, 8.351, -1.0]
+scale = [0.064, 0.064, 0.064]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_27"
+shape = "sphere"
+position = [-1.797, -8.275, -1.0]
+scale = [0.08, 0.08, 0.08]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_28"
+shape = "sphere"
+position = [-6.77, -8.999, -1.0]
+scale = [0.086, 0.086, 0.086]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_29"
+shape = "sphere"
+position = [-6.976, -7.485, -1.0]
+scale = [0.155, 0.155, 0.155]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_30"
+shape = "sphere"
+position = [5.706, -6.788, -1.0]
+scale = [0.113, 0.113, 0.113]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_31"
+shape = "sphere"
+position = [-9.046, 7.422, -1.0]
+scale = [0.072, 0.072, 0.072]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_32"
+shape = "sphere"
+position = [-18.453, -1.689, -1.0]
+scale = [0.125, 0.125, 0.125]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_33"
+shape = "sphere"
+position = [-3.841, -1.646, -1.0]
+scale = [0.157, 0.157, 0.157]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_34"
+shape = "sphere"
+position = [17.098, 1.125, -1.0]
+scale = [0.087, 0.087, 0.087]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_35"
+shape = "sphere"
+position = [-4.996, 5.519, -1.0]
+scale = [0.088, 0.088, 0.088]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_36"
+shape = "sphere"
+position = [-12.754, 2.333, -1.0]
+scale = [0.092, 0.092, 0.092]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_37"
+shape = "sphere"
+position = [4.643, 2.487, -1.0]
+scale = [0.121, 0.121, 0.121]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_38"
+shape = "sphere"
+position = [5.593, -3.569, -1.0]
+scale = [0.075, 0.075, 0.075]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_39"
+shape = "sphere"
+position = [-6.919, 8.855, -1.0]
+scale = [0.159, 0.159, 0.159]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "star_40"
+shape = "sphere"
+position = [4.494, 4.324, -1.0]
+scale = [0.098, 0.098, 0.098]
+color = [0.9, 0.9, 1.0]
+
+[[entities]]
+name = "alien_1"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-7.7, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_2"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-5.5, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_3"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-3.3, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_4"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-1.1, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_5"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [1.1, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_6"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [3.3, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_7"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [5.5, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_8"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [7.7, 7.9, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_9"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-7.7, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_10"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-5.5, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_11"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-3.3, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_12"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-1.1, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_13"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [1.1, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_14"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [3.3, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_15"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [5.5, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_16"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [7.7, 6.3, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_17"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-7.7, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_18"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-5.5, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_19"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-3.3, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_20"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [-1.1, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_21"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [1.1, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_22"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [3.3, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_23"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [5.5, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "alien_24"
+tags = ["alien", "enemy"]
+shape = "box"
+sprite = "alien"
+position = [7.7, 4.7, 0.0]
+scale = [1.107, 1.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+solid = false
+
+[[entities]]
+name = "shield_1"
+tags = ["shield"]
+shape = "box"
+position = [-9.8, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_2"
+tags = ["shield"]
+shape = "box"
+position = [-9.8, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_3"
+tags = ["shield"]
+shape = "box"
+position = [-9.1, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_4"
+tags = ["shield"]
+shape = "box"
+position = [-9.1, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_5"
+tags = ["shield"]
+shape = "box"
+position = [-8.4, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_6"
+tags = ["shield"]
+shape = "box"
+position = [-8.4, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_7"
+tags = ["shield"]
+shape = "box"
+position = [-7.7, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_8"
+tags = ["shield"]
+shape = "box"
+position = [-7.7, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_9"
+tags = ["shield"]
+shape = "box"
+position = [-3.967, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_10"
+tags = ["shield"]
+shape = "box"
+position = [-3.967, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_11"
+tags = ["shield"]
+shape = "box"
+position = [-3.267, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_12"
+tags = ["shield"]
+shape = "box"
+position = [-3.267, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_13"
+tags = ["shield"]
+shape = "box"
+position = [-2.567, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_14"
+tags = ["shield"]
+shape = "box"
+position = [-2.567, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_15"
+tags = ["shield"]
+shape = "box"
+position = [-1.867, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_16"
+tags = ["shield"]
+shape = "box"
+position = [-1.867, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_17"
+tags = ["shield"]
+shape = "box"
+position = [1.867, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_18"
+tags = ["shield"]
+shape = "box"
+position = [1.867, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_19"
+tags = ["shield"]
+shape = "box"
+position = [2.567, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_20"
+tags = ["shield"]
+shape = "box"
+position = [2.567, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_21"
+tags = ["shield"]
+shape = "box"
+position = [3.267, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_22"
+tags = ["shield"]
+shape = "box"
+position = [3.267, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_23"
+tags = ["shield"]
+shape = "box"
+position = [3.967, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_24"
+tags = ["shield"]
+shape = "box"
+position = [3.967, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_25"
+tags = ["shield"]
+shape = "box"
+position = [7.7, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_26"
+tags = ["shield"]
+shape = "box"
+position = [7.7, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_27"
+tags = ["shield"]
+shape = "box"
+position = [8.4, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_28"
+tags = ["shield"]
+shape = "box"
+position = [8.4, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_29"
+tags = ["shield"]
+shape = "box"
+position = [9.1, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_30"
+tags = ["shield"]
+shape = "box"
+position = [9.1, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_31"
+tags = ["shield"]
+shape = "box"
+position = [9.8, -5.85, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "shield_32"
+tags = ["shield"]
+shape = "box"
+position = [9.8, -5.15, 0.0]
+scale = [0.665, 0.665, 1.0]
+color = [0.3, 0.75, 0.3]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "player"
+tags = ["player"]
+shape = "box"
+sprite = "hero"
+position = [0.0, -8.5, 0.0]
+scale = [1.716, 1.3, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "kinematic"
+
+[[texts]]
+id = "help"
+text = "ARROWS/AD MOVE  SPACE FIRE  R RESTART"
+x = 0.02
+y = 0.95
+size = 16.0
+color = [0.75, 0.75, 0.75]

@@ -1,0 +1,525 @@
+[[entities]]
+name = "tree_1"
+shape = "box"
+sprite = "tree"
+position = [3.14, 1.645, -0.5]
+scale = [1.902, 3.391, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_2"
+shape = "box"
+sprite = "tree"
+position = [19.083, 1.633, -0.5]
+scale = [1.888, 3.365, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_3"
+shape = "box"
+sprite = "tree"
+position = [27.98, 1.771, -0.5]
+scale = [2.042, 3.641, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "bush_1"
+shape = "box"
+sprite = "bush"
+position = [44.168, 0.433, -0.5]
+scale = [0.967, 0.967, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_4"
+shape = "box"
+sprite = "tree"
+position = [55.333, 1.371, -0.5]
+scale = [1.594, 2.843, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_5"
+shape = "box"
+sprite = "tree"
+position = [69.104, 1.713, -0.5]
+scale = [1.978, 3.526, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "bush_2"
+shape = "box"
+sprite = "bush"
+position = [76.585, 0.381, -0.5]
+scale = [0.862, 0.862, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_6"
+shape = "box"
+sprite = "tree"
+position = [85.462, 1.427, -0.5]
+scale = [1.657, 2.955, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_7"
+shape = "box"
+sprite = "tree"
+position = [91.851, 1.539, -0.5]
+scale = [1.783, 3.179, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_1"
+shape = "box"
+sprite = "cloud"
+position = [21.242, 9.451, -0.8]
+scale = [2.111, 1.418, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_2"
+shape = "box"
+sprite = "cloud"
+position = [7.483, 6.728, -0.8]
+scale = [2.471, 1.66, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_3"
+shape = "box"
+sprite = "cloud"
+position = [97.226, 6.425, -0.8]
+scale = [1.582, 1.063, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_4"
+shape = "box"
+sprite = "cloud"
+position = [21.106, 9.098, -0.8]
+scale = [2.54, 1.707, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_5"
+shape = "box"
+sprite = "cloud"
+position = [97.472, 7.633, -0.8]
+scale = [1.672, 1.123, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_6"
+shape = "box"
+sprite = "cloud"
+position = [72.165, 6.153, -0.8]
+scale = [1.528, 1.027, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_7"
+shape = "box"
+sprite = "cloud"
+position = [79.338, 8.699, -0.8]
+scale = [1.979, 1.33, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_8"
+shape = "box"
+sprite = "cloud"
+position = [36.667, 6.103, -0.8]
+scale = [2.34, 1.572, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "cloud_9"
+shape = "box"
+sprite = "cloud"
+position = [28.731, 8.203, -0.8]
+scale = [2.004, 1.347, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "ground_1"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [5.5, -3.0, 0.0]
+scale = [11.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "ground_2"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [18.5, -3.0, 0.0]
+scale = [7.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "ground_3"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [29.5, -3.0, 0.0]
+scale = [11.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "ground_4"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [44.5, -3.0, 0.0]
+scale = [9.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "ground_5"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [56.0, -3.0, 0.0]
+scale = [10.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "ground_6"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [73.0, -3.0, 0.0]
+scale = [14.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "ground_7"
+tags = ["ground"]
+shape = "box"
+sprite = "tiles_ground"
+position = [88.5, -3.0, 0.0]
+scale = [13.0, 6.0, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "platform_1"
+tags = ["platform"]
+shape = "box"
+sprite = "tiles_platform"
+position = [13.0, 0.75, 0.0]
+scale = [2.0, 0.5, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "platform_2"
+tags = ["platform"]
+shape = "box"
+sprite = "tiles_platform"
+position = [37.5, 0.75, 0.0]
+scale = [3.0, 0.5, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "platform_3"
+tags = ["platform"]
+shape = "box"
+sprite = "tiles_platform"
+position = [63.5, 0.75, 0.0]
+scale = [3.0, 0.5, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "slime_1"
+tags = ["slime", "enemy"]
+shape = "box"
+sprite = "slime"
+position = [18.5, 0.42, 0.0]
+scale = [0.8, 0.8, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "slime_2"
+tags = ["slime", "enemy"]
+shape = "box"
+sprite = "slime"
+position = [29.5, 0.42, 0.0]
+scale = [0.8, 0.8, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "slime_3"
+tags = ["slime", "enemy"]
+shape = "box"
+sprite = "slime"
+position = [56.0, 0.42, 0.0]
+scale = [0.8, 0.8, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "slime_4"
+tags = ["slime", "enemy"]
+shape = "box"
+sprite = "slime"
+position = [69.5, 0.42, 0.0]
+scale = [0.8, 0.8, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "slime_5"
+tags = ["slime", "enemy"]
+shape = "box"
+sprite = "slime"
+position = [76.5, 0.42, 0.0]
+scale = [0.8, 0.8, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "coin_1"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [5.5, 2.234, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_2"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [12.5, 2.0, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_3"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [18.5, 2.234, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_4"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [23.0, 2.103, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_5"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [29.5, 2.234, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_6"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [36.5, 2.0, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_7"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [37.9, 2.0, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_8"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [44.5, 2.234, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_9"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [50.0, 2.103, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_10"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [57.4, 1.0, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_11"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [63.5, 2.103, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_12"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [63.9, 2.0, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_13"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [74.4, 1.0, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "coin_14"
+tags = ["coin", "pickup"]
+shape = "box"
+sprite = "coin"
+position = [88.5, 2.234, 0.0]
+scale = [0.6, 0.6, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "player"
+tags = ["player"]
+shape = "box"
+sprite = "hero"
+position = [3.0, 0.7, 0.0]
+scale = [1.3, 1.3, 1.0]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[texts]]
+id = "help"
+text = "ARROWS/AD MOVE  SPACE JUMP  R RESTART"
+x = 0.02
+y = 0.95
+size = 16.0
+color = [0.75, 0.75, 0.75]

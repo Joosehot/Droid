@@ -1,0 +1,10 @@
+At the start, the player has 3 lives, play the music "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4" at 132 beats per minute as a square wave, show "SCORE {score}" at the top left in "#f2f2f2", show "LIVES {lives}" at the top right in "#f2f2f2", show "TIME {countdown 60}" at the top in "#f2f2f2" and show "WAVE {wave}" at the bottom in "#f2f2f2".
+Move the player with the arrow keys at 7 units per second and face where it moves.
+Animate the player with "hero_1" and "hero_2" at 8 frames per second while it walks.
+Each zombie moves toward the player at 2.3 units per second.
+Animate each zombie with "zombie_1", "zombie_2" and "zombie_3" at 6 frames per second.
+When the player touches a gem, destroy it, add 5 points, squash the player and play the pickup sound.
+When the player touches a zombie, the player loses a life, safe for 1.5 seconds.
+Every 15 seconds, start the next wave of zombies.
+When the time reaches 60 seconds, the player wins "YOU SURVIVED".
+When the player presses r, restart the game.

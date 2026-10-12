@@ -227,6 +227,16 @@ pub fn reach_at(d: &Design, dh: f32) -> f32 {
     d.speed * (d.jump + disc.sqrt()) / d.gravity
 }
 
+/// Can a player standing on `s` touch something at (x, y)? (jump height plus the player's own
+/// height up, half a jump's reach across; `checks.reach_margin` of the physics.)
+pub fn within_jump(d: &Design, cfg: &Config, s: &Surface, x: f32, y: f32, player_h: f32) -> bool {
+    let m = cfg.checks.reach_margin;
+    let (h, reach) = jump_reach(d);
+    let dx = (s.x0 - x).max(x - s.x1).max(0.0);
+    let dy = y - s.top;
+    !s.hazard && dy <= h * m + player_h && dx <= reach * m / 2.0
+}
+
 fn platformer(d: &Design, cfg: &Config, art: &ArtPlan, col: &Colors, rng: &mut Rng, lv: &mut Level) -> Result<(), String> {
     let lay = &cfg.layout.platformer;
     let tile = cfg.art.tile_size;
@@ -411,7 +421,15 @@ fn platformer(d: &Design, cfg: &Config, art: &ArtPlan, col: &Colors, rng: &mut R
     let hazard_xs: Vec<f32> = ents.iter().filter(|e| e.tags.iter().any(|t| t == "hazard")).map(|e| e.position[0]).collect();
     let walk: Vec<Surface> = segs.iter().chain(floating.iter()).cloned().collect();
     let mut cands: Vec<(f32, f32)> = vec![];
-    let lift = |x: f32, y: f32| if hazard_xs.iter().any(|h| (h - x).abs() < 1.2) { y + jump_h * 0.6 } else { y };
+    // a low pickup right above a hazard would hurt: lift it to jump height
+    let lift = |x: f32, y: f32| {
+        let low = walk.iter().any(|s| x >= s.x0 && x <= s.x1 && y - s.top <= lay.coin_height + 0.01);
+        if low && hazard_xs.iter().any(|h| (h - x).abs() < 1.2) {
+            y + jump_h * 0.6
+        } else {
+            y
+        }
+    };
     match d.variant("pickups") {
         "rewarding" => {
             for s in &floating {
@@ -466,17 +484,29 @@ fn platformer(d: &Design, cfg: &Config, art: &ArtPlan, col: &Colors, rng: &mut R
             }
         }
     }
-    cands.retain(|(x, _)| (x - spawn_x).abs() > 1.0 && (x - exit_x).abs() > 1.2);
+    let clear = |x: f32| (x - spawn_x).abs() > 1.0 && (x - exit_x).abs() > 1.2;
+    cands.retain(|(x, _)| clear(*x));
     cands = cands.into_iter().map(|(x, y)| (x, lift(x, y))).collect();
-    cands.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.total_cmp(&b.1)));
+    // never place what the jump-graph check would reject
+    let ok = |x: f32, y: f32| walk.iter().any(|s| within_jump(d, cfg, s, x, y, lv.player_size[1]));
+    cands.retain(|(x, y)| ok(*x, *y));
     let total = d.pickup_total() as usize;
-    let mut extra = 1.0;
-    while cands.len() < total {
-        // not enough places: a second row above
-        let more: Vec<(f32, f32)> = cands.iter().map(|(x, y)| (*x, y + extra)).collect();
-        cands.extend(more);
-        extra += 1.0;
-        cands.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.total_cmp(&b.1)));
+    if cands.len() < total {
+        // not enough places: dense rows along the ground
+        for s in &segs {
+            let mut x = s.x0 + 0.7;
+            while x <= s.x1 - 0.7 {
+                let y = lift(x, s.top + lay.coin_height);
+                if clear(x) && ok(x, y) && !cands.iter().any(|c| (c.0 - x).abs() < 0.3 && (c.1 - y).abs() < 0.3) {
+                    cands.push((x, y));
+                }
+                x += 0.7;
+            }
+        }
+    }
+    cands.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.total_cmp(&b.1)));
+    if cands.len() < total {
+        return Err(format!("the level has room for {} pickups, not {total}", cands.len()));
     }
     let picked = spread(&cands.iter().map(|c| (c.0, c.1)).collect::<Vec<_>>(), total);
     let mut kinds: Vec<&super::design::PickupPlan> = vec![];
@@ -590,8 +620,9 @@ fn arena(d: &Design, cfg: &Config, art: &ArtPlan, col: &Colors, rng: &mut Rng, l
     } else {
         // a plain floor in the theme's ground colour, so tiled walls and pillars stand out
         ents.push(E::new("floor", [0.0, 0.0, -1.0], [w, h, 1.0]).color(col.ground).0);
-        // outside the walls: the theme's wall colour, not the sky
+        // outside the walls: the theme's wall colour, not the sky; the HUD sits on the tiled wall
         lv.background = col.wall.map(round3);
+        lv.text_color = cfg.colors["white"];
     }
     // outer walls
     for r in [

@@ -1,0 +1,9 @@
+title = "Zombie Arena"
+view = "2d"
+background = [0.5, 0.65, 0.4]
+gravity = [0.0, 0.0, 0.0]
+
+[camera]
+position = [0.0, 0.0, 20.0]
+look_at = [0.0, 0.0, 0.0]
+zoom = 20.0

@@ -1,0 +1,10 @@
+title = "Gnome Garden"
+view = "3d"
+background = [0.6, 0.82, 0.98]
+gravity = [0.0, -22.0, 0.0]
+
+[camera]
+position = [0.0, 14.75, 11.0]
+look_at = [0.0, 0.75, 0.0]
+zoom = 20.0
+follow = "player"

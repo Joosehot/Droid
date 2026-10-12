@@ -1,0 +1,6 @@
+[tiles]
+fill = "tiles_tile_platform_mid"
+top = "tiles_tile_platform_mid"
+left = "tiles_tile_platform_left"
+right = "tiles_tile_platform_right"
+size = 1.0

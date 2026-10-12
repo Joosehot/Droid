@@ -178,7 +178,10 @@ pub fn write(d: &Design, cfg: &Config, lv: &Level, art: &ArtPlan) -> Vec<Line> {
         let k = e.kind.name();
         let line = match e.behavior {
             Behavior::Patrol => format!("Each {k} patrols {} units to each side at {} units per second.", num(*lv.patrol.get(&e.kind).unwrap_or(&r.patrol_distance)), num(e.speed)),
-            Behavior::Chase if d.genre == Genre::Platformer => format!("Each {k} moves toward the player sideways at {} units per second within {} units.", num(e.speed), num(r.chase_range)),
+            // walkers follow along the ground, flyers straight at the player
+            Behavior::Chase if d.genre == Genre::Platformer => {
+                format!("Each {k} moves toward the player{} at {} units per second within {} units.", if e.flying { "" } else { " sideways" }, num(e.speed), num(r.chase_range))
+            }
             Behavior::Chase => {
                 let mut s = format!("Each {k} moves toward the player{ground} at {} units per second", num(e.speed));
                 if d.is("ramp", "speedup") {

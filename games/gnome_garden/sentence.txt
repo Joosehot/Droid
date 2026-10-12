@@ -1,0 +1,1 @@
+make a 3d arena where a gnome collects 8 gems and avoids blobs

@@ -1,0 +1,8 @@
+At the start, the player has 3 lives, play the music "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4" at 132 beats per minute as a square wave, show "GEMS {score} / 8" at the top left in "#263326" and show "LIVES {lives}" at the top right in "#263326".
+Move the player across the ground with the arrow keys at 7 units per second and face where it moves.
+Each blob wanders across the ground at 2 units per second, turning every 1.6 seconds.
+When the player touches a gem, destroy it, add 1 to the score, play the spin animation on the player and play the pickup sound.
+When the player touches a blob, the player loses a life, safe for 1.5 seconds.
+When the player falls below -12, the player goes back to the start.
+When no gems are left, the player wins "ALL COLLECTED".
+When the player presses r, restart the game.

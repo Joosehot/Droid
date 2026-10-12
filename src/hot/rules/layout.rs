@@ -17,14 +17,29 @@ impl Rule for Layout {
         Some("every game has a level".into())
     }
     fn offers(&self, cx: &Ctx, chosen: &Chosen) -> Result<Vec<Offer>, String> {
-        let _ = (cx, chosen);
-        Ok(match genre_of(chosen) {
+        let _ = cx;
+        let all = match genre_of(chosen) {
             Genre::Platformer => vec![Offer::plain("flat_run"), Offer::plain("steps"), Offer::plain("stacked")],
             // inner walls hide the player from a 3D camera
             Genre::Arena if depth(chosen) => vec![Offer::plain("open"), Offer::plain("pillars")],
             Genre::Arena => vec![Offer::plain("open"), Offer::plain("pillars"), Offer::plain("rooms")],
             Genre::Shooter => vec![Offer::plain("open_sky"), Offer::plain("shields")],
-        })
+        };
+        // a named shape wins, if this kind of game has it
+        match &cx.req.layout {
+            Some(l) => match all.iter().find(|o| o.variant == l.v.name()) {
+                Some(o) => Ok(vec![Offer::named(o.variant, l.words.clone())]),
+                None => Err(format!(
+                    "\"{}\": a {}{} has no {}; it can have {}",
+                    l.words,
+                    if depth(chosen) { "3d " } else { "" },
+                    genre_of(chosen).name(),
+                    l.words,
+                    all.iter().map(|o| o.variant.replace('_', " ")).collect::<Vec<_>>().join(", ")
+                )),
+            },
+            None => Ok(all),
+        }
     }
 }
 
@@ -36,6 +51,12 @@ mod tests {
     #[test]
     fn platformer_layouts() {
         assert_eq!(offers(&Layout, "make a platformer", &[("genre", "platformer")]), Some(vec!["flat_run", "steps", "stacked"]));
+    }
+
+    #[test]
+    fn a_named_shape_wins() {
+        assert_eq!(offers(&Layout, "make an arena with rooms", &[("genre", "arena"), ("view", "flat")]), Some(vec!["rooms"]));
+        assert_eq!(offers(&Layout, "make a platformer with rooms", &[("genre", "platformer")]), None);
     }
 
     #[test]

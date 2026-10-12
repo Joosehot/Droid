@@ -1,0 +1,49 @@
+# Why this game is the way it is. Each line: piece  <- [rule/variant]  <- "the words that asked for it"
+# sentence: make a space shooter with 3 rows of aliens that shoot back
+# score 21.400 (rules 21.100, judges +0.300)
+# judge +0.30: lives carry over between waves
+
+== decisions
+genre: shooter  <- [genre/shooter]  <- "space shooter"
+view: flat  <- [view/flat]
+layout: shields  <- [layout/shields]
+controls: slide  <- [controls/slide]
+enemy_attack: straight  <- [enemy_attack/straight]
+goal: destroy_all  <- [goal/destroy_all]
+health: lives  <- [health/lives]
+ramp: waves  <- [ramp/waves]
+palette: bright  <- [palette/bright]
+art: vector  <- [art/vector]
+music: bounce  <- [music/bounce]
+juice: full  <- [juice/full]
+hud: corner  <- [hud/corner]
+theme space  <- [rules.toml default_theme.shooter]
+player ship  <- [rules.toml default_player.shooter]
+player speed 11.00 units/s  <- [controls/slide]
+the player shoots  <- [genre/shooter]
+alien x24 march at 1.40 units/s, shooting  <- [enemy_behavior/by_kind]  <- "aliens"
+3 waves  <- [ramp/waves]
+3 lives  <- [health/lives]
+
+== art (assets/library.toml)
+player drawn with ssr_ship_blue (kenney_space_shooter_remastered)  <- [art/vector]  <- "ship"
+enemy:alien drawn with ssr_alien_green (kenney_space_shooter_remastered)  <- [art/vector]  <- "alien"
+shot drawn with ssr_laser_blue (kenney_space_shooter_remastered)  <- [art/vector]
+bomb drawn with ssr_laser_red (kenney_space_shooter_remastered)  <- [art/vector]
+
+== level: 97 entities, seed 10cbe576d0fcc307
+
+== behavior.txt
+ 1. [music/bounce + hud/corner + health/lives] At the start, the player has 3 lives, play the music "C4/2 E4/2 G4/2 E4/2 F4/2 A4/2 C5/2 A4/2 G4/2 B4/2 D5/2 B4/2 C5 - G4/2 E4/2 C4" at 132 beats per minute as a square wave, show "SCORE {score}" at the top left in "#ffffff", show "LIVES {lives}" at the top right in "#ffffff" and show "WAVE {wave}" at the top in "#ffffff".
+ 2. [controls/slide] Move the player sideways with the arrow keys at 11 units per second within 10.78 units.
+ 3. [abilities.player_bullet_speed] The player shoots up with space at 22 units per second every 0.28 seconds, using "shot", with the laser sound.
+ 4. [genre/shooter (alien: march)] Each alien marches sideways at 1.4 units per second within 12.5 units, stepping down 0.6 units, up to 2.5 times as fewer are left, 15 percent faster each wave.
+ 5. [enemy_attack/straight] Every 1.6 seconds, a random alien shoots down at 9 units per second, using "bomb".
+ 6. [abilities.player_bullet_speed] When a shot hits an alien, destroy both, add 30 points and play the explosion sound.
+ 7. [layout/shields] When a shot hits a shield, destroy the shot.
+ 8. [layout/shields] When a bomb hits a shield, destroy both.
+ 9. [enemy_attack/straight] When a bomb hits the player, destroy the bomb and the player loses a life, safe for 1.5 seconds.
+10. [ramp/waves] When no aliens are left, destroy the bombs and start the next wave of aliens.
+11. [goal/destroy_all] When the score reaches 2160, the player wins "ALL WAVES CLEARED".
+12. [layout.shooter.lose_y] When an alien falls below -6, the player loses "INVADED".
+13. [every game restarts] When the player presses r, restart the game.

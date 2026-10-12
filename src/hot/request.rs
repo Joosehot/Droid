@@ -20,6 +20,9 @@ kinds!(Theme {
     Forest = "forest", Cave = "cave", Space = "space", Desert = "desert", Snow = "snow",
     Garden = "garden", Ocean = "ocean", Candy = "candy", Castle = "castle", City = "city", Lava = "lava",
 });
+kinds!(LayoutReq {
+    FlatRun = "flat_run", Steps = "steps", Stacked = "stacked", Open = "open", Pillars = "pillars", Rooms = "rooms", Shields = "shields",
+});
 kinds!(ArtStyle { Pixel = "pixel", Vector = "vector", Lowpoly = "lowpoly" });
 kinds!(TimeOfDay { Day = "day", Night = "night" });
 kinds!(Color {
@@ -118,6 +121,8 @@ pub struct Request {
     pub time: Option<Val<TimeOfDay>>,
     /// "pixel", "cartoon", "low poly": which family of library art to draw with.
     pub style: Option<Val<ArtStyle>>,
+    /// "with rooms", "on platforms", "with shields": the level's shape.
+    pub layout: Option<Val<LayoutReq>>,
     pub mods: Vec<Val<Mod>>,
     pub lives: Option<Val<u32>>,
     pub edits: Vec<Val<(Target, Change)>>,

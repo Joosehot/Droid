@@ -1,0 +1,290 @@
+[[entities]]
+name = "floor"
+tags = ["ground"]
+shape = "box"
+position = [0.0, -0.5, 0.0]
+scale = [30.0, 1.0, 19.0]
+color = [0.55, 0.78, 0.45]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "wall_1"
+tags = ["wall"]
+shape = "box"
+position = [0.0, 0.7, 9.0]
+scale = [30.0, 1.4, 1.0]
+color = [0.5, 0.65, 0.4]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "wall_2"
+tags = ["wall"]
+shape = "box"
+position = [0.0, 0.7, -9.0]
+scale = [30.0, 1.4, 1.0]
+color = [0.5, 0.65, 0.4]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "wall_3"
+tags = ["wall"]
+shape = "box"
+position = [-14.5, 0.7, 0.0]
+scale = [1.0, 1.4, 17.0]
+color = [0.5, 0.65, 0.4]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "wall_4"
+tags = ["wall"]
+shape = "box"
+position = [14.5, 0.7, 0.0]
+scale = [1.0, 1.4, 17.0]
+color = [0.5, 0.65, 0.4]
+
+[entities.physics]
+body = "static"
+
+[[entities]]
+name = "blob_1"
+tags = ["blob", "enemy"]
+shape = "box"
+model = "blob"
+position = [-12.44, 0.588, 5.598]
+scale = [1.402, 1.077, 1.693]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "blob_2"
+tags = ["blob", "enemy"]
+shape = "box"
+model = "blob"
+position = [12.75, 0.588, 1.703]
+scale = [1.402, 1.077, 1.693]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "blob_3"
+tags = ["blob", "enemy"]
+shape = "box"
+model = "blob"
+position = [12.082, 0.588, -1.232]
+scale = [1.402, 1.077, 1.693]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "blob_4"
+tags = ["blob", "enemy"]
+shape = "box"
+model = "blob"
+position = [9.8, 0.588, -2.542]
+scale = [1.402, 1.077, 1.693]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[entities]]
+name = "gem_1"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [-12.803, 0.65, -7.551]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_2"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [-11.69, 0.65, 6.941]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_3"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [-13.176, 0.65, -1.147]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_4"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [11.898, 0.65, -4.543]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_5"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [10.599, 0.65, 6.705]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_6"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [12.017, 0.65, 3.184]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_7"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [-10.94, 0.65, -1.97]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "gem_8"
+tags = ["gem", "pickup"]
+shape = "box"
+model = "gem"
+position = [-9.036, 0.65, -6.185]
+scale = [0.629, 0.7, 0.545]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "static"
+solid = false
+
+[[entities]]
+name = "bush_1"
+shape = "box"
+model = "bush"
+position = [-11.113, 0.506, 11.336]
+scale = [2.53, 1.012, 2.608]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_1"
+shape = "box"
+model = "tree"
+position = [-7.562, 1.653, -10.53]
+scale = [1.865, 3.306, 1.898]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "bush_2"
+shape = "box"
+model = "bush"
+position = [-17.965, 0.489, 6.365]
+scale = [2.445, 0.978, 2.52]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_2"
+shape = "box"
+model = "tree"
+position = [18.361, 1.587, 2.27]
+scale = [1.79, 3.175, 1.823]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "bush_3"
+shape = "box"
+model = "bush"
+position = [0.7, 0.595, 12.727]
+scale = [2.975, 1.19, 3.066]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_3"
+shape = "box"
+model = "tree"
+position = [-9.945, 1.601, -11.426]
+scale = [1.805, 3.202, 1.838]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "bush_4"
+shape = "box"
+model = "bush"
+position = [-16.556, 0.541, 0.079]
+scale = [2.704, 1.081, 2.786]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "tree_4"
+shape = "box"
+model = "tree"
+position = [18.287, 1.299, -2.262]
+scale = [1.465, 2.598, 1.492]
+color = [1.0, 1.0, 1.0]
+
+[[entities]]
+name = "player"
+tags = ["player"]
+shape = "box"
+model = "hero"
+position = [0.0, 0.75, 0.0]
+scale = [1.447, 1.4, 0.668]
+color = [1.0, 1.0, 1.0]
+
+[entities.physics]
+body = "dynamic"
+
+[[texts]]
+id = "help"
+text = "ARROWS/WASD MOVE  R RESTART"
+x = 0.02
+y = 0.95
+size = 16.0
+color = [0.113, 0.15, 0.113]

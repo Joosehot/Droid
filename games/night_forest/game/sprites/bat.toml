@@ -1,0 +1,3 @@
+sheet = "images/kenney_pixel_platformer/Tilemap/tilemap-characters_packed.png"
+tile = [6, 2]
+tile_size = [24, 24]
