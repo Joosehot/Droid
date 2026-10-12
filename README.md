@@ -7,11 +7,47 @@ droid make forest_run "make a platformer with coins, slimes and bats, a flag at 
 cargo run -p forest_run
 ```
 
+| `"make an ice fishing game where you shout to reel the fish up"` | `"make a hard platformer with 20 coins, slimes and bats, spikes, a flag at the end, in a night forest"` |
+|:---:|:---:|
+| ![The ice-fishing game](docs/images/ice_fishing.png) | ![The night forest platformer](docs/images/night_forest.png) |
+
+Both screenshots are games in `games/`, as they run.
+
 No neural network runs when a game is made. Droid follows the
 [HotMotor](https://github.com/Joosehot/HotMotor) design: a closed vocabulary, a parser that
 remembers which words asked for what, design rules with variants, a beam search with judges,
 and checks before anything is written. The same sentence and the same `rules.toml` give
 byte-identical files. The full contract is `docs/DROID_DESIGN.md`.
+
+## Getting started
+
+Droid needs [Senne](https://github.com/Joosehot/Senne) (its `game-domain` branch) next to it,
+because Senne turns a game's behaviour sentences into Rust. Clone the two side by side:
+
+```
+git clone https://github.com/Joosehot/Droid
+git clone -b game-domain https://github.com/Joosehot/Senne
+cd Droid
+cargo run -p night_forest          # one of the games Droid made, in games/
+cargo run --release -- make my_game "make a platformer with coins and slimes in a forest"
+cargo run -p my_game
+cargo test --release --lib         # 91 tests
+```
+
+`games/` holds games Droid made from one sentence each:
+- `night_forest`, `slime_run`: platformers;
+- `zombie_arena`: top-down survival;
+- `space_shooter`;
+- `gnome_garden`: 3D.
+
+Each of these folders has its `sentence.txt`, the `behavior.txt` Droid wrote, the `why.txt`
+behind every decision, and the `src/main.rs` Senne wrote.
+
+Two more games are there for other reasons:
+- `ice_fishing` is a shout-to-reel ice-fishing game ("make an ice fishing game where you shout
+  to reel the fish up"). Its behaviour goes through Senne, and its sprites are
+  [Piksu](https://github.com/Joosehot/Piksu)'s fish and fisher. It uses the microphone.
+- `coin_runner` is the first game written by hand against the Rust API.
 
 ## Sentence to game
 

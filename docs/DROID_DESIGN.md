@@ -28,7 +28,7 @@ Nobody writes Rhai for new games. `legacy/` keeps the old script games runnable;
 | Senne | `C:\Users\joose\Senne` | crate `senne`; game work happens on branch `game-domain`; `main` must keep passing its 70 tests |
 
 Droid depends on Senne as `senne = { path = "../../Senne" }` (relative to Droid's Cargo.toml it is `../Senne`).
-Never push to GitHub. Commit locally when a part is done, ending the message with
+Public at https://github.com/Joosehot/Droid; push only when the owner asks. Commit locally when a part is done, ending the message with
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 Never kill Python processes (trading bots run in the background on this machine).
 Shell: Git Bash on Windows. Use `python` for multi-line file patches if needed; prefer the Write/Edit tools for files.
